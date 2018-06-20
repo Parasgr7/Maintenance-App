@@ -19,6 +19,12 @@ The platform shall improve our operation efficiency, improve communication and t
 Now after following all the above steps, clone the repository in your local system using the following command:
  `$ git clone https://bitbucket.org/holidale/holidale-maintenanceapp.git/wiki`
  
+ Then go in the project's directory:
+ `cd path/to/directory`
+ 
+ And when inside the directory, run the following command to install the required packages:
+ `yarn install`
+ 
 Make sure that you get an IDE for this. I will suggest using Atom as it has all the required packages that will make the development easy.
   Link to Atom: https://atom.io/
   
