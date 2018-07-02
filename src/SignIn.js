@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Dimensions, Image, ImageBackground} from 'react-native';
+import {View, Text, AsyncStorage, Dimensions, Image, ImageBackground} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 
 var background = require('../assets/Images/login.jpg');
@@ -8,14 +8,85 @@ var logo = require('../assets/Images/logo.png');
 var height= Dimensions.get('window').height;
 var width= Dimensions.get('window').width;
 
-class SignIn extends React.Component{
-  state = {
-    email: "",
-    password: ""
-  }
-  logIn = () =>{
+const ACCESS_TOKEN = 'acess_token';
 
+class SignIn extends React.Component{
+  constructor() {
+    super()
+
+  this.state = {
+    email: "",
+    password: "",
+    error: ""
   }
+}
+
+    async storeToken (accessToken) {
+      try {
+         await AsyncStorage.setItem(ACCESS_TOKEN, accessToken);
+         this.getToken();
+      } catch (error) {
+          console.log("something went wrong")
+      }
+    }
+
+    async getToken (accessToken) {
+        try {
+          let token = await AsyncStorage.getItem(ACCESS_TOKEN, accessToken);
+            console.log("Token is:" + token);
+        } catch (error) {
+            console.log("something went wrong")
+        }
+    }
+
+    async removeToken (accessToken) {
+        try {
+           await AsyncStorage.removeItem(ACCESS_TOKEN, accessToken);
+           this.getToken();
+        } catch (error) {
+            console.log("something went wrong")
+        }
+    }
+
+async onLoginPressed() {
+  this.setState({showProgress: true})
+  try {
+    let response = await fetch('http://dev4.holidale.org/api/v1/login', {
+                            method: 'POST',
+                            headers: {
+                              'Accept': 'application/json',
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+
+                                email: this.state.email,
+                                password: this.state.password,
+
+                            })
+                          });
+    let res = await response.text();
+    console.log(response.status);
+    if (response.status >= 200 && response.status < 300) {
+        //Handle success
+        let accessToken = res;
+        console.log(accessToken);
+        //On success we will store the access_token in the AsyncStorage
+        this.storeToken(accessToken);
+        //this.redirect('home');
+    } else {
+        //Handle error
+        let error = res;
+        throw error;
+    }
+  } catch(error) {
+      this.removeToken();
+      this.setState({error: error});
+      console.log("error " + error);
+      //console.log(response.status);
+      this.setState({showProgress: false});
+  }
+}
+
   render(){
     return(
       <View style={{flex:1}}>
@@ -38,7 +109,7 @@ class SignIn extends React.Component{
                     <Input
                         autoCorrect={false}
                         onChangeText={(password)=>this.setState({password})}
-                        secureTextEntry
+
                     />
                  </Item>
               </Form>
@@ -46,11 +117,16 @@ class SignIn extends React.Component{
                  <Button
                    primary
                    block
-                   onPress={this.logIn}
+                   onPress={this.onLoginPressed.bind(this)}
                  >
                    <Text style={{color: 'white'}}>Sign In</Text>
                  </Button>
               </View>
+
+              <Text style={styles.error}>
+                 {this.state.error}
+              </Text>
+
            </View>
         </ImageBackground>
       </View>
@@ -79,6 +155,10 @@ const styles= {
     flexDirection: 'column',
     justifyContent: 'center',
     margin: 15
+  },
+  error: {
+    color: 'red',
+    paddingTop: 10
   }
 }
 
