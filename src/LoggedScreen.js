@@ -6,10 +6,9 @@ let width= Dimensions.get('window').width;
 // Creating Profile activity.
 class ProfileActivity extends Component {
 
-    // Setting up profile activity title.
     static navigationOptions =
         {
-            title: 'ProfileActivity',
+            title: 'Holidale Maintenance',
 
         };
 
