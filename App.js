@@ -7,6 +7,7 @@ import ProfileActivity from './src/LoggedScreen';
 
 // Importing Stack Navigator library to add multiple activities.
 import { createStackNavigator } from 'react-navigation';
+import WorkOrder from "./src/work_order";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -123,11 +124,13 @@ class LoginActivity extends Component {
 
 
 
-export default MainProject = createStackNavigator(
+export default MaintenanceApp = createStackNavigator(
     {
         First: { screen: LoginActivity },
 
-        Second: { screen: ProfileActivity }
+        Second: { screen: ProfileActivity },
+
+        Third: { screen: WorkOrder }
 
     });
 

@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
 import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
-import WorkOrderCalendar from './work_order_calendar';
+import {Agenda} from 'react-native-calendars';
+import { createStackNavigator } from 'react-navigation';
+
+import MaintenanceApp from '../App';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -13,6 +16,22 @@ class ProfileActivity extends Component {
             title: 'Holidale Maintenance',
 
         };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            items: {}
+        };
+    }
+
+    WorkOrderFunction = () =>{
+
+        this.props.navigation.navigate('Third');
+
+    }
+
+
+
 
 
     render()
@@ -26,24 +45,75 @@ class ProfileActivity extends Component {
                 flex: 1
             }}>
                 <View style={styles.container}>
-               <WorkOrderCalendar />
-            </View>
-                <View style = { styles.MainContainer }>
-                <Text style = {styles.TextComponentStyle}> { this.props.navigation.state.params.Email } </Text>
+                    <Agenda
+                        items={this.state.items}
+                        loadItemsForMonth={this.loadItems.bind(this)}
+                        renderItem={this.renderItem.bind(this)}
+                        renderEmptyDate={this.renderEmptyDate.bind(this)}
+                        rowHasChanged={this.rowHasChanged.bind(this)}
+                    />
+                </View>
 
-                <View style= {{marginTop:20}}>
-                    <Button
-                        primary
-                        block
-                        onPress={ () => goBack(null) }
-                    >
-                        <Text style={{color: 'white'}}>Log Out</Text>
-                    </Button>
-                </View>
-                </View>
             </View>
 
         );
+    }
+
+
+    loadItems(day) {
+        setTimeout(() => {
+            for (let i = 0; i < 31; i++) {
+                const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+                const strTime = this.timeToString(time);
+                if (!this.state.items[strTime]) {
+                    this.state.items[strTime] = [];
+                    const numItems = Math.floor(Math.random() * 5);
+                    for (let j = 0; j < numItems; j++) {
+                        this.state.items[strTime].push({
+                            name: 'Item for ' + strTime,
+                            height: Math.max(50, Math.floor(Math.random() * 150))
+                        });
+                    }
+                }
+            }
+            //console.log(this.state.items);
+            const newItems = {};
+            Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
+            this.setState({
+                items: newItems
+            });
+        }, 1000);
+
+    }
+
+    renderItem(item) {
+        return (
+            <View style={[styles.item, {height: item.height}]}>
+                <Button
+                    primary
+                    block
+                    onPress={this.WorkOrderFunction}
+                >
+                    <Text>{item.name}</Text>
+                </Button></View>
+
+
+        );
+    }
+
+    renderEmptyDate() {
+        return (
+            <View style={styles.emptyDate}><Text>This is empty date!</Text></View>
+        );
+    }
+
+    rowHasChanged(r1, r2) {
+        return r1.name !== r2.name;
+    }
+
+    timeToString(time) {
+        const date = new Date(time);
+        return date.toISOString().split('T')[0];
     }
 }
 
@@ -106,8 +176,23 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 10
+    },
+    item: {
+        backgroundColor: 'white',
+        flex: 1,
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+        marginTop: 17
+    },
+    emptyDate: {
+        height: 15,
+        flex:1,
+        paddingTop: 30
     }
 
 });
+
+
 
 export default ProfileActivity;
