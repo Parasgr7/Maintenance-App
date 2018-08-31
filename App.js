@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
+import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 
-import ProfileActivity from './src/LoggedScreen';
+import { AsyncStorage } from "react-native";
+import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
+import Icon from '@expo/vector-icons/FontAwesome';
 
-// Importing Stack Navigator library to add multiple activities.
-import { createStackNavigator } from 'react-navigation';
 import WorkOrder from "./src/work_order";
+import ProfileActivity from './src/LoggedScreen';
+import Logout from "./src/logout";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
+
+const ACCESS_TOKEN= 'access_token';
+
 
 // Creating Login Activity.
 class LoginActivity extends Component {
@@ -18,13 +23,15 @@ class LoginActivity extends Component {
     // Setting up Login Activity title.
     static navigationOptions =
         {
-            title: 'Log In',
+            // title: 'Log In',
+            header:null
         };
-
+       
+       
     constructor(props) {
 
         super(props)
-
+    
         this.state = {
 
             UserEmail: '',
@@ -32,6 +39,30 @@ class LoginActivity extends Component {
 
         }
 
+    }
+
+
+    _storeToken = async accessToken => {
+        try{
+        await AsyncStorage.setItem(ACCESS_TOKEN,JSON.stringify(accessToken))
+        this._getToken();
+    }catch(error){
+        console.log("SOMething went wrong");
+    }
+        
+    }
+
+
+    _getToken = async () => {
+        try {
+        const token = await AsyncStorage.getItem(ACCESS_TOKEN);
+        if (token !== null) {
+            this.props.navigation.navigate(token? 'App':'Auth');
+        }
+        } catch (error) {
+            console.log(error);
+            console.log("Something went wrongs");
+        }
     }
 
     UserLoginFunction = () =>{
@@ -56,18 +87,18 @@ class LoginActivity extends Component {
 
         }).then((response) => response.json())
             .then((responseJson) => {
-
+                
                 // If server response message same as Data Matched
-                if(responseJson)
-                {
-
+                if(typeof(responseJson)=='string')
+                {   
+                    this._storeToken(responseJson);
                     //Then open Profile activity and send user email to profile activity.
-                    this.props.navigation.navigate('Second', { Email: UserEmail });
-
+                    this.props.navigation.navigate('App');
+                   
                 }
                 else{
-
-                    Alert.alert(responseJson);
+                    this.props.navigation.navigate('App');
+                    // Alert.alert("Provide Proper Credentials");
                 }
 
             }).catch((error) => {
@@ -83,10 +114,11 @@ class LoginActivity extends Component {
             <View style={{flex:1}}>
                 <ImageBackground source={require('./assets/Images/login.jpg')} style={styles.backgroundImage}>
                     <View style={styles.logoImage}>
-                        <Image source={require('./assets/Images/logo.png')} style={styles.logoImagedesign}>
+                        <Image source={require('./assets/Images/logout.png')} style={styles.logoImagedesign}>
                         </Image>
                     </View>
-                    <View style={styles.inputStyle}>
+                    
+                    <KeyboardAvoidingView style={styles.inputStyle} behavior="padding">
                         <Form>
                             <Item floatingLabel>
                                 <Label style={{color: 'white'}}>Email</Label>
@@ -114,7 +146,9 @@ class LoginActivity extends Component {
                             </Button>
                         </View>
 
-                    </View>
+                    </KeyboardAvoidingView>
+
+                    
                 </ImageBackground>
             </View>
 
@@ -122,17 +156,82 @@ class LoginActivity extends Component {
     }
 }
 
+const Tabs = createBottomTabNavigator({
+    Home:   {
+        screen: ProfileActivity,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Icon name="home" size={24} color={tintColor}/>
+            )
+            
+        })},
+    User:  {
+        screen: Logout,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Icon name="user" size={24} color={tintColor}/>
+            )
+            
+        })
+    } 
+},{
+    tabBarOptions: {
+        showLabel: false,
+        activeTintColor: '#45AAC5',
+        inactiveTintColor: 'black',
+        style: {
+          backgroundColor: 'white',
+        },
+      }
+    }
+)
+
+const AppStack = createStackNavigator({ 
+                SecondPage: Tabs, 
+                ThirdPage: WorkOrder, 
+                navigationOptions: () => ({
+                        
+                }),
+                LastPage: {
+                       screen: Logout,
+                      
+
+            
+                } },{
+                    // initialRouteName: 'SecondPage',
+                    navigationOptions: {
+                      headerStyle: {
+                        backgroundColor: 'black',
+                      },
+                      headerTintColor: '#fff',
+                      headerTitleStyle: {
+                        fontWeight: 'bold',
+                      },
+                      headerBackground: (
+                        <Image
+                          style={{width: 150,height: 100,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
+                          source= {require('./assets/Images/logout.png')}
+                        />
+                      ),
+                    },
+                  }
+                
+  
+  );
+const AuthStack = createStackNavigator({ First: LoginActivity });
 
 
-export default MaintenanceApp = createStackNavigator(
+
+export default MaintenanceApp = createSwitchNavigator(
     {
-        First: { screen: LoginActivity },
+        App: AppStack,
+        Auth: AuthStack,
 
-        Second: { screen: ProfileActivity },
-
-        Third: { screen: WorkOrder }
-
-    });
+    },
+    {
+        initialRouteName: 'Auth',
+    }
+);
 
 const styles = StyleSheet.create({
 
@@ -175,7 +274,7 @@ const styles = StyleSheet.create({
     },
     logoImagedesign: {
         marginTop: 100,
-        width: 100,
+        width: 300,
         height: 100,
         resizeMode: 'contain'
     },

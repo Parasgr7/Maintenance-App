@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 import {Agenda} from 'react-native-calendars';
-import { createStackNavigator } from 'react-navigation';
 
 import MaintenanceApp from '../App';
 
@@ -13,10 +12,10 @@ class ProfileActivity extends Component {
 
     static navigationOptions =
         {
-            title: 'Holidale Maintenance',
+            title: 'Home'
 
-        };
-
+        }
+        
     constructor(props) {
         super(props);
         this.state = {
@@ -26,7 +25,7 @@ class ProfileActivity extends Component {
 
     WorkOrderFunction = () =>{
 
-        this.props.navigation.navigate('Third');
+        this.props.navigation.navigate('ThirdPage');
 
     }
 
@@ -62,21 +61,41 @@ class ProfileActivity extends Component {
 
     loadItems(day) {
         setTimeout(() => {
-            for (let i = 0; i < 31; i++) {
+            for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
                 const strTime = this.timeToString(time);
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
-                    const numItems = Math.floor(Math.random() * 5);
-                    for (let j = 0; j < numItems; j++) {
-                        this.state.items[strTime].push({
-                            name: 'Item for ' + strTime,
-                            height: Math.max(50, Math.floor(Math.random() * 150))
-                        });
-                    }
-                }
+                    const userData = {token:108574197299687074239, date:strTime};
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+
+                            // If server response message same as Data Matched
+                            if(responseJson)
+                            {
+                               console.log(responseJson);
+                                const numItems = responseJson.length;
+                                for (let j = 0; j < numItems; j++) {
+                                    this.state.items[strTime].push({
+                                        name: responseJson[j].name,
+                                        id: responseJson[j].id,
+                                        height: Math.max(50, Math.floor(Math.random() * 150))
+                                    });
+                                }
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+
+                }  
             }
-            //console.log(this.state.items);
             const newItems = {};
             Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
             this.setState({
@@ -95,6 +114,7 @@ class ProfileActivity extends Component {
                     onPress={this.WorkOrderFunction}
                 >
                     <Text>{item.name}</Text>
+                    <Text>{item.id}</Text>
                 </Button></View>
 
 
@@ -128,7 +148,9 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        // marginTop: 50
+
     },
 
     TextInputStyleClass: {

@@ -4,6 +4,7 @@ import {Form, Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { AsyncStorage } from "react-native";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -13,11 +14,11 @@ class WorkOrder extends Component {
 
     static navigationOptions =
         {
-            title: 'Work Order',
-
+            // title: 'Work Order',
+            // headerTitle: null
         };
 
-
+    
     render()
     {
         const InventoryState = {
