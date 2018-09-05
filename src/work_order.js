@@ -1,16 +1,21 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
+import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, ImageBackground, Dimensions, Share, ActivityIndicator, Clipboard} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import { AsyncStorage } from "react-native";
 
+import {Permissions, ImagePicker } from 'expo';
+
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
 
 class WorkOrder extends Component {
 
+    state = {
+        image: null,
+    };
 
     static navigationOptions =
         {
@@ -21,6 +26,8 @@ class WorkOrder extends Component {
     
     render()
     {
+        let { image } = this.state;
+
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count'],
             tableData: [
@@ -88,7 +95,9 @@ class WorkOrder extends Component {
                                     name='camera'
                                     type='font-awesome'
                                     color='#517fa4'
-                                    onPress={() => console.log('hello')} />
+                                    onPress={this._pickImage} />
+                                {this._maybeRenderImage()}
+                                {this._maybeRenderUploadingOverlay()}
                             </ScrollView>
                             <ScrollView style={ {margin: 7}}>
                                 <Icon
@@ -131,6 +140,136 @@ class WorkOrder extends Component {
 
         );
     }
+
+    _maybeRenderUploadingOverlay = () => {
+        if (this.state.uploading) {
+            return (
+                <View
+                    style={[StyleSheet.absoluteFill, styles.maybeRenderUploading]}>
+                    <ActivityIndicator color="#fff" size="large" />
+                </View>
+            );
+        }
+    };
+
+    _maybeRenderImage = () => {
+        let {
+            image
+        } = this.state;
+
+        if (!image) {
+            return;
+        }
+
+        return (
+            <View
+                style={styles.maybeRenderContainer}>
+                <View
+                    style={styles.maybeRenderImageContainer}>
+                    <Image source={{ uri: image }} style={styles.maybeRenderImage} />
+                </View>
+
+                <Text
+                    onPress={this._copyToClipboard}
+                    onLongPress={this._share}
+                    style={styles.maybeRenderImageText}>
+                    {image}
+                </Text>
+            </View>
+        );
+    };
+
+    _share = () => {
+        Share.share({
+            message: this.state.image,
+            title: 'Check out this photo',
+            url: this.state.image,
+        });
+    };
+
+    _copyToClipboard = () => {
+        Clipboard.setString(this.state.image);
+        alert('Copied image URL to clipboard');
+    };
+
+    _pickImage = async () => {
+        const {
+            status: cameraRollPerm
+        } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+        // only if user allows permission to camera roll
+        if (cameraRollPerm === 'granted') {
+            let pickerResult = await ImagePicker.launchImageLibraryAsync({
+                allowsEditing: true,
+                aspect: [4, 3],
+            });
+
+            this._handleImagePicked(pickerResult);
+        }
+    };
+
+    _handleImagePicked = async pickerResult => {
+        let uploadResponse, uploadResult;
+
+        try {
+            this.setState({
+                uploading: true
+            });
+
+            if (!pickerResult.cancelled) {
+                uploadResponse = await uploadImageAsync(pickerResult.uri);
+                uploadResult = await uploadResponse.json();
+                console.log(uploadResponse);
+                console.log(uploadResult);
+                this.setState({
+                    image: uploadResult.location
+                });
+            }
+        } catch (e) {
+            console.log({ uploadResponse });
+            console.log({ uploadResult });
+            console.log({ e });
+            alert('Upload failed, sorry :(');
+        } finally {
+            this.setState({
+                uploading: false
+            });
+        }
+    };
+}
+
+async function uploadImageAsync(uri) {
+    let apiUrl = 'https://file-upload-example-backend-dkhqoilqqn.now.sh/upload';
+
+    // Note:
+    // Uncomment this if you want to experiment with local server
+    //
+    // if (Constants.isDevice) {
+    //   apiUrl = `https://your-ngrok-subdomain.ngrok.io/upload`;
+    // } else {
+    //   apiUrl = `http://localhost:3000/upload`
+    // }
+
+    let uriParts = uri.split('.');
+    let fileType = uriParts[uriParts.length - 1];
+
+    let formData = new FormData();
+    formData.append('photo', {
+        uri,
+        name: `photo.${fileType}`,
+        type: `image/${fileType}`,
+    });
+
+    let options = {
+        method: 'POST',
+        body: formData,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+        },
+    };
+
+    return fetch(apiUrl, options);
 }
 
 const styles = StyleSheet.create({
@@ -209,6 +348,38 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 10
+    },
+
+    maybeRenderUploading: {
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+    },
+    maybeRenderContainer: {
+        borderRadius: 3,
+        elevation: 2,
+        marginTop: 30,
+        shadowColor: 'rgba(0,0,0,1)',
+        shadowOpacity: 0.2,
+        shadowOffset: {
+            height: 4,
+            width: 4,
+        },
+        shadowRadius: 5,
+        width: 250,
+    },
+    maybeRenderImageContainer: {
+        borderTopLeftRadius: 3,
+        borderTopRightRadius: 3,
+        overflow: 'hidden',
+    },
+    maybeRenderImage: {
+        height: 250,
+        width: 250,
+    },
+    maybeRenderImageText: {
+        paddingHorizontal: 10,
+        paddingVertical: 10,
     }
 
 });
