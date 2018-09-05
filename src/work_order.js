@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
+import { StyleSheet, TextInput, ScrollView, Alert, Text,  Image, ImageBackground, Dimensions, Picker} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import { AsyncStorage } from "react-native";
+
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -15,12 +16,77 @@ class WorkOrder extends Component {
     static navigationOptions =
         {
             // title: 'Work Order',
-            // headerTitle: null
         };
+        constructor(){
+            super();
+            this.state = {
+                data: {
+                    "listings":["Overview"]
+                },
+            }
+        }
+    
+        componentDidMount(){
+
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        const userData=this.props.navigation.state.params.param.userData;
+        if (check==1){
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {
+                                let res = responseJson;
+                                console.log(res);
+                                
+                                this.setState({
+                                    data: res[0]   
+                                });
+
+                                
+                                
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+        else{
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {
+                                let res= responseJson;
+                                console.log(res);
+                                this.setState({
+                                    data: res[0]
+                                });
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+           
+        }
+    
 
     
     render()
-    {
+    {   
+        console.log(this.state.data.listings);
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count'],
             tableData: [
@@ -50,11 +116,11 @@ class WorkOrder extends Component {
         const {goBack} = this.props.navigation;
 
         return(
-
+            
             <ScrollView style={styles.container}>
-                <Text style={styles. WorkOrderTextStyle}>Checkout Inspection</Text>
-                <Text style={styles.TextComponentStyle}>8 Corporate Park, Irvine CA</Text>
-                <Text style={styles.TextComponentStyle}>Due: 11:00 AM 05/24/18</Text>
+                <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.address}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.due}</Text>
                 <ScrollView style={[{flex: 1}, styles.elementsContainer]}>
                     <ScrollView style={{flex: 1}}>
                        <Dropdown
