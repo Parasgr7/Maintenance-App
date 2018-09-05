@@ -9,6 +9,7 @@ import { AsyncStorage } from "react-native";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
+var PickerItem = Picker.Item;
 
 class WorkOrder extends Component {
 
@@ -23,6 +24,7 @@ class WorkOrder extends Component {
                 data: {
                     "listings":["Overview"]
                 },
+                selectedService: "Overview"
             }
         }
     
@@ -38,7 +40,6 @@ class WorkOrder extends Component {
                             if(responseJson)
                             {
                                 let res = responseJson;
-                                console.log(res);
                                 
                                 this.setState({
                                     data: res[0]   
@@ -64,7 +65,7 @@ class WorkOrder extends Component {
                             if(responseJson)
                             {
                                 let res= responseJson;
-                                console.log(res);
+                        
                                 this.setState({
                                     data: res[0]
                                 });
@@ -86,7 +87,7 @@ class WorkOrder extends Component {
     
     render()
     {   
-        console.log(this.state.data.listings);
+        
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count'],
             tableData: [
@@ -104,6 +105,20 @@ class WorkOrder extends Component {
                 ['Carpet Cleaning', '$150']
             ]
         };
+        
+        // let x=[];
+        // for(let i=0;i<this.state.data.listings.length;i++)
+        // {
+        //     x.push({
+        //         value: this.state.data.listings[i]
+        //     })
+        // }   
+        // console.log(x);
+
+        let serviceItems = this.state.data.listings.map( (s, i) => {
+            return <Picker.Item key={i} value={s} label={s} />
+        });
+
 
         let data = [{
             value: 'Overview',
@@ -114,6 +129,7 @@ class WorkOrder extends Component {
         }];
 
         const {goBack} = this.props.navigation;
+        console.log(this.state.selectedService)
 
         return(
             
@@ -125,8 +141,24 @@ class WorkOrder extends Component {
                     <ScrollView style={{flex: 1}}>
                        <Dropdown
                          label='Select Area'
-                         data={data}
+                         data={data} 
+                        //  onPress={()=>{
+                        //     let { data } = this.state;
+                        
+                        //     console.log( data);
+                        //   }}
                        />
+                       <Picker
+                        // style={{ height: 100, width: 200 }}
+                        selectedValue={this.state.selectedService}
+                        onValueChange={ (service) => ( this.setState({selectedService:service}) ) }
+                        // itemStyle={{ backgroundColor: "grey", color: "blue", fontSize:17 }}
+                        >
+
+                        {serviceItems}
+
+                        </Picker>
+                       
 
                     </ScrollView>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
