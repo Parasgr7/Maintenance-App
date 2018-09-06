@@ -27,7 +27,7 @@ Now after following all the above steps, clone the repository in your local syst
  And when inside the directory, run the following command to install the required packages:
  `yarn install`
  
-Make sure that you get an IDE for this. I will suggest using Atom as it has all the required packages that will make the development easy.
-  Link to Atom: https://atom.io/
+Make sure that you get an IDE for this. I will suggest using Webstorm as it has all the required packages that will make the development easy.
+  Link to Webstorm: https://www.jetbrains.com/webstorm/
   
  Now to run the project run "expo start" from project directory path.
