@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, ImageBackground, Dimensions, Share, ActivityIndicator, Clipboard} from 'react-native';
+import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, ImageBackground, Dimensions, Share, ActivityIndicator, Clipboard, Picker} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -13,7 +13,6 @@ import {Permissions, ImagePicker } from 'expo';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-var PickerItem = Picker.Item;
 
 class WorkOrder extends Component {
 
@@ -23,17 +22,18 @@ class WorkOrder extends Component {
         pickerResult:''
     };
 
-    static navigationOptions =
-        {
+    // static navigationOptions =
+    //     {
  
-        };
+    //     };
         constructor(){
             super();
             this.state = {
                 data: {
                     "listings":["Overview"]
                 },
-                selectedService: "Overview"
+                area:""
+                
             }
         }
     
@@ -43,7 +43,7 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
         if (check==1){
-            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -53,9 +53,6 @@ class WorkOrder extends Component {
                                 this.setState({
                                     data: res[0]   
                                 });
-
-                                
-                                
 
                             }
                             else{
@@ -68,7 +65,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -116,30 +113,31 @@ class WorkOrder extends Component {
             ]
         };
         
-        // let x=[];
-        // for(let i=0;i<this.state.data.listings.length;i++)
-        // {
-        //     x.push({
-        //         value: this.state.data.listings[i]
-        //     })
-        // }   
-        // console.log(x);
+        let data=[];
+        for(let i=0;i<this.state.data.listings.length;i++)
+        {
+            data.push({
+                value: this.state.data.listings[i]
+            })
+        }   
+ 
 
-        let serviceItems = this.state.data.listings.map( (s, i) => {
-            return <Picker.Item key={i} value={s} label={s} />
-        });
+        // let serviceItems = this.state.data.listings.map( (s, i) => {
+        //     return <Picker.Item key={i} value={s} label={s} />
+        // });
 
 
-        let data = [{
-            value: 'Overview',
-        }, {
-            value: 'Master Bedroom',
-        }, {
-            value: 'Garage',
-        }];
+        // let data = [{
+        //     value: 'Overview',
+        // }, {
+        //     value: 'Master Bedroom',
+        // }, {
+        //     value: 'Garage',
+        // }];
+        // console.log(this.state.note);
 
         const {goBack} = this.props.navigation;
-        console.log(this.state.selectedService)
+        // console.log(this.state.selectedService)
 
         return(
             
@@ -152,22 +150,9 @@ class WorkOrder extends Component {
                        <Dropdown
                          label='Select Area'
                          data={data} 
-                        //  onPress={()=>{
-                        //     let { data } = this.state;
-                        
-                        //     console.log( data);
-                        //   }}
+                         onChangeText={(value,index,data)=>{this.setState({area:value})}}
                        />
-                       <Picker
-                        // style={{ height: 100, width: 200 }}
-                        selectedValue={this.state.selectedService}
-                        onValueChange={ (service) => ( this.setState({selectedService:service}) ) }
-                        // itemStyle={{ backgroundColor: "grey", color: "blue", fontSize:17 }}
-                        >
-
-                        {serviceItems}
-
-                        </Picker>
+                       
                        
 
                     </ScrollView>
@@ -280,7 +265,7 @@ class WorkOrder extends Component {
                 <Button
                     primary
                     block
-                    onPress={()=>{ this.uploadNotes(this.state.image,this.state.text)}}
+                    onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}
                 >
                <Text>Upload</Text>
                 </Button>
@@ -414,7 +399,7 @@ async function uploadImageAsync(uri) {
       }
 
     const options = {
-        // keyPrefix: "uploads/",
+        keyPrefix: "uploads/",
         bucket: "holidale-maintenance-app",
         region: "us-east-2",
         accessKey: "AKIAJ4XF6TLKXHLKHERQ",
