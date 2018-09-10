@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
+import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback} from 'react-native';
+import {Form, Item, Label, Input} from 'native-base';
 
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
 import Icon from '@expo/vector-icons/FontAwesome';
+
 
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
@@ -47,7 +48,7 @@ class LoginActivity extends Component {
         await AsyncStorage.setItem(ACCESS_TOKEN,JSON.stringify(accessToken))
         this._getToken();
     }catch(error){
-        console.log("SOMething went wrong");
+        console.log("Something went wrong");
     }
         
     }
@@ -61,7 +62,7 @@ class LoginActivity extends Component {
         }
         } catch (error) {
             console.log(error);
-            console.log("Something went wrongs");
+            console.log("Something went wrong");
         }
     }
 
@@ -118,33 +119,32 @@ class LoginActivity extends Component {
                         </Image>
                     </View>
                     
-                    <KeyboardAvoidingView style={styles.inputStyle} behavior="padding">
+                    <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled>
                         <Form>
-                            <Item floatingLabel>
-                                <Label style={{color: 'white'}}>Email</Label>
+                            <Item >
                                 <Input
                                     autoCorrect={false}
+                                    placeholder="Email"
+                                    placeholderTextColor="white"
                                     onChangeText={UserEmail => this.setState({UserEmail})}
                                 />
                             </Item>
-                            <Item floatingLabel>
-                                <Label style={{color: 'white'}}>Password</Label>
+                            <Item >
                                 <Input
                                     autoCorrect={false}
+                                    placeholder="Password"
+                                    placeholderTextColor="white"
                                     onChangeText={UserPassword => this.setState({UserPassword})}
-
                                 />
                             </Item>
-                        </Form>
-                        <View style= {{marginTop:20}}>
-                            <Button
-                                primary
-                                block
-                                onPress={this.UserLoginFunction}
-                            >
-                                <Text style={{color: 'white'}}>Sign In</Text>
-                            </Button>
-                        </View>
+                            </Form>
+                            <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
+                                <Text style={styles.TextStyle}> Sign In </Text>
+                            </TouchableOpacity>
+ 
+                           
+                        
+                        
 
                     </KeyboardAvoidingView>
 
@@ -178,9 +178,9 @@ const Tabs = createBottomTabNavigator({
     tabBarOptions: {
         showLabel: false,
         activeTintColor: '#45AAC5',
-        inactiveTintColor: 'black',
+        inactiveTintColor: 'white',
         style: {
-          backgroundColor: 'white',
+          backgroundColor: 'black',
         },
       }
     }
@@ -273,9 +273,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     logoImagedesign: {
-        marginTop: 100,
+        marginTop: 80,
         width: 300,
-        height: 100,
         resizeMode: 'contain'
     },
     inputStyle: {
@@ -287,6 +286,22 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 10
-    }
+    },
+    SubmitButtonStyle: {
+ 
+        marginTop:30,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+      },
+     
+      TextStyle:{
+          color:'#fff',
+          textAlign:'center',
+          fontSize:20
+      }
 
 });

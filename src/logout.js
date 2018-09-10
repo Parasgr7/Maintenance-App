@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
+import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,TouchableOpacity} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 
 
@@ -43,20 +43,11 @@ class Logout extends Component {
                     <Text style={styles.WorkOrderTextStyle}>Paras</Text>
                             
                 
-                    <View style={styles.inputStyle}>
-                        <View style= {{marginTop:20}}>
-                            <Button
-                                primary
-                                block
-                                onPress={this._signOutAsync}
-                                style={{borderRadius:10}}>
-                                <Text style={{color: 'white'}}>Log out</Text>
-                            </Button>
-                        </View>
-
-                    </View>
-                </ImageBackground>
-            </View>
+                    <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this._signOutAsync }>
+                                <Text style={styles.TextStyle}> Logout </Text>
+                    </TouchableOpacity>
+                    </ImageBackground>
+               </View>
 
         );
     }
@@ -103,9 +94,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     logoImagedesign: {
-        marginTop: 100,
+        marginTop: 80,
         width: 300,
-        height: 100,
         resizeMode: 'contain'
     },
     inputStyle: {
@@ -123,7 +113,23 @@ const styles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 10
-    }
+    },
+    SubmitButtonStyle: {
+ 
+        marginTop:40,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+      },
+     
+      TextStyle:{
+          color:'#fff',
+          textAlign:'center',
+          fontSize:20
+      }
 
 });
 

@@ -10,8 +10,10 @@ import { RNS3 } from 'react-native-aws3';
 
 import {Permissions, ImagePicker } from 'expo';
 
+
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
+var PickerItem = Picker.Item;
 
 class WorkOrder extends Component {
 
@@ -25,6 +27,71 @@ class WorkOrder extends Component {
         {
  
         };
+        constructor(){
+            super();
+            this.state = {
+                data: {
+                    "listings":["Overview"]
+                },
+                selectedService: "Overview"
+            }
+        }
+    
+        componentDidMount(){
+
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        const userData=this.props.navigation.state.params.param.userData;
+        if (check==1){
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {
+                                let res = responseJson;
+                                
+                                this.setState({
+                                    data: res[0]   
+                                });
+
+                                
+                                
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+        else{
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {
+                                let res= responseJson;
+                        
+                                this.setState({
+                                    data: res[0]
+                                });
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+           
+        }
+    
 
     
     render()
@@ -48,6 +115,20 @@ class WorkOrder extends Component {
                 ['Carpet Cleaning', '$150']
             ]
         };
+        
+        // let x=[];
+        // for(let i=0;i<this.state.data.listings.length;i++)
+        // {
+        //     x.push({
+        //         value: this.state.data.listings[i]
+        //     })
+        // }   
+        // console.log(x);
+
+        let serviceItems = this.state.data.listings.map( (s, i) => {
+            return <Picker.Item key={i} value={s} label={s} />
+        });
+
 
         let data = [{
             value: 'Overview',
@@ -58,19 +139,36 @@ class WorkOrder extends Component {
         }];
 
         const {goBack} = this.props.navigation;
+        console.log(this.state.selectedService)
 
         return(
-
+            
             <ScrollView style={styles.container}>
-                <Text style={styles. WorkOrderTextStyle}>Checkout Inspection</Text>
-                <Text style={styles.TextComponentStyle}>8 Corporate Park, Irvine CA</Text>
-                <Text style={styles.TextComponentStyle}>Due: 11:00 AM 05/24/18</Text>
+                <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.address}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.due}</Text>
                 <ScrollView style={[{flex: 1}, styles.elementsContainer]}>
                     <ScrollView style={{flex: 1}}>
                        <Dropdown
                          label='Select Area'
-                         data={data}
+                         data={data} 
+                        //  onPress={()=>{
+                        //     let { data } = this.state;
+                        
+                        //     console.log( data);
+                        //   }}
                        />
+                       <Picker
+                        // style={{ height: 100, width: 200 }}
+                        selectedValue={this.state.selectedService}
+                        onValueChange={ (service) => ( this.setState({selectedService:service}) ) }
+                        // itemStyle={{ backgroundColor: "grey", color: "blue", fontSize:17 }}
+                        >
+
+                        {serviceItems}
+
+                        </Picker>
+                       
 
                     </ScrollView>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',

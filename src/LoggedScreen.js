@@ -1,7 +1,13 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
+import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,TouchableOpacity} from 'react-native';
 import {Form, Item, Label, Input, Button} from 'native-base';
 import {Agenda} from 'react-native-calendars';
+import WorkOrder from "./work_order";
+
+
+import { AsyncStorage } from "react-native";
+
+const ACCESS_TOKEN= 'access_token';
 
 import MaintenanceApp from '../App';
 
@@ -19,14 +25,31 @@ class ProfileActivity extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: {}
+            items: {},
+            data:{}
         };
     }
 
-    WorkOrderFunction = () =>{
+    _getToken = async () => {
+        try {
+        const token = await AsyncStorage.getItem(ACCESS_TOKEN);
+        // console.log(token);
+ 
+        } catch (error) {
 
-        this.props.navigation.navigate('ThirdPage');
+            console.log("Something went wrong");
+        }
+    }
 
+    WorkOrderFunction = (item) =>{
+        this._getToken();
+        // const token=  AsyncStorage.getItem(ACCESS_TOKEN);
+
+
+        this.state.data={id:item.id,check:item.check,userData:{token:108574197299687074239,date:item.date}};
+        // console.log(this.state.data);
+        this.props.navigation.navigate('ThirdPage',{param:this.state.data});
+        
     }
 
 
@@ -59,6 +82,7 @@ class ProfileActivity extends Component {
 
 
     loadItems(day) {
+        
         setTimeout(() => {
             for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
@@ -73,13 +97,16 @@ class ProfileActivity extends Component {
                             // If server response message same as Data Matched
                             if(responseJson)
                             {
-                               console.log(responseJson);
                                 const numItems = responseJson.length;
                                 for (let j = 0; j < numItems; j++) {
                                     this.state.items[strTime].push({
                                         name: responseJson[j].name,
                                         id: responseJson[j].id,
-                                        height: Math.max(50, Math.floor(Math.random() * 150))
+                                        address: responseJson[j].address,
+                                        status: responseJson[j].status,
+                                        height: Math.max(50, Math.floor(Math.random() * 150)),
+                                        check:responseJson[j].check,
+                                        date:strTime
                                     });
                                 }
 
@@ -105,16 +132,14 @@ class ProfileActivity extends Component {
     }
 
     renderItem(item) {
-        return (
-            <View style={[styles.item, {height: item.height}]}>
-                <Button
-                    primary
-                    block
-                    onPress={this.WorkOrderFunction}
-                >
-                    <Text>{item.name}</Text>
-                    <Text>{item.id}</Text>
-                </Button></View>
+        return ( <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.WorkOrderFunction(item) } }>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.TextStyle}>{item.name}</Text>
+                    <Text style={styles.TextStyle3}>{item.status}</Text>
+                </View>
+                <Text style={styles.TextStyle2}>{item.address}</Text>
+                 </TouchableOpacity>
+           
 
 
         );
@@ -209,7 +234,36 @@ const styles = StyleSheet.create({
     emptyDate: {
         height: 15,
         flex:1,
-        paddingTop: 30
+        paddingTop: 30,
+        marginLeft:30
+    }, 
+    SubmitButtonStyle: {
+ 
+        marginTop:30,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+      },
+     
+      TextStyle:{
+          color:'#fff',
+          fontSize:16,
+          marginLeft:10,
+          fontWeight:'bold'
+      },
+      TextStyle2:{
+        color:'#fff',
+        fontSize:14,
+        marginLeft:10
+    },
+    TextStyle3:{
+        color:'#fff',
+        fontSize:15,
+        marginLeft:60
+        
     }
 
 });
