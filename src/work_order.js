@@ -117,9 +117,9 @@ class WorkOrder extends Component {
             })
         }   
  
-
+        
         const {goBack} = this.props.navigation;
-        console.log(this.state.area)
+     
 
         return(
             
@@ -294,8 +294,9 @@ class WorkOrder extends Component {
             });
 
             if (!pickerResult.cancelled) {
-                uploadResponse = await uploadImageAsync(pickerResult.uri);
+                uploadResponse = await this.uploadImageAsync(pickerResult.uri);
                 uploadResult = await uploadResponse;
+                console.log(uploadResult);
               this.setState({
                     image: uploadResult.location,
                 });
@@ -368,37 +369,72 @@ class WorkOrder extends Component {
         }
     
     }
+
+     uploadImageAsync= async(uri)=> {
+        let uriParts = uri.split('.');
+        let fileType = uriParts[uriParts.length - 1];
+
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        
+        const file = {
+            uri: uri,
+            name: `photo.${fileType}`,
+            type: `image/${fileType}`
+          }
+          
+          console.log(check);
+          console.log(id);
+        const options = {
+            keyPrefix: "work-order/"+(check?"cleaning_schedule/":"service_schedule/")+id.toString()+"/images/",
+            bucket: "holidale-maintenance-app",
+            region: "us-east-2",
+            accessKey: "AKIAJ4XF6TLKXHLKHERQ",
+            secretKey: "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",
+            successActionStatus: 201,
+         
+          }
+          console.log(options);
+    
+        return RNS3.put(file, options).then(response => {
+            if (response.status !== 201)
+              throw new Error("Failed to upload image to S3");
+            return response.body.postResponse;
+          });
+    
+    }
     
     
 }
 
-async function uploadImageAsync(uri) {
-    let uriParts = uri.split('.');
-    let fileType = uriParts[uriParts.length - 1];
+// async function uploadImageAsync(uri) {
+//     let uriParts = uri.split('.');
+//     let fileType = uriParts[uriParts.length - 1];
     
-    const file = {
-        uri: uri,
-        name: `photo.${fileType}`,
-        type: `image/${fileType}`
-      }
-
-    const options = {
-        keyPrefix: "uploads/",
-        bucket: "holidale-maintenance-app",
-        region: "us-east-2",
-        accessKey: "AKIAJ4XF6TLKXHLKHERQ",
-        secretKey: "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",
-        successActionStatus: 201,
+//     const file = {
+//         uri: uri,
+//         name: `photo.${fileType}`,
+//         type: `image/${fileType}`
+//       }
+//     console.log(check);
+//     console.log(id);
+//     const options = {
+//         keyPrefix: "work-order/"+check?"cleaning_schedule/":"service_schedule/"+id+"/images",
+//         bucket: "holidale-maintenance-app",
+//         region: "us-east-2",
+//         accessKey: "AKIAJ4XF6TLKXHLKHERQ",
+//         secretKey: "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",
+//         successActionStatus: 201,
      
-      }
+//       }
 
-    return RNS3.put(file, options).then(response => {
-        if (response.status !== 201)
-          throw new Error("Failed to upload image to S3");
-        return response.body.postResponse;
-      });
+//     return RNS3.put(file, options).then(response => {
+//         if (response.status !== 201)
+//           throw new Error("Failed to upload image to S3");
+//         return response.body.postResponse;
+//       });
 
-}
+// }
 
 
 const styles = StyleSheet.create({
