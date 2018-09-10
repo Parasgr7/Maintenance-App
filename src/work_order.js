@@ -5,6 +5,8 @@ import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import { AsyncStorage } from "react-native";
+import { RNS3 } from 'react-native-aws3';
+
 
 import {Permissions, ImagePicker } from 'expo';
 
@@ -15,12 +17,13 @@ class WorkOrder extends Component {
 
     state = {
         image: null,
+        text: '',
+        pickerResult:''
     };
 
     static navigationOptions =
         {
-            // title: 'Work Order',
-            // headerTitle: null
+ 
         };
 
     
@@ -95,7 +98,8 @@ class WorkOrder extends Component {
                                     name='camera'
                                     type='font-awesome'
                                     color='#517fa4'
-                                    onPress={this._pickImage} />
+                                    onPress={this._pickImage} 
+                                />
                                 {this._maybeRenderImage()}
                                 {this._maybeRenderUploadingOverlay()}
                             </ScrollView>
@@ -146,7 +150,7 @@ class WorkOrder extends Component {
             return (
                 <View
                     style={[StyleSheet.absoluteFill, styles.maybeRenderUploading]}>
-                    <ActivityIndicator color="#fff" size="large" />
+                    <ActivityIndicator color="red" size="small" />
                 </View>
             );
         }
@@ -154,28 +158,37 @@ class WorkOrder extends Component {
 
     _maybeRenderImage = () => {
         let {
-            image
+            image,
         } = this.state;
-
+        // console.log(image);
         if (!image) {
             return;
         }
-
+        // console.log(this.state.text);
         return (
             <View
-                style={styles.maybeRenderContainer}>
+                style={styles.maybeRenderImageText}>
+                 
                 <View
                     style={styles.maybeRenderImageContainer}>
                     <Image source={{ uri: image }} style={styles.maybeRenderImage} />
                 </View>
 
-                <Text
-                    onPress={this._copyToClipboard}
-                    onLongPress={this._share}
-                    style={styles.maybeRenderImageText}>
-                    {image}
-                </Text>
+                <TextInput
+                    style={{height: 40, borderColor: 'gray', borderWidth: 2}}
+                    onChangeText={(text) => this.setState({text})}
+                    value={this.state.text}
+                />
+                <Button
+                    primary
+                    block
+                    onPress={()=>{ this.uploadNotes(this.state.image,this.state.text)}}
+                >
+               <Text>Upload</Text>
+                </Button>
+       
             </View>
+            
         );
     };
 
@@ -193,22 +206,21 @@ class WorkOrder extends Component {
     };
 
     _pickImage = async () => {
+
         const {
             status: cameraRollPerm
         } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-
         // only if user allows permission to camera roll
         if (cameraRollPerm === 'granted') {
-            let pickerResult = await ImagePicker.launchImageLibraryAsync({
+             pickerResult = await ImagePicker.launchImageLibraryAsync({
                 allowsEditing: true,
-                aspect: [4, 3],
-            });
-
+                aspect: [4, 3]
+            });  
             this._handleImagePicked(pickerResult);
         }
     };
 
-    _handleImagePicked = async pickerResult => {
+    _handleImagePicked = async (pickerResult) => {
         let uploadResponse, uploadResult;
 
         try {
@@ -218,16 +230,14 @@ class WorkOrder extends Component {
 
             if (!pickerResult.cancelled) {
                 uploadResponse = await uploadImageAsync(pickerResult.uri);
-                uploadResult = await uploadResponse.json();
-                console.log(uploadResponse);
-                console.log(uploadResult);
-                this.setState({
-                    image: uploadResult.location
+                uploadResult = await uploadResponse;
+              this.setState({
+                    image: uploadResult.location,
                 });
             }
         } catch (e) {
             console.log({ uploadResponse });
-            console.log({ uploadResult });
+        
             console.log({ e });
             alert('Upload failed, sorry :(');
         } finally {
@@ -236,46 +246,97 @@ class WorkOrder extends Component {
             });
         }
     };
+
+    uploadNotes= (link,text,area,id)=> {
+
+        if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/notesupload/cleaning_schedules/'+id+'/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    image: link,
+                    note: text,
+                    area: area,
+                    id: id
+
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/notesupload/service_schedules/'+id+'/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    image: link,
+                    note: text,
+                    area: area,
+                    id: id
+
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+    
+    }
+    
+    
 }
 
 async function uploadImageAsync(uri) {
-    let apiUrl = 'https://file-upload-example-backend-dkhqoilqqn.now.sh/upload';
-
-    // Note:
-    // Uncomment this if you want to experiment with local server
-    //
-    // if (Constants.isDevice) {
-    //   apiUrl = `https://your-ngrok-subdomain.ngrok.io/upload`;
-    // } else {
-    //   apiUrl = `http://localhost:3000/upload`
-    // }
-
     let uriParts = uri.split('.');
     let fileType = uriParts[uriParts.length - 1];
-
-    let formData = new FormData();
-    formData.append('photo', {
-        uri,
+    
+    const file = {
+        uri: uri,
         name: `photo.${fileType}`,
-        type: `image/${fileType}`,
-    });
+        type: `image/${fileType}`
+      }
 
-    let options = {
-        method: 'POST',
-        body: formData,
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'multipart/form-data',
-        },
-    };
+    const options = {
+        // keyPrefix: "uploads/",
+        bucket: "holidale-maintenance-app",
+        region: "us-east-2",
+        accessKey: "AKIAJ4XF6TLKXHLKHERQ",
+        secretKey: "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",
+        successActionStatus: 201,
+     
+      }
 
-    return fetch(apiUrl, options);
+    return RNS3.put(file, options).then(response => {
+        if (response.status !== 201)
+          throw new Error("Failed to upload image to S3");
+        return response.body.postResponse;
+      });
+
 }
+
 
 const styles = StyleSheet.create({
 
     MainContainer :{
-
 
         flex:1,
         margin: 10,
@@ -352,7 +413,7 @@ const styles = StyleSheet.create({
 
     maybeRenderUploading: {
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'black',
         justifyContent: 'center',
     },
     maybeRenderContainer: {
@@ -371,11 +432,11 @@ const styles = StyleSheet.create({
     maybeRenderImageContainer: {
         borderTopLeftRadius: 3,
         borderTopRightRadius: 3,
-        overflow: 'hidden',
+ 
     },
     maybeRenderImage: {
         height: 250,
-        width: 250,
+        width:  250,
     },
     maybeRenderImageText: {
         paddingHorizontal: 10,
