@@ -1,15 +1,14 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,TouchableOpacity} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
+import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
+
 import {Agenda} from 'react-native-calendars';
-import WorkOrder from "./work_order";
+
 
 
 import { AsyncStorage } from "react-native";
 
 const ACCESS_TOKEN= 'access_token';
 
-import MaintenanceApp from '../App';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;

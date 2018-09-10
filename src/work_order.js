@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, ImageBackground, Dimensions, Share, ActivityIndicator, Clipboard, Picker} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
+import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, Dimensions, Share, ActivityIndicator, Clipboard} from 'react-native';
+import { Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
-import { AsyncStorage } from "react-native";
+import { Table, Row, Rows } from 'react-native-table-component';
+
 import { RNS3 } from 'react-native-aws3';
 
 
@@ -16,19 +16,13 @@ let width= Dimensions.get('window').width;
 
 class WorkOrder extends Component {
 
-    state = {
-        image: null,
-        text: '',
-        pickerResult:''
-    };
 
-    // static navigationOptions =
-    //     {
- 
-    //     };
         constructor(){
             super();
             this.state = {
+                image: null,
+                text: '',
+                pickerResult:'',
                 data: {
                     "listings":["Overview"]
                 },
@@ -92,7 +86,9 @@ class WorkOrder extends Component {
 
     
     render()
-    {
+    {   
+
+
         let { image } = this.state;
 
         const InventoryState = {
@@ -122,22 +118,8 @@ class WorkOrder extends Component {
         }   
  
 
-        // let serviceItems = this.state.data.listings.map( (s, i) => {
-        //     return <Picker.Item key={i} value={s} label={s} />
-        // });
-
-
-        // let data = [{
-        //     value: 'Overview',
-        // }, {
-        //     value: 'Master Bedroom',
-        // }, {
-        //     value: 'Garage',
-        // }];
-        // console.log(this.state.note);
-
         const {goBack} = this.props.navigation;
-        // console.log(this.state.selectedService)
+        console.log(this.state.area)
 
         return(
             
@@ -330,12 +312,15 @@ class WorkOrder extends Component {
         }
     };
 
-    uploadNotes= (link,text,area,id)=> {
+    uploadNotes= (link,text,area)=> {
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        // const userData=this.props.navigation.state.params.param.userData;
 
         if (check==0)
         {
             fetch('http://localhost:3000/api/v1/notesupload/cleaning_schedules/'+id+'/', {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -344,13 +329,13 @@ class WorkOrder extends Component {
 
                     image: link,
                     note: text,
-                    area: area,
-                    id: id
+                    area: area
 
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
+                    console.log(responseJson);
                     
 
                 }).catch((error) => {
@@ -360,7 +345,7 @@ class WorkOrder extends Component {
         else
         {   
             fetch('http://localhost:3000/api/v1/notesupload/service_schedules/'+id+'/', {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -369,14 +354,13 @@ class WorkOrder extends Component {
 
                     image: link,
                     note: text,
-                    area: area,
-                    id: id
+                    area: area
 
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    
+                    console.log(responseJson);
 
                 }).catch((error) => {
                 console.error(error);
