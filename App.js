@@ -141,10 +141,7 @@ class LoginActivity extends Component {
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
                                 <Text style={styles.TextStyle}> Sign In </Text>
                             </TouchableOpacity>
- 
-                           
-                        
-                        
+  
 
                     </KeyboardAvoidingView>
 
@@ -209,7 +206,7 @@ const AppStack = createStackNavigator({
                       },
                       headerBackground: (
                         <Image
-                          style={{width: 150,height: 100,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
+                          style={{width: 150,height:100,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
                           source= {require('./assets/Images/logout.png')}
                         />
                       ),

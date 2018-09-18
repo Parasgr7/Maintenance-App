@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, Dimensions, Share, ActivityIndicator, Clipboard} from 'react-native';
+import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, Dimensions, Share, ActivityIndicator, Clipboard, TouchableOpacity} from 'react-native';
 import { Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -20,19 +20,21 @@ class WorkOrder extends Component {
         constructor(){
             super();
             this.state = {
-                image: null,
+                image: "",
                 text: '',
                 pickerResult:'',
                 data: {
-                    "listings":["Overview"]
+                    "listings":["Overview"],
+                    "inventory":["Dummy"]
                 },
-                area:""
+                area:"",
+                rate:"",
                 
             }
         }
     
         componentDidMount(){
-
+    
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
@@ -82,6 +84,8 @@ class WorkOrder extends Component {
         }
            
         }
+
+        
     
 
     
@@ -108,15 +112,21 @@ class WorkOrder extends Component {
                 ['Carpet Cleaning', '$150']
             ]
         };
-        
-        let data=[];
-        for(let i=0;i<this.state.data.listings.length;i++)
+       
+        let inventData=[];
+        for(let i=0;i<this.state.data.inventory.length;i++)
         {
-            data.push({
-                value: this.state.data.listings[i]
-            })
-        }   
- 
+            inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
+        }
+        console.log(inventData);
+
+            let list=[];
+            for(let i=0;i<this.state.data.listings.length;i++)
+            {
+                list.push({
+                    value: this.state.data.listings[i]
+                })
+            }  
         
         const {goBack} = this.props.navigation;
      
@@ -131,8 +141,22 @@ class WorkOrder extends Component {
                     <ScrollView style={{flex: 1}}>
                        <Dropdown
                          label='Select Area'
-                         data={data} 
-                         onChangeText={(value,index,data)=>{this.setState({area:value})}}
+                         data={list} 
+                         onChangeText={(value,index,data)=>{this.setState({area:value});
+
+                                for(let i=0;i<this.state.data.app_data.length;i++)
+                                {   
+                                    if (this.state.area==this.state.data.app_data[i].area)
+                                    {   
+                                        this.setState({area_data : this.state.data.app_data[i] });
+                                        this.setState({index:i});
+                                        this.setState({image:""});
+ 
+
+                                    }
+                                }  
+                        
+                        }}
                        />
                        
                        
@@ -147,13 +171,19 @@ class WorkOrder extends Component {
                                     name='thumbs-up'
                                     type='font-awesome'
                                     color='#517fa4'
-                                    onPress={() => console.log('hello')} />
+                                    // reverseColor='red'
+                                    raised
+                                    // reverse
+                                    onPress={() => this.thumbs_up()} />
                             </ScrollView>
                             <ScrollView style={ {margin: 7}}>
                                 <Icon
                                     name='thumbs-down'
                                     type='font-awesome'
                                     color='#517fa4'
+                                    // reverseColor='green'
+                                    raised
+                                    onPress={() => this.thumbs_down()}
                                 />
                             </ScrollView>
                         </ScrollView>
@@ -163,46 +193,40 @@ class WorkOrder extends Component {
                                     name='camera'
                                     type='font-awesome'
                                     color='#517fa4'
+                                    raised
                                     onPress={this._pickImage} 
                                 />
-                                {this._maybeRenderImage()}
                                 {this._maybeRenderUploadingOverlay()}
-                            </ScrollView>
-                            <ScrollView style={ {margin: 7}}>
-                                <Icon
-                                    name='sticky-note'
-                                    type='font-awesome'
-                                    color='#517fa4'
-                                />
-                            </ScrollView>
+                                 </ScrollView>
                         </ScrollView>
 
+                    </ScrollView>
+                    <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
+                            {this._maybeRenderImage()}
+                            {this.listing_data()}
+                            {this._maybeRenderUploadingOverlay()}
                     </ScrollView>
                     <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                             <Row data={InventoryState.tableHead} style={styles.head} textStyle={styles.text}/>
-                            <Rows data={InventoryState.tableData} textStyle={styles.text}/>
+                            <Rows data={inventData} textStyle={styles.text}/>
                         </Table>
-                        <Button
-                            primary
-                            block
-                            style={[{ width: "50%", margin: 10, padding: 4, backgroundColor: "#43889c" }]}
-                        >
-                            <Text style={{color: 'white'}}>Add Inventory</Text>
-                        </Button>
+                        <View style={styles.content}>
+                        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ console.log("Hello1") }}>
+                   <Text style={styles.TextStyle}>Add Inventory</Text>
+                    </TouchableOpacity>
+                    </View>
                     </ScrollView>
                     <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                             <Row data={CostState.tableHead} style={styles.head} textStyle={styles.text}/>
                             <Rows data={CostState.tableData} textStyle={styles.text}/>
                         </Table>
-                        <Button
-                            primary
-                            block
-                            style={[{ width: "50%", margin: 10, padding: 4, backgroundColor: "#43889c" }]}
-                        >
-                            <Text style={{color: 'white'}}>Add Cost</Text>
-                        </Button>
+                        <View style={styles.content}>
+                        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ console.log("Hello2") }}>
+                   <Text style={styles.TextStyle}>Add Cost</Text>
+                    </TouchableOpacity>
+                    </View>
                     </ScrollView>
                 </ScrollView>
             </ScrollView>
@@ -210,65 +234,194 @@ class WorkOrder extends Component {
         );
     }
 
+    thumbs_up=()=> {
+        this.setState({rate:"true"});
+        console.log(this.state.rate);
+        this.state.area_data.rate="true";
+        console.log(this.state.area_data);
+    
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+      
+        if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    data: this.state.area_data,
+                    index: this.state.index
+
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    data: this.state.area_data,
+                    index: this.state.index
+
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+
+    }
+    thumbs_down=()=>{
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        this.setState({rate:"false"});
+        console.log(this.state.area_data);
+        this.state.area_data.rate="false";
+       
+        if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: this.state.area_data,
+                    index: this.state.index
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: this.state.area_data,
+                    index: this.state.index
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+
+
+    }
+
     _maybeRenderUploadingOverlay = () => {
         if (this.state.uploading) {
             return (
                 <View
-                    style={[StyleSheet.absoluteFill, styles.maybeRenderUploading]}>
-                    <ActivityIndicator color="red" size="small" />
+                    style={ styles.maybeRenderUploading}>
+                    <ActivityIndicator size="large" />
                 </View>
             );
         }
     };
 
-    _maybeRenderImage = () => {
-        let {
-            image,
-        } = this.state;
-        // console.log(image);
-        if (!image) {
+    listing_data=()=>{
+        console.log("Listing data: "+this.state.area_data);
+        if (this.state.area_data) {
+
+            return(
+                <View
+                    style={styles.maybeRenderImageText}>
+                     
+                    <View
+                        style={styles.maybeRenderImageContainer}>
+                        <Image source={{ uri: this.state.area_data.image }} style={styles.maybeRenderImage} />
+                    </View>
+    
+                    <TextInput
+                        style={{height: 40, borderColor: 'gray', borderWidth: 2, margin:5}}
+                        onChangeText={(text) => this.setState({text})}
+                        value={this.state.area_data.note}
+                    />
+                    <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
+                   <Text style={styles.TextStyle}>Upload</Text>
+                    </TouchableOpacity>
+           
+                </View>
+                
+            );
+        }
+        else{
             return;
         }
-        // console.log(this.state.text);
+    }
+    _maybeRenderImage = () => {
+        
+        let {
+            image
+        } = this.state;
+        console.log("RenderImage from UPload: "+image);
+        let x= this.state.image;
+        if(image){
         return (
-            <View
-                style={styles.maybeRenderImageText}>
-                 
+            <View style={styles.maybeRenderImageText}> 
                 <View
                     style={styles.maybeRenderImageContainer}>
                     <Image source={{ uri: image }} style={styles.maybeRenderImage} />
                 </View>
 
                 <TextInput
-                    style={{height: 40, borderColor: 'gray', borderWidth: 2}}
+                    style={styles.textInsert}
                     onChangeText={(text) => this.setState({text})}
                     value={this.state.text}
                 />
-                <Button
-                    primary
-                    block
-                    onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}
-                >
-               <Text>Upload</Text>
-                </Button>
+                <View style={styles.content}>
+                <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
+                   <Text style={styles.TextStyle}>Upload</Text>
+                    </TouchableOpacity>
+                </View>
        
             </View>
             
         );
+    }
+    else{
+        return;
+    }
     };
 
-    _share = () => {
-        Share.share({
-            message: this.state.image,
-            title: 'Check out this photo',
-            url: this.state.image,
-        });
-    };
-
-    _copyToClipboard = () => {
-        Clipboard.setString(this.state.image);
-        alert('Copied image URL to clipboard');
-    };
 
     _pickImage = async () => {
 
@@ -296,9 +449,10 @@ class WorkOrder extends Component {
             if (!pickerResult.cancelled) {
                 uploadResponse = await this.uploadImageAsync(pickerResult.uri);
                 uploadResult = await uploadResponse;
-                console.log(uploadResult);
+                // console.log(uploadResult);
               this.setState({
                     image: uploadResult.location,
+                    area_data: undefined
                 });
             }
         } catch (e) {
@@ -307,6 +461,7 @@ class WorkOrder extends Component {
             console.log({ e });
             alert('Upload failed, sorry :(');
         } finally {
+            
             this.setState({
                 uploading: false
             });
@@ -316,8 +471,7 @@ class WorkOrder extends Component {
     uploadNotes= (link,text,area)=> {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
-        // const userData=this.props.navigation.state.params.param.userData;
-
+      
         if (check==0)
         {
             fetch('http://localhost:3000/api/v1/notesupload/cleaning_schedules/'+id+'/', {
@@ -330,7 +484,8 @@ class WorkOrder extends Component {
 
                     image: link,
                     note: text,
-                    area: area
+                    area: area,
+                    rate: this.state.rate
 
                 })
 
@@ -355,7 +510,8 @@ class WorkOrder extends Component {
 
                     image: link,
                     note: text,
-                    area: area
+                    area: area,
+                    rate: this.state.rate
 
                 })
 
@@ -386,7 +542,7 @@ class WorkOrder extends Component {
           console.log(check);
           console.log(id);
         const options = {
-            keyPrefix: "work-order/"+(check?"cleaning_schedule/":"service_schedule/")+id.toString()+"/images/",
+            keyPrefix: "work-order/"+(check?"service_schedule/":"cleaning_schedule/")+id.toString()+"/images/",
             bucket: "holidale-maintenance-app",
             region: "us-east-2",
             accessKey: "AKIAJ4XF6TLKXHLKHERQ",
@@ -407,34 +563,7 @@ class WorkOrder extends Component {
     
 }
 
-// async function uploadImageAsync(uri) {
-//     let uriParts = uri.split('.');
-//     let fileType = uriParts[uriParts.length - 1];
-    
-//     const file = {
-//         uri: uri,
-//         name: `photo.${fileType}`,
-//         type: `image/${fileType}`
-//       }
-//     console.log(check);
-//     console.log(id);
-//     const options = {
-//         keyPrefix: "work-order/"+check?"cleaning_schedule/":"service_schedule/"+id+"/images",
-//         bucket: "holidale-maintenance-app",
-//         region: "us-east-2",
-//         accessKey: "AKIAJ4XF6TLKXHLKHERQ",
-//         secretKey: "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",
-//         successActionStatus: 201,
-     
-//       }
 
-//     return RNS3.put(file, options).then(response => {
-//         if (response.status !== 201)
-//           throw new Error("Failed to upload image to S3");
-//         return response.body.postResponse;
-//       });
-
-// }
 
 
 const styles = StyleSheet.create({
@@ -450,7 +579,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
 
-    TableContainer: { flex: 1, padding: 16, paddingTop: 10, backgroundColor: '#fff' },
+    TableContainer: { flex: 1, paddingTop: 10, backgroundColor: '#fff', marginTop:15 },
     head: { height: 40, backgroundColor: '#f1f8ff' },
     text: { margin: 6 },
 
@@ -515,14 +644,18 @@ const styles = StyleSheet.create({
     },
 
     maybeRenderUploading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
         alignItems: 'center',
-        backgroundColor: 'black',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     maybeRenderContainer: {
         borderRadius: 3,
         elevation: 2,
-        marginTop: 30,
+        marginTop: 40,
         shadowColor: 'rgba(0,0,0,1)',
         shadowOpacity: 0.2,
         shadowOffset: {
@@ -539,12 +672,49 @@ const styles = StyleSheet.create({
     },
     maybeRenderImage: {
         height: 250,
-        width:  250,
+        width:  400,
     },
     maybeRenderImageText: {
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    }
+      
+        flex:1,
+        marginTop: 20
+       
+    
+    },
+    SubmitButtonStyle: {
+        marginTop:10,
+        padding:10,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+        flex:1,
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center'
+      },
+
+      content:{
+        flex:1,
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center'
+    },
+     
+      TextStyle:{
+          color:'#fff',
+          textAlign:'center',
+          fontSize:15
+      },
+      textInsert:{
+        flex:1,
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center',
+        borderColor: 'gray', 
+        borderWidth: 1, 
+        padding:5,
+        margin:5,
+        borderRadius:5
+      }
 
 });
 

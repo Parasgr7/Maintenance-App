@@ -92,10 +92,10 @@ class ProfileActivity extends Component {
                     fetch('http://localhost:3000/api/v1/work_orders/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
-
+                            
                             // If server response message same as Data Matched
                             if(responseJson)
-                            {
+                            {   
                                 const numItems = responseJson.length;
                                 for (let j = 0; j < numItems; j++) {
                                     this.state.items[strTime].push({
@@ -105,7 +105,9 @@ class ProfileActivity extends Component {
                                         status: responseJson[j].status,
                                         height: Math.max(50, Math.floor(Math.random() * 150)),
                                         check:responseJson[j].check,
-                                        date:strTime
+                                        app_data:responseJson[j].app_data,
+                                        date:strTime,
+                                        inventory: responseJson[j].inventory
                                     });
                                 }
 
