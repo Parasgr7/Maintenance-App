@@ -82,7 +82,7 @@ class ProfileActivity extends Component {
 
     loadItems(day) {
         
-        setTimeout(() => {
+
             for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
                 const strTime = this.timeToString(time);
@@ -128,7 +128,7 @@ class ProfileActivity extends Component {
             this.setState({
                 items: newItems
             });
-        }, 1000);
+
 
     }
 

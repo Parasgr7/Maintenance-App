@@ -1,18 +1,69 @@
 import React, {Component} from 'react';
-import {StyleSheet, TextInput, ScrollView, View, Alert, Text, Image, Dimensions, Share, ActivityIndicator, Clipboard, TouchableOpacity} from 'react-native';
-import { Button} from 'native-base';
+import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity} from 'react-native';
+import { Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
-import { Table, Row, Rows } from 'react-native-table-component';
-
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { AsyncStorage } from "react-native";
+import Modal from 'react-native-modal';
+import t from 'tcomb-form-native';
 import { RNS3 } from 'react-native-aws3';
-
-
 import {Permissions, ImagePicker } from 'expo';
 
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
+
+var _ = require('lodash');
+
+const stylesheet = _.cloneDeep(t.form.Form.stylesheet);
+
+stylesheet.fieldset = {
+    flexDirection: 'row'
+};
+stylesheet.formGroup.normal.flex = 1;
+stylesheet.formGroup.error.flex = 1;
+
+const Form = t.form.Form;
+
+let Sources = t.enums({
+    Car: 'Car',
+    Bike: 'Bike'
+
+});
+let ProductNames = t.enums({
+    Soap: 'Soap',
+    Towel: 'Towel'
+});
+
+const Products = t.struct({
+    name: ProductNames,
+    count: t.Number
+})
+
+const User = t.struct({
+    source: Sources,
+    product: t.list(Products)
+});
+
+const options = {
+    fields: {
+        name: { /*...*/ },
+        product: {
+            item: {
+                fields: {
+                    name: {
+                        // Documents t.struct 'type' options
+                    },
+                    count: {
+                        // Documents t.struct 'value' options
+                    },
+                    stylesheet: stylesheet
+                }
+            }
+        }
+    }
+}
 
 class WorkOrder extends Component {
 
@@ -30,9 +81,32 @@ class WorkOrder extends Component {
                 area:"",
                 rate:"",
                 
+                visibleModal: null,
             }
         }
-    
+
+    handleSubmit = () => {
+        const value = this.formRef.getValue();
+        console.log('value:', value);
+    }
+
+    _renderButton = (text, onPress) => (
+        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={onPress}>
+                <Text style={styles.TextStyle}>{text}</Text>
+        </TouchableOpacity>
+    );
+
+    _renderModalContent = () => (
+        <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
+
+            <Form ref={c => this.formRef = c} type={User} options={options} />
+            <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.handleSubmit }>
+                <Text style={styles.TextStyle}> Submit </Text>
+            </TouchableOpacity>
+            {this._renderButton('Close', () => this.setState({ visibleModal: null }))}
+        </ScrollView>
+    );
+
         componentDidMount(){
     
         const id = this.props.navigation.state.params.param.id;
@@ -47,7 +121,7 @@ class WorkOrder extends Component {
                                 let res = responseJson;
                                 
                                 this.setState({
-                                    data: res[0]   
+                                    data: res[0]
                                 });
 
                             }
@@ -90,11 +164,8 @@ class WorkOrder extends Component {
 
     
     render()
-    {   
-
-
-        let { image } = this.state;
-
+    {
+        console.log(this.state.data.listings);
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count'],
             tableData: [
@@ -216,6 +287,10 @@ class WorkOrder extends Component {
                    <Text style={styles.TextStyle}>Add Inventory</Text>
                     </TouchableOpacity>
                     </View>
+                        {this._renderButton('Add Inventory', () => this.setState({ visibleModal: 1 }))}
+                        <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
+                            {this._renderModalContent()}
+                        </Modal>
                     </ScrollView>
                     <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
@@ -229,6 +304,17 @@ class WorkOrder extends Component {
                     </View>
                     </ScrollView>
                 </ScrollView>
+
+                <ScrollView style={[{flex: 1, marginBottom: 20}, styles.elementsContainer]}>
+                    <ScrollView style={{flex: 1}}>
+                        <Dropdown
+                            label='Select Status'
+                            data={status_data}
+                            onChangeText={(value,index,data)=>{console.log(value)}}
+                        />
+                    </ScrollView>
+                </ScrollView>
+
             </ScrollView>
 
         );
@@ -714,8 +800,36 @@ const styles = StyleSheet.create({
         padding:5,
         margin:5,
         borderRadius:5
-      }
+      },
+    modalContent: {
+        backgroundColor: 'white',
+        paddingTop: 35,
+        padding: 20,
+        //justifyContent: 'center',
+        height: height
+        //alignItems: 'center',
+       // borderRadius: 4,
+        //borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    bottomModal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+    SubmitButtonStyle: {
 
+        marginTop:30,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+    },
+    TextStyle:{
+        color:'#fff',
+        textAlign:'center',
+        fontSize:20
+    }
 });
 
 
