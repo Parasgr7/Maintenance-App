@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity} from 'react-native';
+import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,} from 'react-native';
 import { Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -22,6 +22,7 @@ stylesheet.fieldset = {
     flexDirection: 'row'
 };
 stylesheet.formGroup.normal.flex = 1;
+
 stylesheet.formGroup.error.flex = 1;
 
 const Form = t.form.Form;
@@ -29,7 +30,6 @@ const Form = t.form.Form;
 let Sources = t.enums({
     Car: 'Car',
     Bike: 'Bike'
-
 });
 let ProductNames = t.enums({
     Soap: 'Soap',
@@ -46,24 +46,8 @@ const User = t.struct({
     product: t.list(Products)
 });
 
-const options = {
-    fields: {
-        name: { /*...*/ },
-        product: {
-            item: {
-                fields: {
-                    name: {
-                        // Documents t.struct 'type' options
-                    },
-                    count: {
-                        // Documents t.struct 'value' options
-                    },
-                    stylesheet: stylesheet
-                }
-            }
-        }
-    }
-}
+
+
 
 class WorkOrder extends Component {
 
@@ -80,14 +64,15 @@ class WorkOrder extends Component {
                 },
                 area:"",
                 rate:"",
-                
+                textInput : [],
                 visibleModal: null,
             }
         }
+    
 
     handleSubmit = () => {
-        const value = this.formRef.getValue();
-        console.log('value:', value);
+        // const value = this.formRef.getValue();
+        console.log('value:'+ event);
     }
 
     _renderButton = (text, onPress) => (
@@ -95,15 +80,33 @@ class WorkOrder extends Component {
                 <Text style={styles.TextStyle}>{text}</Text>
         </TouchableOpacity>
     );
+    _renderButtonClose = (text, onPress) => (
+        <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={onPress}>
+                <Text style={styles.TextStyle}>{text}</Text>
+        </TouchableOpacity>
+    );
+
+    addTextInput = (key) => {
+        let textInput = this.state.textInput;
+        textInput.push(<TextInput key={key} />);
+        this.setState({ textInput })
+      }
 
     _renderModalContent = () => (
         <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
+            <ScrollView style={{flex: 1}}>
+            <Dropdown
+                    label='Select Status'
+                    data={source}
+                    onChangeText={(value,index,data)=>{console.log(value)}}
+            />
 
-            <Form ref={c => this.formRef = c} type={User} options={options} />
-            <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.handleSubmit }>
+            </ScrollView>
+        
+            <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={ this.handleSubmit }>
                 <Text style={styles.TextStyle}> Submit </Text>
             </TouchableOpacity>
-            {this._renderButton('Close', () => this.setState({ visibleModal: null }))}
+            {this._renderButtonClose('Close', () => this.setState({ visibleModal: null }))}
         </ScrollView>
     );
 
@@ -112,7 +115,7 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
-        if (check==1){
+        if (check===1){
             fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
@@ -165,7 +168,7 @@ class WorkOrder extends Component {
     
     render()
     {
-        console.log(this.state.data.listings);
+        // console.log(this.state.data.listings);
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count'],
             tableData: [
@@ -189,15 +192,33 @@ class WorkOrder extends Component {
         {
             inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
         }
-        console.log(inventData);
 
-            let list=[];
+        let list=[];
+        if(this.state.data.listings!=null)
+        {
             for(let i=0;i<this.state.data.listings.length;i++)
             {
                 list.push({
                     value: this.state.data.listings[i]
                 })
             }  
+        }
+
+        status_data=[{
+            value:"Completed"
+        },{
+            value:"Pending"
+        },{
+            value:"Scheduled"
+        }]
+
+        source=[{
+            value:"Car"
+        },{
+            value:"Bus"
+        },{
+            value:"Train"
+        }]
         
         const {goBack} = this.props.navigation;
      
@@ -223,15 +244,12 @@ class WorkOrder extends Component {
                                         this.setState({index:i});
                                         this.setState({image:""});
  
-
                                     }
                                 }  
                         
                         }}
                        />
-                       
-                       
-
+                     
                     </ScrollView>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
                         alignItems: 'stretch',
@@ -283,14 +301,12 @@ class WorkOrder extends Component {
                             <Rows data={inventData} textStyle={styles.text}/>
                         </Table>
                         <View style={styles.content}>
-                        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ console.log("Hello1") }}>
-                   <Text style={styles.TextStyle}>Add Inventory</Text>
-                    </TouchableOpacity>
-                    </View>
-                        {this._renderButton('Add Inventory', () => this.setState({ visibleModal: 1 }))}
-                        <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
-                            {this._renderModalContent()}
-                        </Modal>
+                            {this._renderButton('Add Inventory', () => this.setState({ visibleModal: 1 }))}
+                            <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
+                                {this._renderModalContent()}
+                            </Modal>
+                        </View>
+                        
                     </ScrollView>
                     <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
@@ -444,7 +460,7 @@ class WorkOrder extends Component {
     };
 
     listing_data=()=>{
-        console.log("Listing data: "+this.state.area_data);
+        // console.log("Listing data: "+this.state.area_data);
         if (this.state.area_data) {
 
             return(
@@ -478,7 +494,7 @@ class WorkOrder extends Component {
         let {
             image
         } = this.state;
-        console.log("RenderImage from UPload: "+image);
+        // console.log("RenderImage from UPload: "+image);
         let x= this.state.image;
         if(image){
         return (
@@ -777,6 +793,16 @@ const styles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center'
       },
+      SubmitButtonStyle1: {
+        marginTop:10,
+        padding:10,
+        backgroundColor:'#00BCD4',
+        borderRadius:10,
+        // flex:1,
+        // flexDirection:'row',
+        // alignItems:'center',
+        // justifyContent:'center'
+      },
 
       content:{
         flex:1,
@@ -805,30 +831,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         paddingTop: 35,
         padding: 20,
-        //justifyContent: 'center',
         height: height
-        //alignItems: 'center',
-       // borderRadius: 4,
-        //borderColor: 'rgba(0, 0, 0, 0.1)',
+        
     },
     bottomModal: {
         justifyContent: 'flex-end',
         margin: 0,
-    },
-    SubmitButtonStyle: {
-
-        marginTop:30,
-        paddingTop:15,
-        paddingBottom:15,
-        marginLeft:30,
-        marginRight:30,
-        backgroundColor:'#00BCD4',
-        borderRadius:10,
-    },
-    TextStyle:{
-        color:'#fff',
-        textAlign:'center',
-        fontSize:20
+        margin: 0, 
+        backgroundColor: 'white', 
+        flex:0 , 
+        bottom: 0, 
+        position: 'absolute',
+        width: '100%'
     }
 });
 

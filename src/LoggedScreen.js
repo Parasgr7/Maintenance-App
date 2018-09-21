@@ -32,8 +32,6 @@ class ProfileActivity extends Component {
     _getToken = async () => {
         try {
         const token = await AsyncStorage.getItem(ACCESS_TOKEN);
-        // console.log(token);
- 
         } catch (error) {
 
             console.log("Something went wrong");
@@ -42,11 +40,7 @@ class ProfileActivity extends Component {
 
     WorkOrderFunction = (item) =>{
         this._getToken();
-        // const token=  AsyncStorage.getItem(ACCESS_TOKEN);
-
-
         this.state.data={id:item.id,check:item.check,userData:{token:108574197299687074239,date:item.date}};
-        // console.log(this.state.data);
         this.props.navigation.navigate('ThirdPage',{param:this.state.data});
         
     }
