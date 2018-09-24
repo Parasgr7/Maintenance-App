@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,} from 'react-native';
+import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator} from 'react-native';
 import { Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -18,13 +18,6 @@ var _ = require('lodash');
 
 const stylesheet = _.cloneDeep(t.form.Form.stylesheet);
 
-stylesheet.fieldset = {
-    flexDirection: 'row'
-};
-stylesheet.formGroup.normal.flex = 1;
-
-stylesheet.formGroup.error.flex = 1;
-
 const Form = t.form.Form;
 
 let Sources = t.enums({
@@ -35,16 +28,91 @@ let ProductNames = t.enums({
     Soap: 'Soap',
     Towel: 'Towel'
 });
+let Count = t.enums({
+    1: '1',
+    2: '2'
+});
 
 const Products = t.struct({
     name: ProductNames,
     count: t.Number
 })
 
+
 const User = t.struct({
     source: Sources,
-    product: t.list(Products)
+    product: t.list(Products),
 });
+
+const listCost=t.struct({
+    item: t.String,
+    cost: t.Number
+});
+
+const Cost = t.struct({
+    add_cost: t.list(listCost)
+})
+
+
+
+function customTemplate(locals) {
+    // in locals.inputs you find all the rendered fields
+    return (
+        <View style={{flexDirection: 'row',width:width-100, marginTop:35}}>
+          <View style={{flex:1}}>
+            {locals.inputs.name}
+          </View>
+        <View style={{flex:1}}>
+             {locals.inputs.count}
+        </View>
+      </View>
+    );
+  }
+
+  function costTemplate(locals) {
+    // in locals.inputs you find all the rendered fields
+    return (
+        <View style={{flexDirection: 'row',width:width-100, marginTop:35}}>
+          <View style={{flex:1}}>
+            {locals.inputs.item}
+          </View>
+        <View style={{flex:1}}>
+             {locals.inputs.cost}
+        </View>
+      </View>
+    );
+  }
+
+
+const options = {
+ 
+
+    fields: {
+            product:{
+                    disableOrder:true,
+
+                    item:{   
+                            template: customTemplate 
+                    }
+                }
+            }
+
+};
+
+const optionsCost = {
+ 
+
+    fields: {
+            add_cost:{
+                    disableOrder:true,
+
+                    item:{   
+                            template: costTemplate 
+                    }
+                }
+            }
+
+};
 
 
 
@@ -60,19 +128,135 @@ class WorkOrder extends Component {
                 pickerResult:'',
                 data: {
                     "listings":["Overview"],
-                    "inventory":["Dummy"]
+                    "inventory":["Dummy"],
+                    "cost":["Dummy"]
                 },
                 area:"",
                 rate:"",
-                textInput : [],
                 visibleModal: null,
+                visibleModalCost:null,
+                res:[],
+                status:""
             }
         }
     
 
     handleSubmit = () => {
-        // const value = this.formRef.getValue();
-        console.log('value:'+ event);
+        const value = this.formRef.getValue();
+        let req={};
+        let result=[];
+        if(value)
+        {   console.log(value.product[0].name);
+            for(let i=0;i<value.product.length;i++)
+            {   
+                result.push({count:value.product[i].count,product:value.product[i].name,source:value.source});
+            }
+            const id = this.props.navigation.state.params.param.id;
+            const check = this.props.navigation.state.params.param.check;
+            console.log(JSON.stringify(result));
+            if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                     result: JSON.stringify(result)
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Inventory Updated");
+                    
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/add_inventory/service_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    result: JSON.stringify(result)
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Inventory Updated");
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+
+
+        }
+    }
+
+    handleSubmitCost = () => {
+        const value = this.formRef.getValue();
+        let req={};
+        let result=[];
+        if(value)
+        {   
+            for(let i=0;i<value.add_cost.length;i++)
+            {   
+                result.push({item:value.add_cost[i].item,cost:"$ "+value.add_cost[i].cost});
+            }
+            console.log(result);
+            const id = this.props.navigation.state.params.param.id;
+            const check = this.props.navigation.state.params.param.check;
+
+            if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/add_cost/cleaning_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                     cost: JSON.stringify(result)
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Cost Updated");
+                    
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/add_cost/service_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cost: JSON.stringify(result)
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Cost Updated");
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+
+        }
     }
 
     _renderButton = (text, onPress) => (
@@ -86,27 +270,26 @@ class WorkOrder extends Component {
         </TouchableOpacity>
     );
 
-    addTextInput = (key) => {
-        let textInput = this.state.textInput;
-        textInput.push(<TextInput key={key} />);
-        this.setState({ textInput })
-      }
 
-    _renderModalContent = () => (
+    _renderInventoryModalContent = () => (
         <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
-            <ScrollView style={{flex: 1}}>
-            <Dropdown
-                    label='Select Status'
-                    data={source}
-                    onChangeText={(value,index,data)=>{console.log(value)}}
-            />
+            <Form ref={c => this.formRef = c} type={User} options={options} />
 
-            </ScrollView>
-        
             <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={ this.handleSubmit }>
                 <Text style={styles.TextStyle}> Submit </Text>
             </TouchableOpacity>
             {this._renderButtonClose('Close', () => this.setState({ visibleModal: null }))}
+        </ScrollView>
+    );
+
+    _renderCostModalContent = () => (
+        <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
+            <Form ref={d => this.formRef = d} type={Cost} options={optionsCost} />
+
+            <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={ this.handleSubmitCost }>
+                <Text style={styles.TextStyle}> Submit </Text>
+            </TouchableOpacity>
+            {this._renderButtonClose('Close', () => this.setState({ visibleModalCost: null }))}
         </ScrollView>
     );
 
@@ -115,7 +298,8 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
-        if (check===1){
+
+        if (check==1){
             fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
@@ -142,7 +326,7 @@ class WorkOrder extends Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
-                            {
+                            {   
                                 let res= responseJson;
                         
                                 this.setState({
@@ -168,29 +352,24 @@ class WorkOrder extends Component {
     
     render()
     {
-        // console.log(this.state.data.listings);
         const InventoryState = {
-            tableHead: ['Source', 'Product', 'Count'],
-            tableData: [
-                ['Car', 'Soap', '1'],
-                ['Car', 'Toilet Paper', '2'],
-                ['Car', 'Tower', '3'],
-                ['Car', 'Clothe', '4']
-            ]
+            tableHead: ['Source', 'Product', 'Count']
         };
 
         const CostState = {
-            tableHead: ['Item', 'Cost'],
-            tableData: [
-                ['2x Bulb', '$30'],
-                ['Carpet Cleaning', '$150']
-            ]
+            tableHead: ['Item', 'Cost']
         };
        
         let inventData=[];
         for(let i=0;i<this.state.data.inventory.length;i++)
         {
             inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
+        }
+    
+        let costData=[];
+        for(let i=0;i<this.state.data.cost.length;i++)
+        {
+            costData.push([this.state.data.cost[i].item,this.state.data.cost[i].cost])
         }
 
         let list=[];
@@ -221,7 +400,7 @@ class WorkOrder extends Component {
         }]
         
         const {goBack} = this.props.navigation;
-     
+
 
         return(
             
@@ -303,7 +482,7 @@ class WorkOrder extends Component {
                         <View style={styles.content}>
                             {this._renderButton('Add Inventory', () => this.setState({ visibleModal: 1 }))}
                             <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
-                                {this._renderModalContent()}
+                                {this._renderInventoryModalContent()}
                             </Modal>
                         </View>
                         
@@ -311,29 +490,86 @@ class WorkOrder extends Component {
                     <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                             <Row data={CostState.tableHead} style={styles.head} textStyle={styles.text}/>
-                            <Rows data={CostState.tableData} textStyle={styles.text}/>
+                            <Rows data={costData} textStyle={styles.text}/>
                         </Table>
                         <View style={styles.content}>
-                        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ console.log("Hello2") }}>
-                   <Text style={styles.TextStyle}>Add Cost</Text>
-                    </TouchableOpacity>
-                    </View>
-                    </ScrollView>
-                </ScrollView>
+                            {this._renderButton('Add Cost', () => this.setState({ visibleModalCost: 1 }))}
+                            <Modal isVisible={this.state.visibleModalCost === 1} style={styles.bottomModal}>
+                                {this._renderCostModalContent()}
+                            </Modal>
+                        </View>
+                        
+                    <View>
+                            <Dropdown
+                                label='Select Status'
+                                data={status_data}
+                                value={this.state.data.status}
+                                onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
 
-                <ScrollView style={[{flex: 1, marginBottom: 20}, styles.elementsContainer]}>
-                    <ScrollView style={{flex: 1}}>
-                        <Dropdown
-                            label='Select Status'
-                            data={status_data}
-                            onChangeText={(value,index,data)=>{console.log(value)}}
-                        />
+                                />
+                    </View>    
                     </ScrollView>
                 </ScrollView>
 
             </ScrollView>
 
         );
+    }
+
+    statusUpdate=(value)=> {
+        this.setState({status:value});
+        console.log("Here");
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+      
+        if (check==0)
+        {
+            fetch('http://localhost:3000/api/v1/work_status/cleaning_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    status: this.state.status,
+            
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Status Updated!");
+                    
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else
+        {   
+            fetch('http://localhost:3000/api/v1/work_status/service_schedules/'+id+'/', {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+
+                    status: this.state.status
+
+                })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                    Alert.alert("Status Updated!");
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+
     }
 
     thumbs_up=()=> {
@@ -363,6 +599,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
+                    Alert.alert("Liked :)");
                     
 
                 }).catch((error) => {
@@ -387,6 +624,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
+                    Alert.alert("Liked :)");
 
                 }).catch((error) => {
                 console.error(error);
@@ -417,6 +655,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
+                    Alert.alert("Unliked :(");
                     
 
                 }).catch((error) => {
@@ -439,6 +678,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
+                    Alert.alert("Unliked :(");
 
                 }).catch((error) => {
                 console.error(error);
@@ -460,7 +700,6 @@ class WorkOrder extends Component {
     };
 
     listing_data=()=>{
-        // console.log("Listing data: "+this.state.area_data);
         if (this.state.area_data) {
 
             return(
@@ -494,14 +733,14 @@ class WorkOrder extends Component {
         let {
             image
         } = this.state;
-        // console.log("RenderImage from UPload: "+image);
         let x= this.state.image;
+        console.log(image);
         if(image){
         return (
             <View style={styles.maybeRenderImageText}> 
                 <View
                     style={styles.maybeRenderImageContainer}>
-                    <Image source={{ uri: image }} style={styles.maybeRenderImage} />
+                    <Image source={{ uri: this.state.image }} style={styles.maybeRenderImage} />
                 </View>
 
                 <TextInput
@@ -640,9 +879,7 @@ class WorkOrder extends Component {
             name: `photo.${fileType}`,
             type: `image/${fileType}`
           }
-          
-          console.log(check);
-          console.log(id);
+
         const options = {
             keyPrefix: "work-order/"+(check?"service_schedule/":"cleaning_schedule/")+id.toString()+"/images/",
             bucket: "holidale-maintenance-app",
@@ -652,8 +889,7 @@ class WorkOrder extends Component {
             successActionStatus: 201,
          
           }
-          console.log(options);
-    
+          
         return RNS3.put(file, options).then(response => {
             if (response.status !== 201)
               throw new Error("Failed to upload image to S3");

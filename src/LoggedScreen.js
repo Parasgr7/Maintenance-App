@@ -87,6 +87,7 @@ class ProfileActivity extends Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             
+                            
                             // If server response message same as Data Matched
                             if(responseJson)
                             {   
@@ -101,7 +102,8 @@ class ProfileActivity extends Component {
                                         check:responseJson[j].check,
                                         app_data:responseJson[j].app_data,
                                         date:strTime,
-                                        inventory: responseJson[j].inventory
+                                        inventory: responseJson[j].inventory,
+                                        cost: responseJson[j].cost
                                     });
                                 }
 
@@ -122,7 +124,7 @@ class ProfileActivity extends Component {
             this.setState({
                 items: newItems
             });
-
+            
 
     }
 
