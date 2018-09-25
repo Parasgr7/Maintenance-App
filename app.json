@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "holidale-maintenance",
+    "name": "Maintenance",
     "description": "Holidale maintenance app",
     "slug": "holidale-maintenance",
     "privacy": "public",
@@ -21,7 +21,11 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.holidale.holidalemaintenance",
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.holidale.holidalemaintenanceapp"
     }
   }
 }

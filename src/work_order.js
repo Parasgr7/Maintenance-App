@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator} from 'react-native';
+import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator,Platform,KeyboardAvoidingView,RefreshControl} from 'react-native';
 import { Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -7,8 +7,10 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 import { AsyncStorage } from "react-native";
 import Modal from 'react-native-modal';
 import t from 'tcomb-form-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
+
 
 
 let height= Dimensions.get('window').height;
@@ -56,7 +58,7 @@ const Cost = t.struct({
 
 
 function customTemplate(locals) {
-    // in locals.inputs you find all the rendered fields
+ 
     return (
         <View style={{flexDirection: 'row',width:width-100, marginTop:35}}>
           <View style={{flex:1}}>
@@ -70,7 +72,6 @@ function customTemplate(locals) {
   }
 
   function costTemplate(locals) {
-    // in locals.inputs you find all the rendered fields
     return (
         <View style={{flexDirection: 'row',width:width-100, marginTop:35}}>
           <View style={{flex:1}}>
@@ -116,7 +117,6 @@ const optionsCost = {
 
 
 
-
 class WorkOrder extends Component {
 
 
@@ -136,7 +136,8 @@ class WorkOrder extends Component {
                 visibleModal: null,
                 visibleModalCost:null,
                 res:[],
-                status:""
+                status:"",
+                refreshing: false
             }
         }
     
@@ -156,7 +157,7 @@ class WorkOrder extends Component {
             console.log(JSON.stringify(result));
             if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -177,7 +178,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/add_inventory/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_inventory/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -195,8 +196,6 @@ class WorkOrder extends Component {
                 console.error(error);
             });
         }
-
-
         }
     }
 
@@ -216,7 +215,7 @@ class WorkOrder extends Component {
 
             if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/add_cost/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_cost/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -237,7 +236,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/add_cost/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_cost/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -272,7 +271,7 @@ class WorkOrder extends Component {
 
 
     _renderInventoryModalContent = () => (
-        <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
+        <ScrollView contentContainerStyle={styles.modalContent}>
             <Form ref={c => this.formRef = c} type={User} options={options} />
 
             <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={ this.handleSubmit }>
@@ -283,15 +282,21 @@ class WorkOrder extends Component {
     );
 
     _renderCostModalContent = () => (
-        <ScrollView contentContainerStyle={[{justifyContent: 'flex-start'}, styles.modalContent]}>
+        <ScrollView contentContainerStyle={styles.modalContent}>
             <Form ref={d => this.formRef = d} type={Cost} options={optionsCost} />
-
             <TouchableOpacity style={styles.SubmitButtonStyle1} activeOpacity = { .5 } onPress={ this.handleSubmitCost }>
                 <Text style={styles.TextStyle}> Submit </Text>
             </TouchableOpacity>
             {this._renderButtonClose('Close', () => this.setState({ visibleModalCost: null }))}
         </ScrollView>
     );
+
+    _onRefresh = () => {
+        this.setState({refreshing: true});
+        fetchData().then(() => {
+          this.setState({refreshing: false});
+        });
+      }
 
         componentDidMount(){
     
@@ -300,7 +305,7 @@ class WorkOrder extends Component {
         const userData=this.props.navigation.state.params.param.userData;
 
         if (check==1){
-            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -322,7 +327,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -403,6 +408,13 @@ class WorkOrder extends Component {
 
 
         return(
+            <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this._onRefresh}
+              />
+            }>
             
             <ScrollView style={styles.container}>
                 <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
@@ -428,6 +440,7 @@ class WorkOrder extends Component {
                         
                         }}
                        />
+                    
                      
                     </ScrollView>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
@@ -499,7 +512,7 @@ class WorkOrder extends Component {
                             </Modal>
                         </View>
                         
-                    <View>
+                    <View style={{marginBottom:80}}>
                             <Dropdown
                                 label='Select Status'
                                 data={status_data}
@@ -512,7 +525,7 @@ class WorkOrder extends Component {
                 </ScrollView>
 
             </ScrollView>
-
+    </ScrollView>
         );
     }
 
@@ -524,7 +537,7 @@ class WorkOrder extends Component {
       
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/work_status/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -548,7 +561,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/work_status/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -583,7 +596,7 @@ class WorkOrder extends Component {
       
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -608,7 +621,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -641,7 +654,7 @@ class WorkOrder extends Component {
        
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -664,7 +677,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -815,7 +828,7 @@ class WorkOrder extends Component {
       
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/notesupload/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/notesupload/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -841,7 +854,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/notesupload/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -1067,18 +1080,18 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         paddingTop: 35,
         padding: 20,
-        height: height
-        
+        // height: height,
+        justifyContent: 'flex-start',
+        alignItems: 'stretch',
+    
     },
     bottomModal: {
-        justifyContent: 'flex-end',
-        margin: 0,
+        // justifyContent: 'flex-end',
         margin: 0, 
-        backgroundColor: 'white', 
-        flex:0 , 
-        bottom: 0, 
-        position: 'absolute',
-        width: '100%'
+        // flex:0 , 
+        // bottom: 0, 
+        // position: 'absolute',
+        // width: '100%'
     }
 });
 

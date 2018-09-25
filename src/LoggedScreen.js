@@ -83,7 +83,7 @@ class ProfileActivity extends Component {
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
                     const userData = {token:108574197299687074239, date:strTime};
-                    fetch('http://localhost:3000/api/v1/work_orders/?token='+userData.token+'&date='+userData.date)
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             
