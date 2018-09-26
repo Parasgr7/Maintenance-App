@@ -65,6 +65,19 @@ class ProfileActivity extends Component {
                         renderItem={this.renderItem.bind(this)}
                         renderEmptyDate={this.renderEmptyDate.bind(this)}
                         rowHasChanged={this.rowHasChanged.bind(this)}
+                        theme={
+                            {
+                                'stylesheet.agenda.list': {
+                                    dayNum: {
+                                        width: '100%',
+                                        fontSize: 28,
+                                        fontWeight: '200',
+                                        textAlign: 'center',
+                                        color: '#43515c',
+                                    }
+                                }
+                            }
+                        }
                     />
                 </View>
 
