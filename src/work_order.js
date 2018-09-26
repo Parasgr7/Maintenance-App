@@ -7,9 +7,10 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 import { AsyncStorage } from "react-native";
 import Modal from 'react-native-modal';
 import t from 'tcomb-form-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
+import Spinner from 'react-native-loading-spinner-overlay';
+
 
 
 
@@ -137,7 +138,8 @@ class WorkOrder extends Component {
                 visibleModalCost:null,
                 res:[],
                 status:"",
-                refreshing: false
+                refreshing: false,
+                visible: false
             }
         }
     
@@ -147,14 +149,13 @@ class WorkOrder extends Component {
         let req={};
         let result=[];
         if(value)
-        {   console.log(value.product[0].name);
+        {   
             for(let i=0;i<value.product.length;i++)
             {   
                 result.push({count:value.product[i].count,product:value.product[i].name,source:value.source});
             }
             const id = this.props.navigation.state.params.param.id;
             const check = this.props.navigation.state.params.param.check;
-            console.log(JSON.stringify(result));
             if (check==0)
         {
             fetch('http://dev4.holidale.org/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
@@ -192,6 +193,7 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     console.log(responseJson);
                     Alert.alert("Inventory Updated");
+                    
                 }).catch((error) => {
                 console.error(error);
             });
@@ -209,7 +211,6 @@ class WorkOrder extends Component {
             {   
                 result.push({item:value.add_cost[i].item,cost:"$ "+value.add_cost[i].cost});
             }
-            console.log(result);
             const id = this.props.navigation.state.params.param.id;
             const check = this.props.navigation.state.params.param.check;
 
@@ -250,6 +251,7 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     console.log(responseJson);
                     Alert.alert("Cost Updated");
+                    // this.setState({ visibleModalCost: null });
                 }).catch((error) => {
                 console.error(error);
             });
@@ -293,17 +295,13 @@ class WorkOrder extends Component {
 
     _onRefresh = () => {
         this.setState({refreshing: true});
-        fetchData().then(() => {
-          this.setState({refreshing: false});
-        });
+        this.fetchData();
       }
 
-        componentDidMount(){
-    
+      fetchData(){
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
-
         if (check==1){
             fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
@@ -313,7 +311,8 @@ class WorkOrder extends Component {
                                 let res = responseJson;
                                 
                                 this.setState({
-                                    data: res[0]
+                                    data: res[0],
+                                    refreshing: false
                                 });
 
                             }
@@ -333,9 +332,64 @@ class WorkOrder extends Component {
                             if(responseJson)
                             {   
                                 let res= responseJson;
-                        
+                                console.log("Referesh");
                                 this.setState({
-                                    data: res[0]
+                                    data: res[0],
+                                    refreshing: false
+                                });
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+
+      }
+
+        componentDidMount(){
+    
+        const id = this.props.navigation.state.params.param.id;
+        const check = this.props.navigation.state.params.param.check;
+        const userData=this.props.navigation.state.params.param.userData;
+
+        if (check==1){
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {
+                                let res = responseJson;
+                                this.setState({
+                                    data: res[0],
+                                    visible: !this.state.visible
+                                });
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
+        }
+        else{
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            if(responseJson)
+                            {   
+                                let res= responseJson;
+                                
+                                this.setState({
+                                    data: res[0],
+                                    visible: !this.state.visible
                                 });
 
                             }
@@ -357,6 +411,13 @@ class WorkOrder extends Component {
     
     render()
     {
+        if(!this.state.visible) { 
+        return (
+            <View style={{ flex: 1 }}>
+             <Spinner visible={!this.state.visible} textContent={"Loading..."} textStyle={{color: '#FFF'}} />
+            </View>
+          );
+        }
         const InventoryState = {
             tableHead: ['Source', 'Product', 'Count']
         };
@@ -425,8 +486,8 @@ class WorkOrder extends Component {
                        <Dropdown
                          label='Select Area'
                          data={list} 
-                         onChangeText={(value,index,data)=>{this.setState({area:value});
-
+                         onChangeText={(value,index,data)=>{
+                            this.setState({area:value});
                                 for(let i=0;i<this.state.data.app_data.length;i++)
                                 {   
                                     if (this.state.area==this.state.data.app_data[i].area)
@@ -434,13 +495,12 @@ class WorkOrder extends Component {
                                         this.setState({area_data : this.state.data.app_data[i] });
                                         this.setState({index:i});
                                         this.setState({image:""});
+                                        console.log(this.state.area_data);
  
                                     }
                                 }  
-                        
                         }}
                        />
-                    
                      
                     </ScrollView>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
@@ -531,7 +591,6 @@ class WorkOrder extends Component {
 
     statusUpdate=(value)=> {
         this.setState({status:value});
-        console.log("Here");
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
       
@@ -586,11 +645,17 @@ class WorkOrder extends Component {
     }
 
     thumbs_up=()=> {
+        if (typeof(this.state.area_data)!=="undefined")
+        {
         this.setState({rate:"true"});
-        console.log(this.state.rate);
         this.state.area_data.rate="true";
-        console.log(this.state.area_data);
-    
+        }
+        else{
+            Alert.alert("Select an Area");
+            return
+        }
+        
+
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
       
@@ -646,6 +711,15 @@ class WorkOrder extends Component {
 
     }
     thumbs_down=()=>{
+        if (typeof(this.state.area_data)!=="undefined")
+        {
+        this.setState({rate:"true"});
+        this.state.area_data.rate="true";
+        }
+        else{
+            Alert.alert("Select an Area");
+            return
+        }
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         this.setState({rate:"false"});
@@ -667,7 +741,7 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                
                     Alert.alert("Unliked :(");
                     
 
@@ -690,7 +764,6 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     Alert.alert("Unliked :(");
 
                 }).catch((error) => {
@@ -747,7 +820,6 @@ class WorkOrder extends Component {
             image
         } = this.state;
         let x= this.state.image;
-        console.log(image);
         if(image){
         return (
             <View style={styles.maybeRenderImageText}> 
@@ -778,18 +850,27 @@ class WorkOrder extends Component {
 
 
     _pickImage = async () => {
-
-        const {
-            status: cameraRollPerm
-        } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-        // only if user allows permission to camera roll
-        if (cameraRollPerm === 'granted') {
-             pickerResult = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: true,
-                aspect: [4, 3]
-            });  
-            this._handleImagePicked(pickerResult);
+        if (typeof(this.state.area_data)!=="undefined")
+        {
+            const {
+                status: cameraRollPerm
+            } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+            // only if user allows permission to camera roll
+            if (cameraRollPerm === 'granted') {
+                 pickerResult = await ImagePicker.launchImageLibraryAsync({
+                    allowsEditing: true,
+                    aspect: [4, 3]
+                });  
+                this._handleImagePicked(pickerResult);
+            }
+       
         }
+        else{
+            Alert.alert("Select an Area");
+            return
+        }
+
+        
     };
 
     _handleImagePicked = async (pickerResult) => {
@@ -803,15 +884,13 @@ class WorkOrder extends Component {
             if (!pickerResult.cancelled) {
                 uploadResponse = await this.uploadImageAsync(pickerResult.uri);
                 uploadResult = await uploadResponse;
-                // console.log(uploadResult);
+               
               this.setState({
                     image: uploadResult.location,
                     area_data: undefined
                 });
             }
         } catch (e) {
-            console.log({ uploadResponse });
-        
             console.log({ e });
             alert('Upload failed, sorry :(');
         } finally {
@@ -881,6 +960,7 @@ class WorkOrder extends Component {
     }
 
      uploadImageAsync= async(uri)=> {
+        console.log(uri);
         let uriParts = uri.split('.');
         let fileType = uriParts[uriParts.length - 1];
 

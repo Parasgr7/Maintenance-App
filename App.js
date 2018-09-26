@@ -134,8 +134,10 @@ class LoginActivity extends Component {
                                     autoCorrect={false}
                                     placeholder="Password"
                                     placeholderTextColor="white"
+                                    secureTextEntry={true}
                                     onChangeText={UserPassword => this.setState({UserPassword})}
                                 />
+                                
                             </Item>
                             </Form>
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>

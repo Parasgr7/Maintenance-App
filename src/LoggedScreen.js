@@ -75,8 +75,6 @@ class ProfileActivity extends Component {
 
 
     loadItems(day) {
-        
-
             for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
                 const strTime = this.timeToString(time);
@@ -124,8 +122,6 @@ class ProfileActivity extends Component {
             this.setState({
                 items: newItems
             });
-            
-
     }
 
     renderItem(item) {
@@ -180,10 +176,7 @@ const styles = StyleSheet.create({
         marginBottom: 7,
         height: 40,
         borderWidth: 1,
-// Set border Hex Color Code Here.
         borderColor: '#2196F3',
-
-        // Set border Radius.
         borderRadius: 5 ,
 
     },
