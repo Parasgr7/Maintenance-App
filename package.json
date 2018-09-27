@@ -16,9 +16,11 @@
     "react-native-material-dropdown": "^0.11.1",
     "react-native-modal": "^6.5.0",
     "react-native-modalbox": "^1.6.0",
+    "react-native-switch": "^1.5.0",
     "react-native-table-component": "^1.1.8",
     "react-navigation": "^2.5.5",
-    "tcomb-form-native": "^0.6.16"
+    "tcomb-form-native": "^0.6.16",
+    "toggle-switch-react-native": "^2.0.2"
   },
   "devDependencies": {
     "react-devtools": "^3.2.3"

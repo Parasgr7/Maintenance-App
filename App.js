@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback} from 'react-native';
+import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity} from 'react-native';
 import {Form, Item, Label, Input} from 'native-base';
 
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
 import Icon from '@expo/vector-icons/FontAwesome';
-
-
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
+import ToggleSwitch from 'toggle-switch-react-native';
+import { Switch } from 'react-native-switch';
 
 import styles from "./assets/stylesheets/login_css"
 
@@ -26,7 +26,7 @@ class LoginActivity extends Component {
     // Setting up Login Activity title.
     static navigationOptions =
         {
-            // title: 'Log In',
+
             header:null
         };
        
@@ -38,7 +38,8 @@ class LoginActivity extends Component {
         this.state = {
 
             UserEmail: '',
-            UserPassword: ''
+            UserPassword: '',
+            isSwitchOn: false
 
         }
 
@@ -47,7 +48,7 @@ class LoginActivity extends Component {
 
     _storeToken = async accessToken => {
         try{
-        await AsyncStorage.setItem(ACCESS_TOKEN,JSON.stringify(accessToken))
+        await AsyncStorage.setItem(ACCESS_TOKEN,accessToken)
         this._getToken();
     }catch(error){
         console.log("Something went wrong");
@@ -140,8 +141,11 @@ class LoginActivity extends Component {
                                     onChangeText={UserPassword => this.setState({UserPassword})}
                                 />
                                 
-                            </Item>
-                            </Form>
+                                
+                            </Item> 
+                            
+                         </Form>
+
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
                                 <Text style={styles.TextStyle}> Sign In </Text>
                             </TouchableOpacity>

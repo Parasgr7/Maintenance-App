@@ -11,8 +11,8 @@ import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import styles from "../assets/stylesheets/work_order_css"
 
+import styles from "../assets/stylesheets/work_order_css"
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -302,6 +302,7 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
+
         if (check==1){
             fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
@@ -356,7 +357,6 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
-
         if (check==1){
             fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
@@ -495,7 +495,8 @@ class WorkOrder extends Component {
                                         this.setState({area_data : this.state.data.app_data[i] });
                                         this.setState({index:i});
                                         this.setState({image:""});
-                                        console.log(this.state.area_data);
+                                        console.log(this.state.data.app_data[i]);
+                                       
  
                                     }
                                 }  
@@ -645,14 +646,15 @@ class WorkOrder extends Component {
     }
 
     thumbs_up=()=> {
-        if (typeof(this.state.area_data)!=="undefined")
+        if (typeof(this.state.area_data)=="undefined")
         {
-        this.setState({rate:"true"});
-        this.state.area_data.rate="true";
-        }
-        else{
             Alert.alert("Select an Area");
             return
+        
+        }
+        else{
+            this.setState({rate:"true"});
+        this.state.area_data.rate="true";
         }
         
 
@@ -711,14 +713,16 @@ class WorkOrder extends Component {
 
     }
     thumbs_down=()=>{
-        if (typeof(this.state.area_data)!=="undefined")
+        if (typeof(this.state.area_data)=="undefined")
         {
-        this.setState({rate:"true"});
-        this.state.area_data.rate="true";
-        }
-        else{
             Alert.alert("Select an Area");
             return
+       
+        }
+        else{
+            this.setState({rate:"true"});
+            this.state.area_data.rate="true";
+            
         }
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
@@ -812,6 +816,7 @@ class WorkOrder extends Component {
         }
         else{
             return;
+            
         }
     }
     _maybeRenderImage = () => {
@@ -850,8 +855,14 @@ class WorkOrder extends Component {
 
 
     _pickImage = async () => {
-        if (typeof(this.state.area_data)!=="undefined")
+        if (typeof(this.state.area_data)=="undefined")
         {
+            Alert.alert("Select an Area");
+            return
+       
+        }
+        else{
+            
             const {
                 status: cameraRollPerm
             } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -863,11 +874,6 @@ class WorkOrder extends Component {
                 });  
                 this._handleImagePicked(pickerResult);
             }
-       
-        }
-        else{
-            Alert.alert("Select an Area");
-            return
         }
 
         

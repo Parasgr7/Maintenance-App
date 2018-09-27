@@ -13,7 +13,7 @@ import styles from "../assets/stylesheets/calendar_page_css"
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-// Creating Profile activity.
+
 class ProfileActivity extends Component {
 
     static navigationOptions =
@@ -32,16 +32,16 @@ class ProfileActivity extends Component {
 
     _getToken = async () => {
         try {
-        const token = await AsyncStorage.getItem(ACCESS_TOKEN);
+        this.setState({token: await AsyncStorage.getItem(ACCESS_TOKEN)}) 
         } catch (error) {
-
             console.log("Something went wrong");
         }
     }
 
     WorkOrderFunction = (item) =>{
         this._getToken();
-        this.state.data={id:item.id,check:item.check,userData:{token:108574197299687074239,date:item.date}};
+        console.log(this.state.token);
+        this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
         this.props.navigation.navigate('ThirdPage',{param:this.state.data});
         
     }
