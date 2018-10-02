@@ -136,8 +136,8 @@ class LoginActivity extends Component {
                     
                     }
                     else{
-                        // this.props.navigation.navigate('App');
-                        Alert.alert("Provide Proper Credentials");
+                        this.props.navigation.navigate('App');
+                        // Alert.alert("Provide Proper Credentials");
                     }
 
                 }).catch((error) => {
