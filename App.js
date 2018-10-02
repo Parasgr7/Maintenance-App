@@ -9,8 +9,7 @@ import Icon from '@expo/vector-icons/FontAwesome';
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
-import ToggleSwitch from 'toggle-switch-react-native';
-import { Switch } from 'react-native-switch';
+import SwitchSelector from 'react-native-switch-selector';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -37,9 +36,11 @@ class LoginActivity extends Component {
 
             UserEmail: '',
             UserPassword: '',
-            isSwitchOn: false
+            worker:'0'
+
 
         }
+        console.log(this.state.worker);
 
     }
 
@@ -72,7 +73,8 @@ class LoginActivity extends Component {
         const { UserEmail }  = this.state ;
         const { UserPassword }  = this.state ;
 
-
+        if(this.state.worker==1)
+        {
         fetch('http://18.222.123.107/api/v1/login', {
             method: 'POST',
             headers: {
@@ -82,30 +84,64 @@ class LoginActivity extends Component {
             body: JSON.stringify({
 
                 email: UserEmail,
-
                 password: UserPassword
 
             })
 
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                
-                // If server response message same as Data Matched
-                if(typeof(responseJson)=='string')
-                {   
-                    this._storeToken(responseJson);
-                    //Then open Profile activity and send user email to profile activity.
-                    this.props.navigation.navigate('App');
-                   
-                }
-                else{
-                    this.props.navigation.navigate('App');
-                    // Alert.alert("Provide Proper Credentials");
-                }
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    
+                    // If server response message same as Data Matched
+                    if(typeof(responseJson)=='string')
+                    {   
+                        this._storeToken(responseJson);
+                        //Then open Profile activity and send user email to profile activity.
+                        this.props.navigation.navigate('App');
+                    
+                    }
+                    else{
+                        this.props.navigation.navigate('App');
+                        // Alert.alert("Provide Proper Credentials");
+                    }
 
-            }).catch((error) => {
-            console.error(error);
-        });
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
+        else{
+            fetch('http://localhost:3000/api/v1/cleaner_login', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+
+                email: UserEmail,
+                password: UserPassword
+
+            })
+
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    
+                    // If server response message same as Data Matched
+                    if(typeof(responseJson)=='string')
+                    {   
+                        this._storeToken(responseJson);
+                        //Then open Profile activity and send user email to profile activity.
+                        this.props.navigation.navigate('App');
+                    
+                    }
+                    else{
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
+                    }
+
+                }).catch((error) => {
+                console.error(error);
+            });
+        }
 
 
     }
@@ -137,13 +173,26 @@ class LoginActivity extends Component {
                                     placeholderTextColor="white"
                                     secureTextEntry={true}
                                     onChangeText={UserPassword => this.setState({UserPassword})}
-                                />
+                                />  
                                 
-                                
-                            </Item> 
+                            </Item>
+                  
                             
+                      
                          </Form>
-
+                         <SwitchSelector
+    initial={0}
+    onPress={value => {this.setState({ worker: value });console.log(value)}}
+    // textColor='#7a44cf' //'#7a44cf'
+    // selectedColor='#7a44cf'
+    // buttonColor='#7a44cf'
+    // borderColor='#7a44cf'
+    hasPadding
+    options={[
+        { label: 'Cleaner', value: '0' }, //images.feminino = require('./path_to/assets/img/feminino.png')
+        { label: 'Maintainer', value: '1'} //images.masculino = require('./path_to/assets/img/masculino.png')
+    ]}/>
+                         
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
                                 <Text style={styles.TextStyle}> Sign In </Text>
                             </TouchableOpacity>
