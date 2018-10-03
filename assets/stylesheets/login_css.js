@@ -18,10 +18,7 @@ export default StyleSheet.create({
         marginBottom: 7,
         height: 40,
         borderWidth: 1,
-// Set border Hex Color Code Here.
         borderColor: '#2196F3',
-
-        // Set border Radius.
         borderRadius: 5 ,
 
     },
@@ -72,6 +69,12 @@ export default StyleSheet.create({
         color:'#fff',
         textAlign:'center',
         fontSize:20
+    },
+
+    Select:{
+        marginLeft:15,
+        paddingTop:40,
+        width:170
     }
 
 });

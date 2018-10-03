@@ -11,6 +11,8 @@ import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 
+import { showMessage, hideMessage } from "react-native-flash-message";
+
 
 import styles from "../assets/stylesheets/work_order_css"
 
@@ -150,7 +152,7 @@ class WorkOrder extends Component {
         const value = this.formRef.getValue();
         let req={};
         let result=[];
-        if(value)
+        if(value.product.length)
         {   
             for(let i=0;i<value.product.length;i++)
             {   
@@ -205,9 +207,10 @@ class WorkOrder extends Component {
 
     handleSubmitCost = () => {
         const value = this.formRef.getValue();
+        console.log(value);
         let req={};
         let result=[];
-        if(value)
+        if(value.add_cost.length)
         {   
             for(let i=0;i<value.add_cost.length;i++)
             {   
@@ -354,13 +357,23 @@ class WorkOrder extends Component {
 
       }
 
+      _getToken = async () => {
+        try {
+           data = await AsyncStorage.getItem('session_data');
+           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker });
+        
+        } catch (error) {
+            console.log("Something went wrong");
+        }
+    }
+
         componentDidMount(){
-    
+        this._getToken();
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
         if (check==1){
-            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -382,7 +395,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -420,25 +433,11 @@ class WorkOrder extends Component {
             </View>
           );
         }
-        const InventoryState = {
-            tableHead: ['Source', 'Product', 'Count']
-        };
-
-        const CostState = {
-            tableHead: ['Item', 'Cost']
-        };
+        
        
-        let inventData=[];
-        for(let i=0;i<this.state.data.inventory.length;i++)
-        {
-            inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
-        }
+        
     
-        let costData=[];
-        for(let i=0;i<this.state.data.cost.length;i++)
-        {
-            costData.push([this.state.data.cost[i].item,this.state.data.cost[i].cost])
-        }
+        
 
         let list=[];
         if(this.state.data.listings!=null)
@@ -550,7 +549,38 @@ class WorkOrder extends Component {
                             {this.listing_data()}
                             {this._maybeRenderUploadingOverlay()}
                     </ScrollView>
-                    <ScrollView style={styles.TableContainer} >
+                    {this.add_inventory()}
+                    {this.add_cost()}
+                    <View style={{marginBottom:80}}>
+                            <Dropdown
+                                label='Select Status'
+                                data={status_data}
+                                value={this.state.data.status}
+                                onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
+
+                            />
+                    </View>
+                </ScrollView>
+
+            </ScrollView>
+    </ScrollView>
+        );
+    }
+
+    add_inventory=()=>{
+        const InventoryState = {
+            tableHead: ['Source', 'Product', 'Count']
+        };
+        let inventData=[];
+        for(let i=0;i<this.state.data.inventory.length;i++)
+        {
+            inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
+        }
+        console.log(this.state.worker);
+        if(this.state.worker==='0')
+        {
+            return(
+        <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                             <Row data={InventoryState.tableHead} style={styles.head} textStyle={styles.text}/>
                             <Rows data={inventData} textStyle={styles.text}/>
@@ -560,10 +590,29 @@ class WorkOrder extends Component {
                             <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
                                 {this._renderInventoryModalContent()}
                             </Modal>
-                        </View>
-                        
-                    </ScrollView>
-                    <ScrollView style={styles.TableContainer} >
+                        </View>   
+        </ScrollView>
+            );
+        }
+        else 
+            return;
+
+    }
+
+    add_cost=()=>{
+        const CostState = {
+            tableHead: ['Item', 'Cost']
+        };
+        let costData=[];
+        for(let i=0;i<this.state.data.cost.length;i++)
+        {
+            costData.push([this.state.data.cost[i].item,this.state.data.cost[i].cost])
+        }
+        console.log(this.state.worker);
+        if(this.state.worker==='1')
+        {
+            return(
+        <ScrollView style={styles.TableContainer} >
                         <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                             <Row data={CostState.tableHead} style={styles.head} textStyle={styles.text}/>
                             <Rows data={costData} textStyle={styles.text}/>
@@ -573,23 +622,13 @@ class WorkOrder extends Component {
                             <Modal isVisible={this.state.visibleModalCost === 1} style={styles.bottomModal}>
                                 {this._renderCostModalContent()}
                             </Modal>
-                        </View>
-                        
-                    <View style={{marginBottom:80}}>
-                            <Dropdown
-                                label='Select Status'
-                                data={status_data}
-                                value={this.state.data.status}
-                                onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
+                        </View>    
+        </ScrollView>
+            );
+        }
+        else
+            return;
 
-                                />
-                    </View>    
-                    </ScrollView>
-                </ScrollView>
-
-            </ScrollView>
-    </ScrollView>
-        );
     }
 
     statusUpdate=(value)=> {
@@ -649,6 +688,9 @@ class WorkOrder extends Component {
 
     thumbs_up=()=> {
 
+        if (this.state.area_data.area==this.state.area)
+        {
+
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
       
@@ -666,11 +708,16 @@ class WorkOrder extends Component {
                     index: this.state.index
 
                 })
-
+                
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
                     Alert.alert("Liked :)");
+                    // showMessage({
+                    //     message: "Simple message",
+                    //     type: "info",
+                    //   });
+           
                     
 
                 }).catch((error) => {
@@ -696,15 +743,25 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     console.log(responseJson);
                     Alert.alert("Liked :)");
+                    // showMessage({
+                    //     message: "Simple message",
+                    //     type: "info",
+                    //   });
+           
 
                 }).catch((error) => {
                 console.error(error);
             });
         }
+    }
+    else{
+        Alert.alert("Select Proper Area");
+    }
 
     }
     thumbs_down=()=>{
-        
+        if (this.state.area_data.area==this.state.area)
+        {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         this.setState({rate:"false"});
@@ -755,7 +812,10 @@ class WorkOrder extends Component {
                 console.error(error);
             });
         }
-
+    }
+    else{
+        Alert.alert("Select Proper Area");
+    }
 
     }
 
@@ -905,7 +965,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    
+                    Alert.alert("Successfully Uploaded");
 
                 }).catch((error) => {
                 console.error(error);
@@ -931,6 +991,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
+                    Alert.alert("Successfully Uploaded");
 
                 }).catch((error) => {
                 console.error(error);

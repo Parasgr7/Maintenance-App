@@ -1,22 +1,10 @@
 import React, { Component } from 'react';
-
 import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,TouchableOpacity} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
-
-
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/logout_css";
 
-let height= Dimensions.get('window').height;
-let width= Dimensions.get('window').width;
-
-const ACCESS_TOKEN= 'access_token';
-
-
-// Creating Logout Activity.
 class Logout extends Component {
 
-    // Setting up Logout Activity title.
     static navigationOptions =
         {
             title: 'Log Out',
@@ -24,7 +12,7 @@ class Logout extends Component {
         };
        
     _signOutAsync = async () => {
-        await AsyncStorage.removeItem(ACCESS_TOKEN);
+        await AsyncStorage.removeItem('session_data');
         this.props.navigation.navigate('Auth');
         };
 

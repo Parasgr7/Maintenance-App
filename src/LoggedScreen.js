@@ -1,18 +1,8 @@
 import React, {Component} from 'react';
 import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
-
 import {Agenda} from 'react-native-calendars';
-
-
-
 import { AsyncStorage } from "react-native";
-
-const ACCESS_TOKEN= 'access_token';
-
 import styles from "../assets/stylesheets/calendar_page_css"
-
-let height= Dimensions.get('window').height;
-let width= Dimensions.get('window').width;
 
 class ProfileActivity extends Component {
 
@@ -32,7 +22,9 @@ class ProfileActivity extends Component {
 
     _getToken = async () => {
         try {
-        this.setState({token: await AsyncStorage.getItem(ACCESS_TOKEN)}) 
+           data = await AsyncStorage.getItem('session_data');
+           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker });
+        
         } catch (error) {
             console.log("Something went wrong");
         }
@@ -40,7 +32,6 @@ class ProfileActivity extends Component {
 
     WorkOrderFunction = (item) =>{
         this._getToken();
-        console.log(this.state.token);
         this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
         this.props.navigation.navigate('ThirdPage',{param:this.state.data});
         
@@ -94,12 +85,13 @@ class ProfileActivity extends Component {
                 const strTime = this.timeToString(time);
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
-                    const userData = {token:108574197299687074239, date:strTime};
-                    fetch('http://localhost:3000/api/v1/work_orders/?token='+userData.token+'&date='+userData.date)
+                    const userData = {date:strTime};
+                    this._getToken();
+                    if (this.state.worker==='0')
+                    {
+                    fetch('http://localhost:3000/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
-                            
-                            
                             // If server response message same as Data Matched
                             if(responseJson)
                             {   
@@ -128,6 +120,43 @@ class ProfileActivity extends Component {
                         }).catch((error) => {
                         console.error(error);
                     });
+                }
+                else if(this.state.worker==='1')
+                {
+                    fetch('http://localhost:3000/api/v1/work_orders/maintainer/?token='+this.state.token+'&date='+userData.date)
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        
+                        console.log("Maintainer",responseJson);
+                        // If server response message same as Data Matched
+                        if(responseJson)
+                        {   
+                            const numItems = responseJson.length;
+                            for (let j = 0; j < numItems; j++) {
+                                this.state.items[strTime].push({
+                                    name: responseJson[j].name,
+                                    id: responseJson[j].id,
+                                    address: responseJson[j].address,
+                                    status: responseJson[j].status,
+                                    height: Math.max(50, Math.floor(Math.random() * 150)),
+                                    check:responseJson[j].check,
+                                    app_data:responseJson[j].app_data,
+                                    date:strTime,
+                                    inventory: responseJson[j].inventory,
+                                    cost: responseJson[j].cost
+                                });
+                            }
+
+                        }
+                        else{
+
+                            Alert.alert(responseJson);
+                        }
+
+                    }).catch((error) => {
+                    console.error(error);
+                });  
+                }
 
                 }  
             }

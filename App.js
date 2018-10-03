@@ -11,12 +11,11 @@ import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 
-import styles from "./assets/stylesheets/login_css"
+import styles from "./assets/stylesheets/login_css";
+import FlashMessage from 'react-native-flash-message';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-
-const ACCESS_TOKEN= 'access_token';
 
 
 // Creating Login Activity.
@@ -25,7 +24,6 @@ class LoginActivity extends Component {
     // Setting up Login Activity title.
     static navigationOptions =
         {
-
             header:null
         };
        
@@ -40,16 +38,17 @@ class LoginActivity extends Component {
             UserPassword: '',
             worker:'0'
 
-
         }
-        console.log(this.state.worker);
 
     }
-
+    
 
     _storeToken = async accessToken => {
         try{
-        await AsyncStorage.setItem(ACCESS_TOKEN,accessToken)
+            userdata={"access_token": accessToken, "worker": this.state.worker};
+            item=[];
+            item.push(userdata);
+        await AsyncStorage.setItem('session_data',JSON.stringify(item))
         this._getToken();
     }catch(error){
         console.log("Something went wrong");
@@ -60,7 +59,7 @@ class LoginActivity extends Component {
 
     _getToken = async () => {
         try {
-        const token = await AsyncStorage.getItem(ACCESS_TOKEN);
+        const token = await AsyncStorage.getItem('data');
         if (token !== null) {
             this.props.navigation.navigate(token? 'App':'Auth');
         }
@@ -75,7 +74,7 @@ class LoginActivity extends Component {
         const { UserEmail }  = this.state ;
         const { UserPassword }  = this.state ;
 
-        if(this.state.worker==1)
+        if(this.state.worker=='1')
         {
         fetch('http://18.222.123.107/api/v1/login', {
             method: 'POST',
@@ -110,7 +109,7 @@ class LoginActivity extends Component {
                 console.error(error);
             });
         }
-        else{
+        else if (this.state.worker==='0'){
             fetch('http://localhost:3000/api/v1/cleaner_login', {
             method: 'POST',
             headers: {
@@ -126,12 +125,9 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    
-                    // If server response message same as Data Matched
-                    if(typeof(responseJson)=='string')
-                    {   
+                    if(typeof(responseJson)=='number')
+                    {  
                         this._storeToken(responseJson);
-                        //Then open Profile activity and send user email to profile activity.
                         this.props.navigation.navigate('App');
                     
                     }
@@ -182,18 +178,22 @@ class LoginActivity extends Component {
                             
                       
                          </Form>
+                         <View style={styles.Select}>
                          <SwitchSelector
-    initial={0}
-    onPress={value => {this.setState({ worker: value });console.log(value)}}
-    // textColor='#7a44cf' //'#7a44cf'
-    // selectedColor='#7a44cf'
-    // buttonColor='#7a44cf'
-    // borderColor='#7a44cf'
-    hasPadding
-    options={[
-        { label: 'Cleaner', value: '0' }, //images.feminino = require('./path_to/assets/img/feminino.png')
-        { label: 'Maintainer', value: '1'} //images.masculino = require('./path_to/assets/img/masculino.png')
-    ]}/>
+                            initial={0}
+                            onPress={value => {this.setState({ worker: value });console.log(value)}}
+                            // textColor='#7a44cf' //'#7a44cf'
+                            // selectedColor='#7a44cf'
+                            buttonColor='#00BCD4'
+                            // borderColor='#7a44cf'
+                            hasPadding
+                            // style={styles.SubmitButtonStyle}
+                            options={[
+                                { label: 'Cleaner', value: '0' }, //images.feminino = require('./path_to/assets/img/feminino.png')
+                                { label: 'Maintainer', value: '1'} //images.masculino = require('./path_to/assets/img/masculino.png')
+                            ]}
+                         />
+                         </View>
                          
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
                                 <Text style={styles.TextStyle}> Sign In </Text>
@@ -204,6 +204,7 @@ class LoginActivity extends Component {
 
                     
                 </ImageBackground>
+                <FlashMessage position="top" />
             </View>
 
         );
