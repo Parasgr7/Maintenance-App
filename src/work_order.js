@@ -175,7 +175,8 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Inventory Updated");
+                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
+
                     
                 }).catch((error) => {
                 console.error(error);
@@ -196,7 +197,8 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Inventory Updated");
+                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
+
                     
                 }).catch((error) => {
                 console.error(error);
@@ -234,7 +236,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Cost Updated");
+                    Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
                     
                 }).catch((error) => {
                 console.error(error);
@@ -255,8 +257,9 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Cost Updated");
-                    // this.setState({ visibleModalCost: null });
+                    Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () => this.setState({ visibleModalCost: null }) }]);
+ 
+                    // 
                 }).catch((error) => {
                 console.error(error);
             });

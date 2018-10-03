@@ -184,7 +184,7 @@ class LoginActivity extends Component {
                             onPress={value => {this.setState({ worker: value });console.log(value)}}
                             // textColor='#7a44cf' //'#7a44cf'
                             // selectedColor='#7a44cf'
-                            buttonColor='#00BCD4'
+                            buttonColor='#6db3bc'
                             // borderColor='#7a44cf'
                             hasPadding
                             // style={styles.SubmitButtonStyle}
