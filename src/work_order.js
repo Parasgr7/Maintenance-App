@@ -11,9 +11,6 @@ import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-import { showMessage, hideMessage } from "react-native-flash-message";
-
-
 import styles from "../assets/stylesheets/work_order_css"
 
 let height= Dimensions.get('window').height;
@@ -715,13 +712,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Liked :)");
-                    // showMessage({
-                    //     message: "Simple message",
-                    //     type: "info",
-                    //   });
-           
-                    
+                    Alert.alert("Liked :)");  
 
                 }).catch((error) => {
                 console.error(error);
@@ -886,7 +877,7 @@ class WorkOrder extends Component {
                 <View style={styles.content}>
                 <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
                    <Text style={styles.TextStyle}>Upload</Text>
-                    </TouchableOpacity>
+                </TouchableOpacity>
                 </View>
        
             </View>

@@ -12,7 +12,6 @@ import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 
 import styles from "./assets/stylesheets/login_css";
-import FlashMessage from 'react-native-flash-message';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -204,7 +203,6 @@ class LoginActivity extends Component {
 
                     
                 </ImageBackground>
-                <FlashMessage position="top" />
             </View>
 
         );
