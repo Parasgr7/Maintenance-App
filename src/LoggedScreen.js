@@ -89,7 +89,7 @@ class ProfileActivity extends Component {
                     this._getToken();
                     if (this.state.worker==='0')
                     {
-                    fetch('http://localhost:3000/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             // If server response message same as Data Matched
@@ -123,7 +123,7 @@ class ProfileActivity extends Component {
                 }
                 else if(this.state.worker==='1')
                 {
-                    fetch('http://localhost:3000/api/v1/work_orders/maintainer/?token='+this.state.token+'&date='+userData.date)
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/maintainer/?token='+this.state.token+'&date='+userData.date)
                     .then((response) => response.json())
                     .then((responseJson) => {
                         

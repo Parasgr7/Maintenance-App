@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator,Platform,KeyboardAvoidingView,RefreshControl} from 'react-native';
+import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator,Platform,KeyboardAvoidingView,RefreshControl,TouchableHighlight} from 'react-native';
 import { Item, Label, Input, Button} from 'native-base';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
@@ -149,7 +149,12 @@ class WorkOrder extends Component {
         const value = this.formRef.getValue();
         let req={};
         let result=[];
-        if(value.product.length)
+        if(value==null)
+        {
+            Alert.alert("Fields cannot be empty");
+            return;
+        }
+        else(value.product.length)
         {   
             for(let i=0;i<value.product.length;i++)
             {   
@@ -159,7 +164,7 @@ class WorkOrder extends Component {
             const check = this.props.navigation.state.params.param.check;
             if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_inventory/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -172,7 +177,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
+                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
                     
                 }).catch((error) => {
@@ -181,7 +186,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/add_inventory/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_inventory/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -194,7 +199,7 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     console.log(responseJson);
-                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
+                    Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
                     
                 }).catch((error) => {
@@ -209,7 +214,12 @@ class WorkOrder extends Component {
         console.log(value);
         let req={};
         let result=[];
-        if(value.add_cost.length)
+        if(value==null)
+        {
+            Alert.alert("Fields cannot be empty");
+            return;
+        }
+        else if(value.add_cost.length)
         {   
             for(let i=0;i<value.add_cost.length;i++)
             {   
@@ -220,7 +230,7 @@ class WorkOrder extends Component {
 
             if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/add_cost/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_cost/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -241,7 +251,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/add_cost/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/add_cost/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -262,6 +272,10 @@ class WorkOrder extends Component {
             });
         }
 
+        }
+        else{
+            Alert.alert("Add Items");
+            return
         }
     }
 
@@ -309,7 +323,7 @@ class WorkOrder extends Component {
         const userData=this.props.navigation.state.params.param.userData;
 
         if (check==1){
-            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -332,7 +346,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -373,7 +387,7 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
         const userData=this.props.navigation.state.params.param.userData;
         if (check==1){
-            fetch('http://localhost:3000/api/v1/work_order/service_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -395,7 +409,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://localhost:3000/api/v1/work_order/cleaning_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
+            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -530,6 +544,7 @@ class WorkOrder extends Component {
                                 />
                             </ScrollView>
                         </ScrollView>
+                        
                         <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                             <ScrollView style={ {margin: 7}}>
                                 <Icon
@@ -638,7 +653,7 @@ class WorkOrder extends Component {
       
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/work_status/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -662,7 +677,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/work_status/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -690,13 +705,16 @@ class WorkOrder extends Component {
 
         if (this.state.area_data.area==this.state.area)
         {
+        this.setState({rate:"true"});
+        this.state.area_data.rate="true";
+        console.log(this.state.area_data);
 
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
-      
+        
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -719,8 +737,8 @@ class WorkOrder extends Component {
             });
         }
         else
-        {   
-            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+        {   console.log(this.state.area_data);
+            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -759,12 +777,11 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         this.setState({rate:"false"});
-        console.log(this.state.area_data);
         this.state.area_data.rate="false";
        
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/up/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -787,7 +804,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/down/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -861,6 +878,7 @@ class WorkOrder extends Component {
         } = this.state;
         let x= this.state.image;
         console.log("Mayberender",this.state.image);
+        
         if(image){
         return (
             <View style={styles.maybeRenderImageText}> 
@@ -871,6 +889,7 @@ class WorkOrder extends Component {
 
                 <TextInput
                     style={styles.textInsert}
+                    placeholder="Notes Here"
                     onChangeText={(text) => this.setState({text})}
                     value={this.state.text}
                 />
@@ -891,6 +910,11 @@ class WorkOrder extends Component {
 
 
     _pickImage = async () => {
+        if(this.state.area=="")
+        {
+            Alert.alert("Select proper area");
+            return
+        }
             
             const {
                 status: cameraRollPerm
@@ -938,10 +962,15 @@ class WorkOrder extends Component {
     uploadNotes= (link,text,area)=> {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
+        if(link==false)
+        {
+            Alert.alert("Image not selected!");
+        }
+        else{
       
         if (check==0)
         {
-            fetch('http://localhost:3000/api/v1/notesupload/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/notesupload/cleaning_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -967,7 +996,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://localhost:3000/api/v1/notesupload/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -991,6 +1020,7 @@ class WorkOrder extends Component {
                 console.error(error);
             });
         }
+    }
     
     }
 

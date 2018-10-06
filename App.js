@@ -100,8 +100,8 @@ class LoginActivity extends Component {
                     
                     }
                     else{
-                        this.props.navigation.navigate('App');
-                        // Alert.alert("Provide Proper Credentials");
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
                     }
 
                 }).catch((error) => {
@@ -109,7 +109,7 @@ class LoginActivity extends Component {
             });
         }
         else if (this.state.worker==='0'){
-            fetch('http://localhost:3000/api/v1/cleaner_login', {
+            fetch('http://dev4.holidale.org/api/v1/cleaner_login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -131,8 +131,8 @@ class LoginActivity extends Component {
                     
                     }
                     else{
-                        this.props.navigation.navigate('App');
-                        // Alert.alert("Provide Proper Credentials");
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
                     }
 
                 }).catch((error) => {
