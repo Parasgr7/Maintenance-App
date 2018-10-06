@@ -1034,7 +1034,7 @@ class WorkOrder extends Component {
         
         const file = {
             uri: uri,
-            name: `${uriParts[0].substr(uriParts[0].length - 7)}.${fileType}`,
+            name: `${uriParts[uriParts.length - 2]}.${fileType}`,
             type: `image/${fileType}`
           }
         const options = {
