@@ -40,6 +40,9 @@ class LoginActivity extends Component {
         }
 
     }
+    componentDidMount(){
+        this._getToken();
+    }
     
 
     _storeToken = async accessToken => {
@@ -58,13 +61,13 @@ class LoginActivity extends Component {
 
     _getToken = async () => {
         try {
-        const token = await AsyncStorage.getItem('data');
+        const token = await AsyncStorage.getItem('session_data');
         if (token !== null) {
             this.props.navigation.navigate(token? 'App':'Auth');
         }
         } catch (error) {
-            console.log(error);
-            console.log("Something went wrong");
+            // console.log(error);
+            console.log("Something went wrong while getting token");
         }
     }
 
@@ -173,23 +176,17 @@ class LoginActivity extends Component {
                                 />  
                                 
                             </Item>
-                  
-                            
-                      
-                         </Form>
+                        </Form>
                          <View style={styles.Select}>
                          <SwitchSelector
                             initial={0}
-                            onPress={value => {this.setState({ worker: value });console.log(value)}}
-                            // textColor='#7a44cf' //'#7a44cf'
-                            // selectedColor='#7a44cf'
+                            onPress={value => {this.setState({ worker: value })}}
                             buttonColor='#6db3bc'
                             // borderColor='#7a44cf'
                             hasPadding
-                            // style={styles.SubmitButtonStyle}
                             options={[
-                                { label: 'Cleaner', value: '0' }, //images.feminino = require('./path_to/assets/img/feminino.png')
-                                { label: 'Maintainer', value: '1'} //images.masculino = require('./path_to/assets/img/masculino.png')
+                                { label: 'Cleaner', value: '0' }, 
+                                { label: 'Maintainer', value: '1'} 
                             ]}
                          />
                          </View>

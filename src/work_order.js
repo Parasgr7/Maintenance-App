@@ -176,7 +176,6 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
                     
@@ -198,7 +197,7 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+
                     Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
                     
@@ -211,7 +210,6 @@ class WorkOrder extends Component {
 
     handleSubmitCost = () => {
         const value = this.formRef.getValue();
-        console.log(value);
         let req={};
         let result=[];
         if(value==null)
@@ -242,7 +240,6 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
                     
                 }).catch((error) => {
@@ -263,7 +260,7 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                
                     Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () => this.setState({ visibleModalCost: null }) }]);
  
                     // 
@@ -352,7 +349,6 @@ class WorkOrder extends Component {
                             if(responseJson)
                             {   
                                 let res= responseJson;
-                                console.log("Referesh");
                                 this.setState({
                                     data: res[0],
                                     refreshing: false
@@ -527,8 +523,7 @@ class WorkOrder extends Component {
                                 <Icon
                                     name='thumbs-up'
                                     type='font-awesome'
-                                    color='#517fa4'
-                                    // reverseColor='red'
+                                    color={this.state.area_data.rate=="true" && this.state.area_data.area==this.state.area?"#033b49":"#378A9E"}
                                     raised
                                     // reverse
                                     onPress={() => this.thumbs_up()} />
@@ -537,8 +532,7 @@ class WorkOrder extends Component {
                                 <Icon
                                     name='thumbs-down'
                                     type='font-awesome'
-                                    color='#517fa4'
-                                    // reverseColor='green'
+                                    color={this.state.area_data.rate=="false" && this.state.area_data.area==this.state.area?"#033b49":"#378A9E"}
                                     raised
                                     onPress={() => this.thumbs_down()}
                                 />
@@ -550,7 +544,7 @@ class WorkOrder extends Component {
                                 <Icon
                                     name='camera'
                                     type='font-awesome'
-                                    color='#517fa4'
+                                    color='#378A9E'
                                     raised
                                     onPress={this._pickImage} 
                                 />
@@ -702,12 +696,22 @@ class WorkOrder extends Component {
     }
 
     thumbs_up=()=> {
+       
+        if(this.state.area=="")
+        {
+            Alert.alert("Select Proper Area");
+        }
+        else if(this.state.area_data.area!=this.state.area)
+        {
+            console.log(this.state.area,"Yes");
+            Alert.alert("Please upload image");
+            return;
+        }
 
-        if (this.state.area_data.area==this.state.area)
+        else (this.state.area_data.area==this.state.area)
         {
         this.setState({rate:"true"});
         this.state.area_data.rate="true";
-        console.log(this.state.area_data);
 
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
@@ -753,26 +757,27 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                  
                     Alert.alert("Liked :)");
-                    // showMessage({
-                    //     message: "Simple message",
-                    //     type: "info",
-                    //   });
-           
-
                 }).catch((error) => {
                 console.error(error);
             });
         }
     }
-    else{
-        Alert.alert("Select Proper Area");
-    }
-
     }
     thumbs_down=()=>{
-        if (this.state.area_data.area==this.state.area)
+        console.log(this.state.area);
+        if(this.state.area=="")
+        {
+            Alert.alert("Select Proper Area");
+        }
+        else if(this.state.area_data.area!=this.state.area)
+        {   
+            console.log(this.state.area,"No");
+            Alert.alert("Please upload image");
+        }
+
+        else(this.state.area_data.area==this.state.area)
         {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
@@ -824,9 +829,6 @@ class WorkOrder extends Component {
             });
         }
     }
-    else{
-        Alert.alert("Select Proper Area");
-    }
 
     }
 
@@ -877,7 +879,6 @@ class WorkOrder extends Component {
             image
         } = this.state;
         let x= this.state.image;
-        console.log("Mayberender",this.state.image);
         
         if(image){
         return (
@@ -987,7 +988,7 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+
                     Alert.alert("Successfully Uploaded");
 
                 }).catch((error) => {
@@ -1013,7 +1014,6 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     Alert.alert("Successfully Uploaded");
 
                 }).catch((error) => {

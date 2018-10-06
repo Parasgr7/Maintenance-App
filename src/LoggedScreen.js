@@ -26,7 +26,7 @@ class ProfileActivity extends Component {
            this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker });
         
         } catch (error) {
-            console.log("Something went wrong");
+            console.log("Something went wrong in logged screen");
         }
     }
 
@@ -127,7 +127,6 @@ class ProfileActivity extends Component {
                     .then((response) => response.json())
                     .then((responseJson) => {
                         
-                        console.log("Maintainer",responseJson);
                         // If server response message same as Data Matched
                         if(responseJson)
                         {   

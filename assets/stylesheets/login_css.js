@@ -73,7 +73,7 @@ export default StyleSheet.create({
 
     Select:{
         marginLeft:15,
-        paddingTop:40,
+        paddingTop:10,
         width:170
     }
 
