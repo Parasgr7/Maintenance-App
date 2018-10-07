@@ -700,10 +700,10 @@ class WorkOrder extends Component {
         if(this.state.area=="")
         {
             Alert.alert("Select Proper Area");
+            return;
         }
         else if(this.state.area_data.area!=this.state.area)
         {
-            console.log(this.state.area,"Yes");
             Alert.alert("Please upload image");
             return;
         }
@@ -770,11 +770,12 @@ class WorkOrder extends Component {
         if(this.state.area=="")
         {
             Alert.alert("Select Proper Area");
+            return;
         }
         else if(this.state.area_data.area!=this.state.area)
         {   
-            console.log(this.state.area,"No");
             Alert.alert("Please upload image");
+            return;
         }
 
         else(this.state.area_data.area==this.state.area)
