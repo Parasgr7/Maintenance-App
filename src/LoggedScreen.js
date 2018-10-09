@@ -3,6 +3,7 @@ import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity} from 'react
 import {Agenda} from 'react-native-calendars';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css"
+import Spinner from 'react-native-loading-spinner-overlay'
 
 class ProfileActivity extends Component {
 
@@ -16,7 +17,8 @@ class ProfileActivity extends Component {
         super(props);
         this.state = {
             items: {},
-            data:{}
+            data:{},
+            visible: false,
         };
     }
 
@@ -36,15 +38,23 @@ class ProfileActivity extends Component {
         this.props.navigation.navigate('ThirdPage',{param:this.state.data});
         
     }
-
-
-
-
+    
 
     render()
     {
         const {goBack} = this.props.navigation;
-
+        console.log(Object.getOwnPropertyNames(this.state.items).length);
+        // if(Object.getOwnPropertyNames(this.state.items).length>0)
+        // {
+        //     this.setState({visible:true});
+        // }
+        // if(Object.getOwnPropertyNames(this.state.items).length==0) { 
+        //     return (
+        //         <View style={{ flex: 1 }}>
+        //          <Spinner visible={true} textContent={"Loading..."} textStyle={{color: '#FFF', width: '100%', textAlign: 'center'}} />
+        //         </View>
+        //       );
+        //     }
         return(
 
             <View style={{
@@ -94,7 +104,7 @@ class ProfileActivity extends Component {
                         .then((responseJson) => {
                             // If server response message same as Data Matched
                             if(responseJson)
-                            {   
+                            {   this.setState({visible: !this.state.visible});
                                 const numItems = responseJson.length;
                                 for (let j = 0; j < numItems; j++) {
                                     this.state.items[strTime].push({
@@ -129,7 +139,7 @@ class ProfileActivity extends Component {
                         
                         // If server response message same as Data Matched
                         if(responseJson)
-                        {   
+                        {   this.setState({visible: !this.state.visible});
                             const numItems = responseJson.length;
                             for (let j = 0; j < numItems; j++) {
                                 this.state.items[strTime].push({

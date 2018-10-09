@@ -554,7 +554,6 @@ class WorkOrder extends Component {
 
                     </ScrollView>
                     <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                            {this._maybeRenderImage()}
                             {this.listing_data()}
                             {this._maybeRenderUploadingOverlay()}
                     </ScrollView>
@@ -857,7 +856,8 @@ class WorkOrder extends Component {
                     </View>
     
                     <TextInput
-                        style={{height: 40, borderColor: 'gray', borderWidth: 2, margin:5}}
+                        style={styles.textInsert}
+                        placeholder="Notes Here"
                         onChangeText={(text) => this.setState({text})}
                         value={this.state.area_data.note}
                     />
@@ -874,41 +874,41 @@ class WorkOrder extends Component {
             
         }
     }
-    _maybeRenderImage = () => {
+    // _maybeRenderImage = () => {
         
-        let {
-            image
-        } = this.state;
-        let x= this.state.image;
+    //     let {
+    //         image
+    //     } = this.state;
+    //     let x= this.state.image;
         
-        if(image){
-        return (
-            <View style={styles.maybeRenderImageText}> 
-                <View
-                    style={styles.maybeRenderImageContainer}>
-                    <Image source={{ uri: this.state.image }} style={styles.maybeRenderImage} />
-                </View>
+    //     if(image){
+    //     return (
+    //         <View style={styles.maybeRenderImageText}> 
+    //             <View
+    //                 style={styles.maybeRenderImageContainer}>
+    //                 <Image source={{ uri: this.state.image }} style={styles.maybeRenderImage} />
+    //             </View>
 
-                <TextInput
-                    style={styles.textInsert}
-                    placeholder="Notes Here"
-                    onChangeText={(text) => this.setState({text})}
-                    value={this.state.text}
-                />
-                <View style={styles.content}>
-                <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
-                   <Text style={styles.TextStyle}>Upload</Text>
-                </TouchableOpacity>
-                </View>
+    //             <TextInput
+    //                 style={styles.textInsert}
+    //                 placeholder="Notes Here"
+    //                 onChangeText={(text) => this.setState({text})}
+    //                 value={this.state.text}
+    //             />
+    //             <View style={styles.content}>
+    //             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
+    //                <Text style={styles.TextStyle}>Upload</Text>
+    //             </TouchableOpacity>
+    //             </View>
        
-            </View>
+    //         </View>
             
-        );
-    }
-    else{
-        return;
-    }
-    };
+    //     );
+    // }
+    // else{
+    //     return;
+    // }
+    // };
 
 
     _pickImage = async () => {
@@ -946,7 +946,7 @@ class WorkOrder extends Component {
               this.setState({
                     image: uploadResult.location,
                     renderUpload: true,
-                    area_data: false,
+                    area_data: {area:this.state.area, image:uploadResult.location, rate:"",note:"" },
                     text:''
                 });
             }

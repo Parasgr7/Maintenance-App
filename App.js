@@ -40,7 +40,7 @@ class LoginActivity extends Component {
         }
 
     }
-    componentDidMount(){
+    componentWillMount(){
         this._getToken();
     }
     
@@ -93,22 +93,23 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    
+                    console.log(responseJson);
                     // If server response message same as Data Matched
                     if(typeof(responseJson)=='string')
                     {   
                         this._storeToken(responseJson);
-                        //Then open Profile activity and send user email to profile activity.
+                        // Then open Profile activity and send user email to profile activity.
                         this.props.navigation.navigate('App');
                     
                     }
                     else{
-                        // this.props.navigation.navigate('App');
-                        Alert.alert("Provide Proper Credentials");
+                        this.props.navigation.navigate('App');
+                        // Alert.alert("Provide Proper Credentials");
                     }
 
                 }).catch((error) => {
-                console.error(error);
+                Alert.alert("Server Unavailable");
+                // console.error(error);
             });
         }
         else if (this.state.worker==='0'){
@@ -127,6 +128,7 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
+                    console.log(responseJson);
                     if(typeof(responseJson)=='number')
                     {  
                         this._storeToken(responseJson);
@@ -134,12 +136,13 @@ class LoginActivity extends Component {
                     
                     }
                     else{
-                        // this.props.navigation.navigate('App');
-                        Alert.alert("Provide Proper Credentials");
+                        this.props.navigation.navigate('App');
+                        // Alert.alert("Provide Proper Credentials");
                     }
 
                 }).catch((error) => {
-                console.error(error);
+                    Alert.alert("Server Unavailable");
+                // console.error(error);
             });
         }
 
