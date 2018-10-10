@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity,ActivityIndicator} from 'react-native';
 import {Agenda} from 'react-native-calendars';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css"
@@ -18,8 +18,11 @@ class ProfileActivity extends Component {
         this.state = {
             items: {},
             data:{},
-            visible: false,
+            visible: false
         };
+    }
+    componentDidMount(){
+        this._getToken();
     }
 
     _getToken = async () => {
@@ -33,28 +36,16 @@ class ProfileActivity extends Component {
     }
 
     WorkOrderFunction = (item) =>{
-        this._getToken();
         this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
         this.props.navigation.navigate('ThirdPage',{param:this.state.data});
         
     }
     
+    
 
     render()
-    {
-        const {goBack} = this.props.navigation;
-        console.log(Object.getOwnPropertyNames(this.state.items).length);
-        // if(Object.getOwnPropertyNames(this.state.items).length>0)
-        // {
-        //     this.setState({visible:true});
-        // }
-        // if(Object.getOwnPropertyNames(this.state.items).length==0) { 
-        //     return (
-        //         <View style={{ flex: 1 }}>
-        //          <Spinner visible={true} textContent={"Loading..."} textStyle={{color: '#FFF', width: '100%', textAlign: 'center'}} />
-        //         </View>
-        //       );
-        //     }
+    {   
+
         return(
 
             <View style={{
@@ -96,7 +87,7 @@ class ProfileActivity extends Component {
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
                     const userData = {date:strTime};
-                    this._getToken();
+                    // this._getToken();
                     if (this.state.worker==='0')
                     {
                     fetch('http://dev4.holidale.org/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
@@ -104,7 +95,7 @@ class ProfileActivity extends Component {
                         .then((responseJson) => {
                             // If server response message same as Data Matched
                             if(responseJson)
-                            {   this.setState({visible: !this.state.visible});
+                            {   
                                 const numItems = responseJson.length;
                                 for (let j = 0; j < numItems; j++) {
                                     this.state.items[strTime].push({
@@ -139,7 +130,7 @@ class ProfileActivity extends Component {
                         
                         // If server response message same as Data Matched
                         if(responseJson)
-                        {   this.setState({visible: !this.state.visible});
+                        {   
                             const numItems = responseJson.length;
                             for (let j = 0; j < numItems; j++) {
                                 this.state.items[strTime].push({

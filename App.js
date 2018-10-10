@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity} from 'react-native';
 import {Form, Item, Label, Input} from 'native-base';
 
 import { AsyncStorage } from "react-native";
@@ -35,7 +35,8 @@ class LoginActivity extends Component {
 
             UserEmail: '',
             UserPassword: '',
-            worker:'0'
+            worker:'0',
+            isLoading: false
 
         }
 
@@ -43,6 +44,11 @@ class LoginActivity extends Component {
     componentWillMount(){
         this._getToken();
     }
+
+    // componentWillUnmount(){
+    //     this.setState({isLoading: false});
+
+    // }
     
 
     _storeToken = async accessToken => {
@@ -62,8 +68,9 @@ class LoginActivity extends Component {
     _getToken = async () => {
         try {
         const token = await AsyncStorage.getItem('session_data');
+        this.setState({token: token});
         if (token !== null) {
-            this.props.navigation.navigate(token? 'App':'Auth');
+            this.props.navigation.navigate(token? 'App':'Auth',{ name: 'Brent' });
         }
         } catch (error) {
             // console.log(error);
@@ -72,13 +79,14 @@ class LoginActivity extends Component {
     }
 
     UserLoginFunction = () =>{
+        this.setState({isLoading: true});
 
         const { UserEmail }  = this.state ;
         const { UserPassword }  = this.state ;
 
         if(this.state.worker=='1')
         {
-        fetch('http://18.222.123.107/api/v1/login', {
+        fetch('http://dev4.holidale.org/api/v1/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -93,22 +101,24 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     // If server response message same as Data Matched
                     if(typeof(responseJson)=='string')
                     {   
                         this._storeToken(responseJson);
+                        this.setState({isLoading: false});
                         // Then open Profile activity and send user email to profile activity.
-                        this.props.navigation.navigate('App');
+                        // this.props.navigation.navigate('App');
                     
                     }
                     else{
-                        this.props.navigation.navigate('App');
-                        // Alert.alert("Provide Proper Credentials");
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
+                        this.setState({isLoading: false});
                     }
 
                 }).catch((error) => {
                 Alert.alert("Server Unavailable");
+                this.setState({isLoading: false});
                 // console.error(error);
             });
         }
@@ -128,27 +138,38 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     if(typeof(responseJson)=='number')
                     {  
                         this._storeToken(responseJson);
+                        this.setState({isLoading: false});
                         this.props.navigation.navigate('App');
                     
                     }
                     else{
-                        this.props.navigation.navigate('App');
-                        // Alert.alert("Provide Proper Credentials");
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
+                        this.setState({isLoading: false});
                     }
 
                 }).catch((error) => {
                     Alert.alert("Server Unavailable");
+                    this.setState({isLoading: false});
                 // console.error(error);
             });
         }
 
 
     }
-
+    _maybeRenderUploadingOverlay = () => {
+        if (this.state.isLoading) {
+            return (
+                <View
+                    style={ styles.maybeRenderUploading}>
+                    <ActivityIndicator size="small" color="black"/>
+                </View>
+            );
+        }
+    };
     render() {
         return (
 
@@ -195,6 +216,7 @@ class LoginActivity extends Component {
                          </View>
                          
                             <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
+                            {this._maybeRenderUploadingOverlay()}
                                 <Text style={styles.TextStyle}> Sign In </Text>
                             </TouchableOpacity>
   
@@ -208,6 +230,8 @@ class LoginActivity extends Component {
         );
     }
 }
+
+
 
 const Tabs = createBottomTabNavigator({
     Home:   {
@@ -247,9 +271,6 @@ const AppStack = createStackNavigator({
                 }),
                 LastPage: {
                        screen: Logout,
-                      
-
-            
                 } },{
                     // initialRouteName: 'SecondPage',
                     navigationOptions: {

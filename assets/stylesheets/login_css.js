@@ -22,7 +22,15 @@ export default StyleSheet.create({
         borderRadius: 5 ,
 
     },
-
+    maybeRenderUploading: {
+        position: 'absolute',
+        left: 0,
+        right: 20,
+        top: 0,
+        bottom: 0,
+        alignItems: 'flex-end',
+        justifyContent: 'center'
+    },
     TextComponentStyle: {
         fontSize: 20,
         color: "#000",
