@@ -519,7 +519,7 @@ class WorkOrder extends Component {
                         alignItems: 'stretch',
                         justifyContent: 'space-between'}}>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch',flexDirection: 'row', flex: 1}}>
-                            <ScrollView style={ {margin: 7}}>
+                            <ScrollView style={ {margin: 17}}>
                                 <Icon
                                     name='thumbs-up'
                                     type='font-awesome'
@@ -528,7 +528,7 @@ class WorkOrder extends Component {
                                     // reverse
                                     onPress={() => this.thumbs_up()} />
                             </ScrollView>
-                            <ScrollView style={ {margin: 7}}>
+                            <ScrollView style={ {margin: 17}}>
                                 <Icon
                                     name='thumbs-down'
                                     type='font-awesome'
@@ -540,7 +540,7 @@ class WorkOrder extends Component {
                         </ScrollView>
                         
                         <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                            <ScrollView style={ {margin: 7}}>
+                            <ScrollView style={ {margin: 17}}>
                                 <Icon
                                     name='camera'
                                     type='font-awesome'
@@ -845,7 +845,7 @@ class WorkOrder extends Component {
 
     listing_data=()=>{
         if (this.state.area_data.area==this.state.area) {
-            
+            console.log(this.state.area_data.image );
             return(
                 <View
                     style={styles.maybeRenderImageText}>

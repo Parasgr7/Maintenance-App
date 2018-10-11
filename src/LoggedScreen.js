@@ -5,6 +5,11 @@ import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css"
 import Spinner from 'react-native-loading-spinner-overlay'
 
+
+
+let height= Dimensions.get('window').height;
+let width= Dimensions.get('window').width;
+// let x=((width)/2-95);
 class ProfileActivity extends Component {
 
     static navigationOptions =
@@ -44,7 +49,8 @@ class ProfileActivity extends Component {
     
 
     render()
-    {   
+    {   console.log(height,width);
+        // console.log(x);
 
         return(
 

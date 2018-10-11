@@ -15,7 +15,17 @@ import styles from "./assets/stylesheets/login_css";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-
+let diff =height-width;
+let adjst;
+ if (diff<420){
+    adjst=70;
+ }
+ else if (420<=diff<=470){
+    adjst=120;
+ }
+ else{
+    adjst=95;
+ }
 
 // Creating Login Activity.
 class LoginActivity extends Component {
@@ -45,10 +55,6 @@ class LoginActivity extends Component {
         this._getToken();
     }
 
-    // componentWillUnmount(){
-    //     this.setState({isLoading: false});
-
-    // }
     
 
     _storeToken = async accessToken => {
@@ -58,9 +64,10 @@ class LoginActivity extends Component {
             item.push(userdata);
         await AsyncStorage.setItem('session_data',JSON.stringify(item))
         this._getToken();
-    }catch(error){
-        console.log("Something went wrong");
-    }
+        }
+        catch(error){
+            console.log("Something went wrong");
+        }
         
     }
 
@@ -171,6 +178,9 @@ class LoginActivity extends Component {
         }
     };
     render() {
+        console.log(height,width);
+        console.log(diff);
+        console.log(adjst);
         return (
 
             <View style={{flex:1}}>
@@ -283,7 +293,7 @@ const AppStack = createStackNavigator({
                       },
                       headerBackground: (
                         <Image
-                          style={{width: 150,height:100,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
+                          style={{width: 150,height:adjst,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
                           source= {require('./assets/Images/logout.png')}
                         />
                       ),

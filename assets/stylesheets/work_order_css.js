@@ -109,7 +109,7 @@ export default StyleSheet.create({
     },
     maybeRenderImage: {
         height: 250,
-        width:  400,
+        width:  width,
     },
     maybeRenderImageText: {
 
