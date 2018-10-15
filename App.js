@@ -10,21 +10,25 @@ import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
-
 import styles from "./assets/stylesheets/login_css";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
 let diff = height-width;
 let adjst;
+console.log(diff);
  if (diff<420){
-    adjst=70;
+    adjst=80;
  }
  else if (420<=diff<=470){
     adjst=120;
  }
- else{
+ else if(diff>470){
     adjst=95;
+ }
+ 
+ else{
+    // break;
  }
 
 // Creating Login Activity.
@@ -178,9 +182,9 @@ class LoginActivity extends Component {
         }
     };
     render() {
-        console.log(height,width);
-        console.log(diff);
-        console.log(adjst);
+        // console.log(height,width);
+        // console.log(diff);
+        // console.log(adjst);
         return (
 
             <View style={{flex:1}}>

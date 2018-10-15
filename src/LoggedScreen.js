@@ -9,7 +9,6 @@ import Spinner from 'react-native-loading-spinner-overlay'
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-// let x=((width)/2-95);
 class ProfileActivity extends Component {
 
     static navigationOptions =
@@ -49,8 +48,7 @@ class ProfileActivity extends Component {
     
 
     render()
-    {   console.log(height,width);
-        // console.log(x);
+    {  
 
         return(
 
@@ -174,16 +172,14 @@ class ProfileActivity extends Component {
     }
 
     renderItem(item) {
-        return ( <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.WorkOrderFunction(item) } }>
-                <View style={{flexDirection: 'row'}}>
+        return ( 
+        <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.WorkOrderFunction(item) } }>
+                <View style={{flexDirection: 'row',flex:1}}>
                     <Text style={styles.TextStyle}>{item.name}</Text>
                     <Text style={styles.TextStyle3}>{item.status}</Text>
                 </View>
                 <Text style={styles.TextStyle2}>{item.address}</Text>
                  </TouchableOpacity>
-           
-
-
         );
     }
 

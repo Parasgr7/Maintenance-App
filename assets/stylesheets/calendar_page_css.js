@@ -77,7 +77,8 @@ export default StyleSheet.create({
         marginLeft:30
     },
     SubmitButtonStyle: {
-
+        flex:1,
+        // justifyContent: "center",
         marginTop:30,
         paddingTop:15,
         paddingBottom:15,
@@ -89,7 +90,7 @@ export default StyleSheet.create({
 
     TextStyle:{
         color:'#fff',
-        fontSize:16,
+        fontSize:17,
         marginLeft:10,
         fontWeight:'bold'
     },
@@ -101,7 +102,7 @@ export default StyleSheet.create({
     TextStyle3:{
         color:'#fff',
         fontSize:15,
-        marginLeft:60
+        marginLeft:60,
 
     }
 

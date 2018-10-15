@@ -964,7 +964,67 @@ class WorkOrder extends Component {
     uploadNotes= (link,text,area)=> {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
-        if(link==false)
+        // if(link==false)
+        // {
+        //     Alert.alert("Image not selected!");
+        // }
+        if(link==false&&text){
+            link= this.state.area_data.image;
+            if (check==0)
+            {
+                fetch('http://dev4.holidale.org/api/v1/notesupload/cleaning_schedules/'+id+'/', {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+    
+                        image: link,
+                        note: text,
+                        area: area,
+                        rate: this.state.rate
+    
+                    })
+    
+                }).then((response) => response.json())
+                    .then((responseJson) => {
+    
+                        Alert.alert("Successfully Uploaded");
+    
+                    }).catch((error) => {
+                    console.error(error);
+                });
+            }
+            else
+            {   
+                link= this.state.area_data.image;
+    
+                fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+    
+                        image: link,
+                        note: text,
+                        area: area,
+                        rate: this.state.rate
+    
+                    })
+    
+                }).then((response) => response.json())
+                    .then((responseJson) => {
+                        Alert.alert("Successfully Uploaded");
+    
+                    }).catch((error) => {
+                    console.error(error);
+                });
+            }
+        }
+        else if(link==false&&text=='')
         {
             Alert.alert("Image not selected!");
         }
@@ -998,6 +1058,8 @@ class WorkOrder extends Component {
         }
         else
         {   
+            link= this.state.area_data.image;
+
             fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {

@@ -47,7 +47,8 @@ export default StyleSheet.create({
     },
 
     WorkOrderTextStyle: {
-        fontSize: 16,
+        fontSize: 22,
+        // fontWeight:'bold',
         color: "#43889c",
         textAlign: 'center',
         marginBottom: 10,
