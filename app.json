@@ -21,11 +21,11 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.holidale.holidalemaintenance",
+      "bundleIdentifier": "com.holidale.maintenance",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.holidale.holidalemaintenanceapp"
+      "package": "com.holidale.maintenance"
     }
   }
 }

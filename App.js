@@ -15,7 +15,7 @@ import styles from "./assets/stylesheets/login_css";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
-let diff =height-width;
+let diff = height-width;
 let adjst;
  if (diff<420){
     adjst=70;
