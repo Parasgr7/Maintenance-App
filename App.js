@@ -16,7 +16,7 @@ let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
 let diff = height-width;
 let adjst;
-console.log(diff);
+console.log("Hey",diff);
  if (diff<420){
     adjst=80;
  }

@@ -90,19 +90,20 @@ export default StyleSheet.create({
 
     TextStyle:{
         color:'#fff',
-        fontSize:17,
+        fontSize:16,
         marginLeft:10,
         fontWeight:'bold'
     },
     TextStyle2:{
         color:'#fff',
-        fontSize:14,
+        fontSize:15,
         marginLeft:10
     },
     TextStyle3:{
+        textAlign: 'right',
         color:'#fff',
-        fontSize:15,
-        marginLeft:60,
+        fontSize:16,
+        marginRight:10,
 
     }
 

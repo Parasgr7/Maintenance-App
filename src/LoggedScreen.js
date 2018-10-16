@@ -176,9 +176,12 @@ class ProfileActivity extends Component {
         <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.WorkOrderFunction(item) } }>
                 <View style={{flexDirection: 'row',flex:1}}>
                     <Text style={styles.TextStyle}>{item.name}</Text>
+                    </View>
+                <Text style={styles.TextStyle2}>{item.address}</Text>
+                <View >
                     <Text style={styles.TextStyle3}>{item.status}</Text>
                 </View>
-                <Text style={styles.TextStyle2}>{item.address}</Text>
+                
                  </TouchableOpacity>
         );
     }
