@@ -16,7 +16,7 @@ let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
 let diff = height-width;
 let adjst;
-console.log("Hey",diff);
+
  if (diff<420){
     adjst=80;
  }
@@ -212,6 +212,7 @@ class LoginActivity extends Component {
                                     secureTextEntry={true}
                                     onChangeText={UserPassword => this.setState({UserPassword})}
                                 />  
+                                 
                                 
                             </Item>
                         </Form>

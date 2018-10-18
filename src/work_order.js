@@ -10,6 +10,7 @@ import t from 'tcomb-form-native';
 import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { TextField } from 'react-native-material-textfield';
 
 import styles from "../assets/stylesheets/work_order_css"
 
@@ -506,7 +507,7 @@ class WorkOrder extends Component {
                                         this.setState({area_data : this.state.data.app_data[i] });
                                         this.setState({index:i});
                                         this.setState({image:false});  
-                                        console.log(this.state.area_data);
+                                        // console.log(this.state.area_data);
  
                                     }
                                     
@@ -845,7 +846,6 @@ class WorkOrder extends Component {
 
     listing_data=()=>{
         if (this.state.area_data.area==this.state.area) {
-            console.log(this.state.area_data.image );
             return(
                 <View
                     style={styles.maybeRenderImageText}>
@@ -854,13 +854,12 @@ class WorkOrder extends Component {
                         style={styles.maybeRenderImageContainer}>
                         <Image source={{ uri: this.state.area_data.image }} style={styles.maybeRenderImage} />
                     </View>
-    
-                    <TextInput
-                        style={styles.textInsert}
-                        placeholder="Notes Here"
-                        onChangeText={(text) => this.setState({text})}
-                        value={this.state.area_data.note}
-                    />
+
+                    <TextField
+        label='Notes'
+        value={this.state.area_data.note}
+        onChangeText={ (text) => this.setState({text}) }
+      />
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
                    <Text style={styles.TextStyle}>Upload</Text>
                     </TouchableOpacity>
