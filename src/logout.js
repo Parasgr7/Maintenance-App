@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions,TouchableOpacity} from 'react-native';
+import { View, Text,  Image, ImageBackground,TouchableOpacity} from 'react-native';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/logout_css";
 
@@ -28,9 +28,7 @@ class Logout extends Component {
                     </View>
                     
                     <Text style={styles.WorkOrderTextStyle}>Maintenance App</Text>
-                    <Text style={styles.WorkOrderTextStyle}>V0.1</Text>
-                    <Text style={styles.WorkOrderTextStyle}>Paras</Text>
-                            
+                    <Text style={styles.WorkOrderTextStyle}>V0.1</Text>                            
                 
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this._signOutAsync }>
                                 <Text style={styles.TextStyle}> Logout </Text>

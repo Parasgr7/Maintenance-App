@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, ScrollView, View, Alert, Text,  Image, ImageBackground, Dimensions, TouchableOpacity,ActivityIndicator,Platform,KeyboardAvoidingView,RefreshControl,TouchableHighlight} from 'react-native';
-import { Item, Label, Input, Button} from 'native-base';
+import { ScrollView, View, Alert, Text,  Image, Dimensions, TouchableOpacity,ActivityIndicator,RefreshControl} from 'react-native';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
+import { Table, Row, Rows } from 'react-native-table-component';
 import { AsyncStorage } from "react-native";
 import Modal from 'react-native-modal';
 import t from 'tcomb-form-native';
@@ -12,7 +11,7 @@ import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { TextField } from 'react-native-material-textfield';
 
-import styles from "../assets/stylesheets/work_order_css"
+import styles from "../assets/stylesheets/work_order_css";
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -126,6 +125,7 @@ class WorkOrder extends Component {
             this.state = {
                 image: false,
                 text: '',
+                keys: '',
                 pickerResult:'',
                 data: {
                     "listings":["Overview"],
@@ -850,16 +850,17 @@ class WorkOrder extends Component {
                 <View
                     style={styles.maybeRenderImageText}>
                      
-                    <View
-                        style={styles.maybeRenderImageContainer}>
+                    <View style={styles.maybeRenderImageContainer}>
                         <Image source={{ uri: this.state.area_data.image }} style={styles.maybeRenderImage} />
                     </View>
 
                     <TextField
-        label='Notes'
-        value={this.state.area_data.note}
-        onChangeText={ (text) => this.setState({text}) }
-      />
+                        label='Notes'
+                        value={this.state.area_data.note}
+                        onChangeText={ this.changeText }
+                        
+                    />
+
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
                    <Text style={styles.TextStyle}>Upload</Text>
                     </TouchableOpacity>
@@ -873,6 +874,12 @@ class WorkOrder extends Component {
             
         }
     }
+  
+    changeText=(text)=>{
+        this.setState({text: text});
+
+    }
+
     // _maybeRenderImage = () => {
         
     //     let {

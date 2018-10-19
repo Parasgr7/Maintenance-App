@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import { StyleSheet, View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView,TextInput,TouchableHighlight, TouchableOpacity} from 'react-native';
-import {Form, Item, Label, Input} from 'native-base';
+import { View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import {Form, Item, Input} from 'native-base';
 
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';

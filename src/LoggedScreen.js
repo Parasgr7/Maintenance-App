@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
-import { StyleSheet, View, Alert, Text, Dimensions,TouchableOpacity,ActivityIndicator} from 'react-native';
+import { View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
 import {Agenda} from 'react-native-calendars';
 import { AsyncStorage } from "react-native";
-import styles from "../assets/stylesheets/calendar_page_css"
-import Spinner from 'react-native-loading-spinner-overlay'
+import styles from "../assets/stylesheets/calendar_page_css";
 
 
-
-let height= Dimensions.get('window').height;
-let width= Dimensions.get('window').width;
+// let height= Dimensions.get('window').height;
+// let width= Dimensions.get('window').width;
 class ProfileActivity extends Component {
 
     static navigationOptions =
