@@ -10,7 +10,7 @@
     "orientation": "portrait",
     "icon": "./assets/app-logo.png",
     "splash": {
-      "image": "./assets/LAST.gif",
+      "image": "./assets/SIMPLE.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
