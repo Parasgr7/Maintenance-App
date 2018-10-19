@@ -507,10 +507,8 @@ class WorkOrder extends Component {
                                         this.setState({area_data : this.state.data.app_data[i] });
                                         this.setState({index:i});
                                         this.setState({image:false});  
-                                        // console.log(this.state.area_data);
- 
+                                
                                     }
-                                    
                                 }  
                         }}
                        />
@@ -566,7 +564,6 @@ class WorkOrder extends Component {
                                 data={status_data}
                                 value={this.state.data.status}
                                 onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
-
                             />
                     </View>
                 </ScrollView>
@@ -585,7 +582,6 @@ class WorkOrder extends Component {
         {
             inventData.push([this.state.data.inventory[i].source,this.state.data.inventory[i].product,this.state.data.inventory[i].count])
         }
-        console.log(this.state.worker);
         if(this.state.worker==='0')
         {
             return(
