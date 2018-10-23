@@ -89,7 +89,6 @@ class ProfileActivity extends Component {
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
                     const userData = {date:strTime};
-                    // this._getToken();
                     if (this.state.worker==='0')
                     {
                     fetch('http://dev4.holidale.org/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
