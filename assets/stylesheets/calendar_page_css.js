@@ -87,6 +87,7 @@ export default StyleSheet.create({
         backgroundColor:'#00BCD4',
         borderRadius:10,
     },
+    
 
     TextStyle:{
         color:'#fff',

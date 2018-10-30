@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-
 import { View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {Form, Item, Input} from 'native-base';
-
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
 import Icon from '@expo/vector-icons/FontAwesome';
@@ -11,6 +9,7 @@ import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
+
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -118,7 +117,7 @@ class LoginActivity extends Component {
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
                         // Then open Profile activity and send user email to profile activity.
-                        // this.props.navigation.navigate('App');
+                        this.props.navigation.navigate('App');
                     
                     }
                     else{

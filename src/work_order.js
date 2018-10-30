@@ -388,7 +388,7 @@ class WorkOrder extends Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
-                            {
+                            {   console.log(responseJson);
                                 let res = responseJson;
                                 this.setState({
                                     data: res[0],
@@ -411,6 +411,7 @@ class WorkOrder extends Component {
                         .then((responseJson) => {
                             if(responseJson)
                             {   
+                                console.log(responseJson);
                                 let res= responseJson;
                                 
                                 this.setState({
@@ -872,7 +873,9 @@ class WorkOrder extends Component {
     }
   
     changeText=(text)=>{
+        console.log(text);
         this.setState({text: text});
+        console.log(this.state.text);
 
     }
 

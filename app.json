@@ -26,6 +26,7 @@
     },
     "android": {
       "package": "com.holidale.maintenance"
-    }
+    },
+    "packagerOpts": { "nonPersistent": true }
   }
 }

@@ -4,18 +4,15 @@ import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/logout_css";
 
 class Logout extends Component {
-
     static navigationOptions =
         {
             title: 'Log Out',
             
         };
-       
     _signOutAsync = async () => {
         await AsyncStorage.removeItem('session_data');
         this.props.navigation.navigate('Auth');
         };
-
 
     render() {
         return (
