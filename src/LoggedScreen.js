@@ -58,7 +58,7 @@ class ProfileActivity extends Component {
                 Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
         return earthRadiusKm * c;
-      }
+    }
 
     WorkOrderFunction = (item) =>{
        
@@ -66,14 +66,13 @@ class ProfileActivity extends Component {
         console.log(dist);
         if(dist<0.02)
         {   
-            timeStamp=new Date();
-            house_id= item.house_id;
-            
+            timeStamp = new Date();
+            house_id = item.house_id;
             this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
             this.props.navigation.navigate('ThirdPage',{param:this.state.data});  
         }
         else{
-            Alert.alert("Too far away to Check-Ins");
+            Alert.alert("Too far away to Check-In");
         }
         
         
@@ -86,9 +85,7 @@ class ProfileActivity extends Component {
 
         return(
 
-            <View style={{
-                flex: 1
-            }}>
+            <View style={{ flex: 1}}>
                 <View style={styles.container}>
                     <Agenda
                         items={this.state.items}
@@ -167,7 +164,6 @@ class ProfileActivity extends Component {
                     fetch('http://dev4.holidale.org/api/v1/work_orders/maintainer/?token='+this.state.token+'&date='+userData.date)
                     .then((response) => response.json())
                     .then((responseJson) => {
-                        
                         // If server response message same as Data Matched
                         if(responseJson)
                         {   
@@ -219,7 +215,7 @@ class ProfileActivity extends Component {
                 <View >
                     <Text style={styles.TextStyle3}>{item.status}</Text>
                 </View>
-                <TouchableOpacity style={styles.SubmitButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
+                <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
                     <View>
                         <Text style={styles.TextStyle3}>Check-In</Text>
                     </View>

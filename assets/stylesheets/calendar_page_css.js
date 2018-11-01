@@ -87,7 +87,17 @@ export default StyleSheet.create({
         backgroundColor:'#00BCD4',
         borderRadius:10,
     },
-    
+    Check_inButtonStyle: {
+        flex:1,
+        justifyContent: "flex-end",
+        // marginTop:30,
+        // paddingTop:15,
+        // paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'black',
+        borderRadius:10,
+    },
 
     TextStyle:{
         color:'#fff',

@@ -30,8 +30,8 @@ class Logout extends Component {
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this._signOutAsync }>
                                 <Text style={styles.TextStyle}> Logout </Text>
                     </TouchableOpacity>
-                    </ImageBackground>
-               </View>
+                </ImageBackground>
+            </View>
 
         );
     }
