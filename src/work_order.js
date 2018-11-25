@@ -388,7 +388,7 @@ class WorkOrder extends Component {
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
-                            {   console.log(responseJson);
+                            {  
                                 let res = responseJson;
                                 this.setState({
                                     data: res[0],
@@ -411,7 +411,7 @@ class WorkOrder extends Component {
                         .then((responseJson) => {
                             if(responseJson)
                             {   
-                                console.log(responseJson);
+                            
                                 let res= responseJson;
                                 
                                 this.setState({
@@ -446,11 +446,6 @@ class WorkOrder extends Component {
           );
         }
         
-       
-        
-    
-        
-
         let list=[];
         if(this.state.data.listings!=null)
         {
@@ -567,11 +562,41 @@ class WorkOrder extends Component {
                                 onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
                             />
                     </View>
+                    <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>
+                        <View>
+                            <Text style={styles.TextStyle4}>Check-Out</Text>
+                        </View>
+                    </TouchableOpacity>
                 </ScrollView>
 
             </ScrollView>
     </ScrollView>
         );
+    }
+
+    check_out=()=>{
+         var time= new Date();
+         var id=this.props.navigation.state.params.param.id;
+         console.log(id);
+         fetch('http://dev4.holidale.org/api/v1/access_out_update/check_out/'+id+'/', {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                access_out_datetime: time
+            })
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                if(responseJson)
+                {
+                    Alert.alert("Checked Out");
+                }
+            }).catch((error) => {
+            console.error(error);
+        }); 
+         
     }
 
     add_inventory=()=>{
@@ -614,7 +639,7 @@ class WorkOrder extends Component {
         {
             costData.push([this.state.data.cost[i].item,this.state.data.cost[i].cost])
         }
-        console.log(this.state.worker);
+    
         if(this.state.worker==='1')
         {
             return(
@@ -658,7 +683,6 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
                     Alert.alert("Status Updated!");
                     
 
@@ -682,7 +706,7 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                
                     Alert.alert("Status Updated!");
 
                 }).catch((error) => {
@@ -730,7 +754,7 @@ class WorkOrder extends Component {
                 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                  
                     Alert.alert("Liked :)");  
 
                 }).catch((error) => {
@@ -738,7 +762,7 @@ class WorkOrder extends Component {
             });
         }
         else
-        {   console.log(this.state.area_data);
+        {   
             fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
@@ -763,7 +787,7 @@ class WorkOrder extends Component {
     }
     }
     thumbs_down=()=>{
-        console.log(this.state.area);
+
         if(this.state.area=="")
         {
             Alert.alert("Select Proper Area");
@@ -873,7 +897,6 @@ class WorkOrder extends Component {
     }
   
     changeText=(text)=>{
-        console.log(text);
         this.setState({text: text});
         console.log(this.state.text);
 

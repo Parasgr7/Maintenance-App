@@ -60,9 +60,9 @@ class LoginActivity extends Component {
 
     
 
-    _storeToken = async accessToken => {
+    _storeToken = async responseJson => {
         try{
-            userdata={"access_token": accessToken, "worker": this.state.worker};
+            userdata={"access_token": responseJson.token, "worker": this.state.worker, "user_id": responseJson.id};
             item=[];
             item.push(userdata);
         await AsyncStorage.setItem('session_data',JSON.stringify(item))
@@ -80,7 +80,7 @@ class LoginActivity extends Component {
         const token = await AsyncStorage.getItem('session_data');
         this.setState({token: token});
         if (token !== null) {
-            this.props.navigation.navigate(token? 'App':'Auth',{ name: 'Brent' });
+            this.props.navigation.navigate(token? 'App':'Auth');
         }
         } catch (error) {
             // console.log(error);
@@ -112,7 +112,7 @@ class LoginActivity extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     // If server response message same as Data Matched
-                    if(typeof(responseJson)=='string')
+                    if(typeof(responseJson)=='object')
                     {   
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -148,7 +148,7 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    if(typeof(responseJson)=='number')
+                    if(typeof(responseJson)=='object')
                     {  
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -181,9 +181,7 @@ class LoginActivity extends Component {
         }
     };
     render() {
-        // console.log(height,width);
-        // console.log(diff);
-        // console.log(adjst);
+
         return (
 
             <View style={{flex:1}}>
@@ -286,7 +284,6 @@ const AppStack = createStackNavigator({
                 LastPage: {
                        screen: Logout,
                 } },{
-                    // initialRouteName: 'SecondPage',
                     navigationOptions: {
                       headerStyle: {
                         backgroundColor: 'black',

@@ -89,13 +89,12 @@ export default StyleSheet.create({
     },
     Check_inButtonStyle: {
         flex:1,
-        justifyContent: "flex-end",
-        // marginTop:30,
-        // paddingTop:15,
-        // paddingBottom:15,
-        marginLeft:30,
-        marginRight:30,
-        backgroundColor:'black',
+        justifyContent: "center",
+        width:100,
+        height:35,
+        marginTop:10,
+        marginLeft:145,
+        backgroundColor:'#018b9e',
         borderRadius:10,
     },
 
@@ -113,9 +112,15 @@ export default StyleSheet.create({
     TextStyle3:{
         textAlign: 'right',
         color:'#fff',
+        fontWeight:'bold',
         fontSize:16,
         marginRight:10,
 
+    },
+    TextStyle4:{
+        color:'#fff',
+        textAlign:'center',
+        fontSize:15,
     }
 
 });

@@ -4,9 +4,11 @@ import {Agenda} from 'react-native-calendars';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
 
+const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
 
 class ProfileActivity extends Component {
 
+    
     static navigationOptions =
         {
             title: 'Home'
@@ -18,27 +20,39 @@ class ProfileActivity extends Component {
         this.state = {
             items: {},
             data:{},
-            visible: false
+            visible: false,
         };
+        
     }
     componentDidMount(){
         this._getToken();
         navigator.geolocation.getCurrentPosition((position)=>{
             this.setState({latitude:parseFloat(position.coords.latitude)}) ;
             this.setState({longitude: parseFloat(position.coords.longitude)});
-       
-       })
+        
+        });
     }
    
 
     _getToken = async () => {
         try {
            data = await AsyncStorage.getItem('session_data');
-           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker });
+           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
         
         } catch (error) {
             console.log("Something went wrong in logged screen");
         }
+    }
+
+    getLocation=()=>
+    {   
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+auth_token)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                    this.setState({loc: responseJson.features[0].place_name });
+                }).catch((error) => {
+                console.error(error);
+            });
     }
 
      degreesToRadians=(degrees)=> {
@@ -50,26 +64,56 @@ class ProfileActivity extends Component {
       
         var dLat = this.degreesToRadians(lat2-lat1);
         var dLon = this.degreesToRadians(lon2-lon1);
-      
         lat1 = this.degreesToRadians(lat1);
         lat2 = this.degreesToRadians(lat2);
       
         var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                 Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        return earthRadiusKm * c;
+        return Math.round(earthRadiusKm * c * 1000);
+    }
+
+    house_access=(data)=>{
+  
+        fetch('http://dev4.holidale.org/api/v1/access_update/check_in', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    house_id: data.house_id,
+	                user_id: data.user_id,
+	                work_order_id: data.work_order_id,
+	                location: data.location,
+                    access_in_datetime: data.access_in_datetime,
+                    access_out_datetime: "nil"
+                })
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                }).catch((error) => {
+                console.error(error);
+            }); 
     }
 
     WorkOrderFunction = (item) =>{
-       
-        dist=this.distanceInKmBetweenCoordinates(item.latitude,item.longitude,this.state.latitude,this.state.longitude);
-        console.log(dist);
-        if(dist<0.02)
+        this.getLocation();
+        var obj={
+            access_in_datetime: new Date(),
+            work_order_id:item.id,
+            user_id: this.state.user_id,
+            house_id: item.house_id,
+            location: this.state.loc
+        }
+    
+        DistInMet=this.distanceInKmBetweenCoordinates(item.latitude,item.longitude,this.state.latitude,this.state.longitude);
+
+        if(DistInMet>25)
         {   
-            timeStamp = new Date();
-            house_id = item.house_id;
             this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
             this.props.navigation.navigate('ThirdPage',{param:this.state.data});  
+            this.house_access(obj);
         }
         else{
             Alert.alert("Too far away to Check-In");
@@ -136,6 +180,7 @@ class ProfileActivity extends Component {
                                     this.state.items[strTime].push({
                                         name: responseJson[j].name,
                                         id: responseJson[j].id,
+                                        house_id: responseJson[j].house_id,
                                         address: responseJson[j].address,
                                         status: responseJson[j].status,
                                         height: Math.max(50, Math.floor(Math.random() * 150)),
@@ -172,6 +217,7 @@ class ProfileActivity extends Component {
                                 this.state.items[strTime].push({
                                     name: responseJson[j].name,
                                     id: responseJson[j].id,
+                                    house_id: responseJson[j].house_id,
                                     address: responseJson[j].address,
                                     status: responseJson[j].status,
                                     height: Math.max(50, Math.floor(Math.random() * 150)),
@@ -217,7 +263,7 @@ class ProfileActivity extends Component {
                 </View>
                 <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
                     <View>
-                        <Text style={styles.TextStyle3}>Check-In</Text>
+                        <Text style={styles.TextStyle4}>Check-In</Text>
                     </View>
                 </TouchableOpacity>
         </View>

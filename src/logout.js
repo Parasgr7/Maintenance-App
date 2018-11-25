@@ -25,7 +25,7 @@ class Logout extends Component {
                     </View>
                     
                     <Text style={styles.WorkOrderTextStyle}>Maintenance App</Text>
-                    <Text style={styles.WorkOrderTextStyle}>V0.1</Text>                            
+                    <Text style={styles.WorkOrderTextStyle}>V1.0</Text>                            
                 
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this._signOutAsync }>
                                 <Text style={styles.TextStyle}> Logout </Text>

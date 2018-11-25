@@ -63,7 +63,6 @@ export default StyleSheet.create({
         paddingTop: 10
     },
     SubmitButtonStyle: {
-
         marginTop:30,
         paddingTop:15,
         paddingBottom:15,

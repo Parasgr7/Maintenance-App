@@ -179,5 +179,22 @@ export default StyleSheet.create({
         // bottom: 0,
         // position: 'absolute',
         // width: '100%'
+    },
+    Check_outButtonStyle: {
+        flex:1,
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent: "center",
+        width:100,
+        height:35,
+        marginTop:10,
+        marginLeft:120,
+        backgroundColor:'#018b9e',
+        borderRadius:10,
+    },
+    TextStyle4:{
+        color:'#fff',
+        textAlign:'center',
+        fontSize:15,
     }
 });

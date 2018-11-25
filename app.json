@@ -1,18 +1,18 @@
 {
   "expo": {
     "name": "Maintenance",
-    "description": "Holidale maintenance app",
-    "slug": "holidale-maintenance",
+    "description": "Holidale Maintenance App",
+    "slug": "Maintenance",
     "privacy": "public",
-    "sdkVersion": "28.0.0",
+    "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app-logo.png",
+    "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/to.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#2a7791"
+      "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
