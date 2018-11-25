@@ -11,7 +11,9 @@ The platform shall improve our operation efficiency, improve communication and t
  2. After you have installed NodeJs install Yarn from https://yarnpkg.com/lang/en/.
     Yarn is node package manager which helps in downloading different open source packages which helps in development process.
  
- 3. Now install Expo XDE from https://expo.io/tools#xde.
+ 3. Now install Expo CLI, just run "npm install -g expo-cli".
+    Expo CLI is the tool for building React Native apps with Expo.
+    Expo CLI replaces our previous tools exp (a CLI) and XDE (a desktop app), by providing both an improved version of the familiar command-line interface and a graphical interface running in the browser.
     It is the tool to serve, share, and publish your projects. Using this tool you can easily test your code on your mobile app like an usual app using the Expo mobile app.
 	
     Note: To test the app in simulator on your system you will need to install XCode(for MacOS).
@@ -28,4 +30,4 @@ Now after following all the above steps, clone the repository in your local syst
 Make sure that you get an IDE for this. I will suggest using Atom as it has all the required packages that will make the development easy.
   Link to Atom: https://atom.io/
   
- Now run the Expo XDE and click on Project and open the cloned project. 
+ Now to run the project run "expo start" from project directory path.
