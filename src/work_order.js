@@ -475,41 +475,15 @@ class WorkOrder extends Component {
         
         const {goBack} = this.props.navigation;
 
+        const questionair=[
+            {id: 1, text: "This is the first question?"},
+            {id: 2, text: "This is the second question?"},
+            {id: 3, text: "This is the third question?"}
+        ];
 
-        return(
-            <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={this._onRefresh}
-              />
-            }>
-            
-            <ScrollView style={styles.container}>
-                <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
-                <Text style={styles.TextComponentStyle}>{this.state.data.address}</Text>
-                <Text style={styles.TextComponentStyle}>{this.state.data.due}</Text>
-                <ScrollView style={[{flex: 1}, styles.elementsContainer]}>
-                    <ScrollView style={{flex: 1}}>
-                       <Dropdown
-                         label='Select Area'
-                         data={list} 
-                         onChangeText={(value,index,data)=>{
-                            this.setState({area:value});
-                                for(let i=0;i<this.state.data.app_data.length;i++)
-                                {   
-                                    if (this.state.area==this.state.data.app_data[i].area)
-                                    {   
-                                        this.setState({area_data : this.state.data.app_data[i] });
-                                        this.setState({index:i});
-                                        this.setState({image:false});  
-                                
-                                    }
-                                }  
-                        }}
-                       />
-                     
-                    </ScrollView>
+        var questions=[];
+        for (var i = 0; i < questionair.length; i++) {
+            questions.push(<View><Text style={styles.WorkOrderTextStyle}>{questionair[i].id}.  {questionair[i].text}</Text>
                     <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
                         alignItems: 'stretch',
                         justifyContent: 'space-between'}}>
@@ -548,6 +522,26 @@ class WorkOrder extends Component {
                         </ScrollView>
 
                     </ScrollView>
+            
+            </View>);
+        }
+        return(
+            <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this._onRefresh}
+              />
+            }>
+            
+            <ScrollView style={styles.container}>
+                <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.address}</Text>
+                <Text style={styles.TextComponentStyle}>{this.state.data.due}</Text>
+               
+                {questions}
+        
+               
                     <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                             {this.listing_data()}
                             {this._maybeRenderUploadingOverlay()}
@@ -570,7 +564,7 @@ class WorkOrder extends Component {
                 </ScrollView>
 
             </ScrollView>
-    </ScrollView>
+  
         );
     }
 
@@ -718,12 +712,7 @@ class WorkOrder extends Component {
 
     thumbs_up=()=> {
        
-        if(this.state.area=="")
-        {
-            Alert.alert("Select Proper Area");
-            return;
-        }
-        else if(this.state.area_data.area!=this.state.area)
+        if(this.state.area_data.area!=this.state.area)
         {
             Alert.alert("Please upload image");
             return;
@@ -788,12 +777,7 @@ class WorkOrder extends Component {
     }
     thumbs_down=()=>{
 
-        if(this.state.area=="")
-        {
-            Alert.alert("Select Proper Area");
-            return;
-        }
-        else if(this.state.area_data.area!=this.state.area)
+        if(this.state.area_data.area!=this.state.area)
         {   
             Alert.alert("Please upload image");
             return;
@@ -940,11 +924,6 @@ class WorkOrder extends Component {
 
 
     _pickImage = async () => {
-        if(this.state.area=="")
-        {
-            Alert.alert("Select proper area");
-            return
-        }
             
             const {
                 status: cameraRollPerm
