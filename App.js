@@ -1,16 +1,34 @@
 import React, { Component } from 'react';
-
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
-
-import ProfileActivity from './src/LoggedScreen';
-
-// Importing Stack Navigator library to add multiple activities.
-import { createStackNavigator } from 'react-navigation';
+import { View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import {Form, Item, Input} from 'native-base';
+import { AsyncStorage } from "react-native";
+import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
+import Icon from '@expo/vector-icons/FontAwesome';
 import WorkOrder from "./src/work_order";
+import ProfileActivity from './src/LoggedScreen';
+import Logout from "./src/logout";
+import SwitchSelector from 'react-native-switch-selector';
+import styles from "./assets/stylesheets/login_css";
+
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
+let diff = height-width;
+let adjst;
+
+ if (diff<420){
+    adjst=80;
+ }
+ else if (420<=diff<=470){
+    adjst=120;
+ }
+ else if(diff>470){
+    adjst=95;
+ }
+ 
+ else{
+    // break;
+ }
 
 // Creating Login Activity.
 class LoginActivity extends Component {
@@ -18,29 +36,67 @@ class LoginActivity extends Component {
     // Setting up Login Activity title.
     static navigationOptions =
         {
-            title: 'Log In',
+            header:null
         };
-
+       
+       
     constructor(props) {
 
         super(props)
-
+    
         this.state = {
 
             UserEmail: '',
-            UserPassword: ''
+            UserPassword: '',
+            worker:'0',
+            isLoading: false
 
         }
 
     }
+    componentWillMount(){
+        this._getToken();
+    }
+
+    
+
+    _storeToken = async responseJson => {
+        try{
+            userdata={"access_token": responseJson.token, "worker": this.state.worker, "user_id": responseJson.id};
+            item=[];
+            item.push(userdata);
+        await AsyncStorage.setItem('session_data',JSON.stringify(item))
+        this._getToken();
+        }
+        catch(error){
+            console.log("Something went wrong");
+        }
+        
+    }
+
+
+    _getToken = async () => {
+        try {
+        const token = await AsyncStorage.getItem('session_data');
+        this.setState({token: token});
+        if (token !== null) {
+            this.props.navigation.navigate(token? 'App':'Auth');
+        }
+        } catch (error) {
+            // console.log(error);
+            console.log("Something went wrong while getting token");
+        }
+    }
 
     UserLoginFunction = () =>{
+        this.setState({isLoading: true});
 
         const { UserEmail }  = this.state ;
         const { UserPassword }  = this.state ;
 
-
-        fetch('http://18.222.123.107/api/v1/login', {
+        if(this.state.worker=='1')
+        {
+        fetch('http://dev4.holidale.org/api/v1/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -49,72 +105,137 @@ class LoginActivity extends Component {
             body: JSON.stringify({
 
                 email: UserEmail,
-
                 password: UserPassword
 
             })
 
-        }).then((response) => response.json())
-            .then((responseJson) => {
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    // If server response message same as Data Matched
+                    if(typeof(responseJson)=='object')
+                    {   
+                        this._storeToken(responseJson);
+                        this.setState({isLoading: false});
+                        // Then open Profile activity and send user email to profile activity.
+                        this.props.navigation.navigate('App');
+                    
+                    }
+                    else{
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
+                        this.setState({isLoading: false});
+                    }
 
-                // If server response message same as Data Matched
-                if(responseJson)
-                {
+                }).catch((error) => {
+                Alert.alert("Server Unavailable");
+                this.setState({isLoading: false});
+                // console.error(error);
+            });
+        }
+        else if (this.state.worker==='0'){
+            fetch('http://dev4.holidale.org/api/v1/cleaner_login', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
 
-                    //Then open Profile activity and send user email to profile activity.
-                    this.props.navigation.navigate('Second', { Email: UserEmail });
+                email: UserEmail,
+                password: UserPassword
 
-                }
-                else{
+            })
 
-                    Alert.alert(responseJson);
-                }
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    if(typeof(responseJson)=='object')
+                    {  
+                        this._storeToken(responseJson);
+                        this.setState({isLoading: false});
+                        this.props.navigation.navigate('App');
+                    
+                    }
+                    else{
+                        // this.props.navigation.navigate('App');
+                        Alert.alert("Provide Proper Credentials");
+                        this.setState({isLoading: false});
+                    }
 
-            }).catch((error) => {
-            console.error(error);
-        });
+                }).catch((error) => {
+                    Alert.alert("Server Unavailable");
+                    this.setState({isLoading: false});
+                // console.error(error);
+            });
+        }
 
 
     }
-
+    _maybeRenderUploadingOverlay = () => {
+        if (this.state.isLoading) {
+            return (
+                <View
+                    style={ styles.maybeRenderUploading}>
+                    <ActivityIndicator size="small" color="black"/>
+                </View>
+            );
+        }
+    };
     render() {
+
         return (
 
             <View style={{flex:1}}>
                 <ImageBackground source={require('./assets/Images/login.jpg')} style={styles.backgroundImage}>
                     <View style={styles.logoImage}>
-                        <Image source={require('./assets/Images/logo.png')} style={styles.logoImagedesign}>
+                        <Image source={require('./assets/Images/logout.png')} style={styles.logoImagedesign}>
                         </Image>
                     </View>
-                    <View style={styles.inputStyle}>
+                    
+                    <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled>
                         <Form>
-                            <Item floatingLabel>
-                                <Label style={{color: 'white'}}>Email</Label>
+                            <Item >
                                 <Input
                                     autoCorrect={false}
+                                    placeholder="Email"
+                                    placeholderTextColor="white"
                                     onChangeText={UserEmail => this.setState({UserEmail})}
                                 />
                             </Item>
-                            <Item floatingLabel>
-                                <Label style={{color: 'white'}}>Password</Label>
+                            <Item >
                                 <Input
                                     autoCorrect={false}
+                                    placeholder="Password"
+                                    placeholderTextColor="white"
+                                    secureTextEntry={true}
                                     onChangeText={UserPassword => this.setState({UserPassword})}
-
-                                />
+                                />  
+                                 
+                                
                             </Item>
                         </Form>
-                        <View style= {{marginTop:20}}>
-                            <Button
-                                primary
-                                block
-                                onPress={this.UserLoginFunction}
-                            >
-                                <Text style={{color: 'white'}}>Sign In</Text>
-                            </Button>
-                        </View>
+                         <View style={styles.Select}>
+                         <SwitchSelector
+                            initial={0}
+                            onPress={value => {this.setState({ worker: value })}}
+                            buttonColor='#6db3bc'
+                            // borderColor='#7a44cf'
+                            hasPadding
+                            options={[
+                                { label: 'Cleaner', value: '0' }, 
+                                { label: 'Maintainer', value: '1'} 
+                            ]}
+                         />
+                         </View>
+                         
+                            <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this.UserLoginFunction }>
+                            {this._maybeRenderUploadingOverlay()}
+                                <Text style={styles.TextStyle}> Sign In </Text>
+                            </TouchableOpacity>
+  
 
-                    </View>
+                    </KeyboardAvoidingView>
+
+                    
                 </ImageBackground>
             </View>
 
@@ -124,70 +245,75 @@ class LoginActivity extends Component {
 
 
 
-export default MaintenanceApp = createStackNavigator(
-    {
-        First: { screen: LoginActivity },
-
-        Second: { screen: ProfileActivity },
-
-        Third: { screen: WorkOrder }
-
-    });
-
-const styles = StyleSheet.create({
-
-    MainContainer :{
-
-        justifyContent: 'center',
-        flex:1,
-        margin: 10,
-    },
-
-    TextInputStyleClass: {
-
-        textAlign: 'center',
-        marginBottom: 7,
-        height: 40,
-        borderWidth: 1,
-// Set border Hex Color Code Here.
-        borderColor: '#2196F3',
-
-        // Set border Radius.
-        borderRadius: 5 ,
-
-    },
-
-    TextComponentStyle: {
-        fontSize: 20,
-        color: "#000",
-        textAlign: 'center',
-        marginBottom: 15
-    },
-
-    backgroundImage: {
-        flex: 1,
-        width: width,
-        height: height
-    },
-    logoImage: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    logoImagedesign: {
-        marginTop: 100,
-        width: 100,
-        height: 100,
-        resizeMode: 'contain'
-    },
-    inputStyle: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        margin: 15
-    },
-    error: {
-        color: 'red',
-        paddingTop: 10
+const Tabs = createBottomTabNavigator({
+    Home:   {
+        screen: ProfileActivity,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Icon name="home" size={24} color={tintColor}/>
+            )
+            
+        })},
+    User:  {
+        screen: Logout,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Icon name="user" size={24} color={tintColor}/>
+            )
+            
+        })
+    } 
+},{
+    tabBarOptions: {
+        showLabel: false,
+        activeTintColor: '#45AAC5',
+        inactiveTintColor: 'white',
+        style: {
+          backgroundColor: 'black',
+        },
+      }
     }
+)
 
-});
+const AppStack = createStackNavigator({ 
+                SecondPage: Tabs, 
+                ThirdPage: WorkOrder, 
+                navigationOptions: () => ({
+                        
+                }),
+                LastPage: {
+                       screen: Logout,
+                } },{
+                    navigationOptions: {
+                      headerStyle: {
+                        backgroundColor: 'black',
+                      },
+                      headerTintColor: '#fff',
+                      headerTitleStyle: {
+                        fontWeight: 'bold',
+                      },
+                      headerBackground: (
+                        <Image
+                          style={{width: 150,height:adjst,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
+                          source= {require('./assets/Images/logout.png')}
+                        />
+                      ),
+                    },
+                  }
+                
+  
+  );
+const AuthStack = createStackNavigator({ First: LoginActivity });
+
+
+
+export default MaintenanceApp = createSwitchNavigator(
+    {
+        App: AppStack,
+        Auth: AuthStack,
+
+    },
+    {
+        initialRouteName: 'Auth',
+    }
+);

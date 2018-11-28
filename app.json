@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "holidale-maintenance",
-    "description": "Holidale maintenance app",
-    "slug": "holidale-maintenance",
+    "name": "Maintenance",
+    "description": "Holidale Maintenance App",
+    "slug": "Maintenance",
     "privacy": "public",
-    "sdkVersion": "28.0.0",
+    "sdkVersion": "31.0.0",
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,12 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.holidale.maintenance",
       "supportsTablet": true
-    }
+    },
+    "android": {
+      "package": "com.holidale.maintenance"
+    },
+    "packagerOpts": { "nonPersistent": true }
   }
 }

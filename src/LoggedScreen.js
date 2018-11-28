@@ -1,49 +1,135 @@
 import React, {Component} from 'react';
-import { StyleSheet, TextInput, View, Alert, Text,  Image, ImageBackground, Dimensions} from 'react-native';
-import {Form, Item, Label, Input, Button} from 'native-base';
+import { View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
 import {Agenda} from 'react-native-calendars';
-import { createStackNavigator } from 'react-navigation';
+import { AsyncStorage } from "react-native";
+import styles from "../assets/stylesheets/calendar_page_css";
 
-import MaintenanceApp from '../App';
+const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
 
-let height= Dimensions.get('window').height;
-let width= Dimensions.get('window').width;
-// Creating Profile activity.
 class ProfileActivity extends Component {
 
+    
     static navigationOptions =
         {
-            title: 'Holidale Maintenance',
+            title: 'Home'
 
-        };
-
+        }
+        
     constructor(props) {
         super(props);
         this.state = {
-            items: {}
+            items: {},
+            data:{},
+            visible: false,
         };
+        
+    }
+    componentDidMount(){
+        this._getToken();
+        navigator.geolocation.getCurrentPosition((position)=>{
+            this.setState({latitude:parseFloat(position.coords.latitude)}) ;
+            this.setState({longitude: parseFloat(position.coords.longitude)});
+        
+        });
+    }
+   
+
+    _getToken = async () => {
+        try {
+           data = await AsyncStorage.getItem('session_data');
+           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
+        
+        } catch (error) {
+            console.log("Something went wrong in logged screen");
+        }
     }
 
-    WorkOrderFunction = () =>{
-
-        this.props.navigation.navigate('Third');
-
+    getLocation=()=>
+    {   
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+auth_token)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                    this.setState({loc: responseJson.features[0].place_name });
+                }).catch((error) => {
+                console.error(error);
+            });
     }
 
+     degreesToRadians=(degrees)=> {
+        return degrees * Math.PI / 180;
+      }
 
+    distanceInKmBetweenCoordinates=(lat1, lon1, lat2, lon2)=> {
+        var earthRadiusKm = 6371;
+      
+        var dLat = this.degreesToRadians(lat2-lat1);
+        var dLon = this.degreesToRadians(lon2-lon1);
+        lat1 = this.degreesToRadians(lat1);
+        lat2 = this.degreesToRadians(lat2);
+      
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return Math.round(earthRadiusKm * c * 1000);
+    }
 
+    house_access=(data)=>{
+  
+        fetch('http://dev4.holidale.org/api/v1/access_update/check_in', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    house_id: data.house_id,
+	                user_id: data.user_id,
+	                work_order_id: data.work_order_id,
+	                location: data.location,
+                    access_in_datetime: data.access_in_datetime,
+                    access_out_datetime: "nil"
+                })
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                    console.log(responseJson);
+                }).catch((error) => {
+                console.error(error);
+            }); 
+    }
 
+    WorkOrderFunction = (item) =>{
+        this.getLocation();
+        var obj={
+            access_in_datetime: new Date(),
+            work_order_id:item.id,
+            user_id: this.state.user_id,
+            house_id: item.house_id,
+            location: this.state.loc
+        }
+    
+        DistInMet=this.distanceInKmBetweenCoordinates(item.latitude,item.longitude,this.state.latitude,this.state.longitude);
+
+        if(DistInMet>25)
+        {   
+            this.state.data={id:item.id,check:item.check,userData:{token:this.state.token,date:item.date}};
+            this.props.navigation.navigate('ThirdPage',{param:this.state.data});  
+            this.house_access(obj);
+        }
+        else{
+            Alert.alert("Too far away to Check-In");
+        }
+        
+        
+    }
+    
+    
 
     render()
-    {
-
-        const {goBack} = this.props.navigation;
+    {  
 
         return(
 
-            <View style={{
-                flex: 1
-            }}>
+            <View style={{ flex: 1}}>
                 <View style={styles.container}>
                     <Agenda
                         items={this.state.items}
@@ -51,6 +137,19 @@ class ProfileActivity extends Component {
                         renderItem={this.renderItem.bind(this)}
                         renderEmptyDate={this.renderEmptyDate.bind(this)}
                         rowHasChanged={this.rowHasChanged.bind(this)}
+                        theme={
+                            {
+                                'stylesheet.agenda.list': {
+                                    dayNum: {
+                                        width: '100%',
+                                        fontSize: 28,
+                                        fontWeight: '200',
+                                        textAlign: 'center',
+                                        color: '#43515c',
+                                    }
+                                }
+                            }
+                        }
                     />
                 </View>
 
@@ -61,49 +160,120 @@ class ProfileActivity extends Component {
 
 
     loadItems(day) {
-        setTimeout(() => {
-            for (let i = 0; i < 31; i++) {
+            for (let i = -15; i < 85; i++) {
                 const time = day.timestamp + i * 24 * 60 * 60 * 1000;
                 const strTime = this.timeToString(time);
                 if (!this.state.items[strTime]) {
                     this.state.items[strTime] = [];
-                    const numItems = Math.floor(Math.random() * 5);
-                    for (let j = 0; j < numItems; j++) {
-                        this.state.items[strTime].push({
-                            name: 'Item for ' + strTime,
-                            height: Math.max(50, Math.floor(Math.random() * 150))
-                        });
-                    }
+                    const userData = {date:strTime};
+                    if (this.state.worker==='0')
+                    {
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/cleaner/?token='+this.state.token+'&date='+userData.date)
+                        .then((response) => response.json())
+                        .then((responseJson) => {
+                            // If server response message same as Data Matched
+
+                            if(responseJson)
+                            {   
+                                const numItems = responseJson.length;
+                                for (let j = 0; j < numItems; j++) {
+                                    this.state.items[strTime].push({
+                                        name: responseJson[j].name,
+                                        id: responseJson[j].id,
+                                        house_id: responseJson[j].house_id,
+                                        address: responseJson[j].address,
+                                        status: responseJson[j].status,
+                                        height: Math.max(50, Math.floor(Math.random() * 150)),
+                                        check:responseJson[j].check,
+                                        app_data:responseJson[j].app_data,
+                                        date:strTime,
+                                        inventory: responseJson[j].inventory,
+                                        cost: responseJson[j].cost,
+                                        latitude:responseJson[j].location.latitude,
+                                        longitude:responseJson[j].location.longitude
+                                    });
+                                }
+
+                            }
+                            else{
+
+                                Alert.alert(responseJson);
+                            }
+
+                        }).catch((error) => {
+                        console.error(error);
+                    });
                 }
+                else if(this.state.worker==='1')
+                {
+                    fetch('http://dev4.holidale.org/api/v1/work_orders/maintainer/?token='+this.state.token+'&date='+userData.date)
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        // If server response message same as Data Matched
+                        if(responseJson)
+                        {   
+                            const numItems = responseJson.length;
+                            for (let j = 0; j < numItems; j++) {
+                                this.state.items[strTime].push({
+                                    name: responseJson[j].name,
+                                    id: responseJson[j].id,
+                                    house_id: responseJson[j].house_id,
+                                    address: responseJson[j].address,
+                                    status: responseJson[j].status,
+                                    height: Math.max(50, Math.floor(Math.random() * 150)),
+                                    check:responseJson[j].check,
+                                    app_data:responseJson[j].app_data,
+                                    date:strTime,
+                                    inventory: responseJson[j].inventory,
+                                    cost: responseJson[j].cost,
+                                    latitude:responseJson[j].location.latitude,
+                                    longitude:responseJson[j].location.longitude
+                                });
+                            }
+
+                        }
+                        else{
+
+                            Alert.alert(responseJson);
+                        }
+
+                    }).catch((error) => {
+                    console.error(error);
+                });  
+                }
+
+                }  
             }
-            //console.log(this.state.items);
             const newItems = {};
             Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
             this.setState({
                 items: newItems
             });
-        }, 1000);
-
     }
 
     renderItem(item) {
-        return (
-            <View style={[styles.item, {height: item.height}]}>
-                <Button
-                    primary
-                    block
-                    onPress={this.WorkOrderFunction}
-                >
-                    <Text>{item.name}</Text>
-                </Button></View>
-
-
+        return ( 
+        <View style={styles.SubmitButtonStyle} activeOpacity = { .5 } >
+                <View style={{flexDirection: 'row',flex:1}}>
+                    <Text style={styles.TextStyle}>{item.name}</Text>
+                </View>
+                <Text style={styles.TextStyle2}>{item.address}</Text>
+                <View >
+                    <Text style={styles.TextStyle3}>{item.status}</Text>
+                </View>
+                <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
+                    <View>
+                        <Text style={styles.TextStyle4}>Check-In</Text>
+                    </View>
+                </TouchableOpacity>
+        </View>
         );
     }
 
     renderEmptyDate() {
         return (
             <View style={styles.emptyDate}><Text>This is empty date!</Text></View>
+            
         );
     }
 
@@ -116,83 +286,6 @@ class ProfileActivity extends Component {
         return date.toISOString().split('T')[0];
     }
 }
-
-const styles = StyleSheet.create({
-
-    MainContainer :{
-
-
-        flex:1,
-        margin: 10,
-    },
-
-    container: {
-        flex: 1,
-        flexDirection: 'row'
-    },
-
-    TextInputStyleClass: {
-
-        textAlign: 'center',
-        marginBottom: 7,
-        height: 40,
-        borderWidth: 1,
-// Set border Hex Color Code Here.
-        borderColor: '#2196F3',
-
-        // Set border Radius.
-        borderRadius: 5 ,
-
-    },
-
-    TextComponentStyle: {
-        fontSize: 20,
-        color: "#000",
-        textAlign: 'center',
-        marginBottom: 15
-    },
-
-    backgroundImage: {
-        flex: 1,
-        width: width,
-        height: height
-    },
-    logoImage: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    logoImagedesign: {
-        marginTop: 100,
-        width: 100,
-        height: 100,
-        resizeMode: 'contain'
-    },
-    inputStyle: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        margin: 15
-    },
-    error: {
-        color: 'red',
-        paddingTop: 10
-    },
-    item: {
-        backgroundColor: 'white',
-        flex: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginRight: 10,
-        marginTop: 17
-    },
-    emptyDate: {
-        height: 15,
-        flex:1,
-        paddingTop: 30
-    }
-
-});
-
 
 
 export default ProfileActivity;
