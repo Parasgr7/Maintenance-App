@@ -578,7 +578,7 @@ class WorkOrder extends Component {
     check_out=()=>{
          var time= new Date();
          var id=this.props.navigation.state.params.param.id;
-         fetch('http://localhost:3000/api/v1/access_out_update/check_out/'+id+'/', {
+         fetch('http://dev4.holidale.org/api/v1/access_out_update/check_out/'+id+'/', {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',

@@ -87,7 +87,7 @@ class ProfileActivity extends Component {
 
     house_access=(data)=>{
   
-        fetch('http://localhost:3000/api/v1/access_update/check_in', {
+        fetch('http://dev4.holidale.org/api/v1/access_update/check_in', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
