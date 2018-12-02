@@ -10,6 +10,7 @@ import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { TextField } from 'react-native-material-textfield';
+import { Input} from 'native-base';
 
 import styles from "../assets/stylesheets/work_order_css";
 
@@ -577,8 +578,7 @@ class WorkOrder extends Component {
     check_out=()=>{
          var time= new Date();
          var id=this.props.navigation.state.params.param.id;
-         console.log(id);
-         fetch('http://dev4.holidale.org/api/v1/access_out_update/check_out/'+id+'/', {
+         fetch('http://localhost:3000/api/v1/access_out_update/check_out/'+id+'/', {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -878,8 +878,7 @@ class WorkOrder extends Component {
                     <TextField
                         label='Notes'
                         value={this.state.area_data.note}
-                        onChangeText={ this.changeText }
-                        
+                        onChangeText={ this.changeText }   
                     />
 
                     <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>

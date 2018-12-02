@@ -56,13 +56,22 @@ class LoginActivity extends Component {
     }
     componentWillMount(){
         this._getToken();
+        navigator.geolocation.getCurrentPosition((position)=>{
+            this.setState({latitude:parseFloat(position.coords.latitude)});
+            this.setState({longitude: parseFloat(position.coords.longitude)});
+        });
     }
 
     
 
     _storeToken = async responseJson => {
+        console.log("App",this.state.latitude);
         try{
-            userdata={"access_token": responseJson.token, "worker": this.state.worker, "user_id": responseJson.id};
+            userdata={"access_token": responseJson.token,
+             "worker": this.state.worker,
+              "user_id": responseJson.id,
+              "lat": this.state.latitude,
+              "long":this.state.longitude  };
             item=[];
             item.push(userdata);
         await AsyncStorage.setItem('session_data',JSON.stringify(item))
@@ -127,6 +136,7 @@ class LoginActivity extends Component {
                     }
 
                 }).catch((error) => {
+                console.log(error);
                 Alert.alert("Server Unavailable");
                 this.setState({isLoading: false});
                 // console.error(error);

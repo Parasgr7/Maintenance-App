@@ -21,23 +21,34 @@ class ProfileActivity extends Component {
             items: {},
             data:{},
             visible: false,
+            location: "bewq"
         };
         
     }
     componentDidMount(){
         this._getToken();
-        navigator.geolocation.getCurrentPosition((position)=>{
-            this.setState({latitude:parseFloat(position.coords.latitude)}) ;
-            this.setState({longitude: parseFloat(position.coords.longitude)});
+
         
-        });
+        
     }
    
 
     _getToken = async () => {
         try {
            data = await AsyncStorage.getItem('session_data');
-           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
+           this.setState({token: JSON.parse(data)[0].access_token,
+                             worker: JSON.parse(data)[0].worker,
+                             user_id: JSON.parse(data)[0].user_id,
+                            latitude:JSON.parse(data)[0].lat,
+                            longitude:JSON.parse(data)[0].long});
+
+            fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+auth_token)
+                    .then((response) => {return response.json()})
+                    .then((responseJson) => {
+                        this.setState({loc: responseJson.features[0].place_name });
+                    }).catch((error) => {
+                        console.error(error);
+                });
         
         } catch (error) {
             console.log("Something went wrong in logged screen");
@@ -46,13 +57,14 @@ class ProfileActivity extends Component {
 
     getLocation=()=>
     {   
+    
         fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+auth_token)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                     this.setState({loc: responseJson.features[0].place_name });
                 }).catch((error) => {
-                console.error(error);
-            });
+                    console.error(error);
+        });
     }
 
      degreesToRadians=(degrees)=> {
@@ -75,7 +87,7 @@ class ProfileActivity extends Component {
 
     house_access=(data)=>{
   
-        fetch('http://dev4.holidale.org/api/v1/access_update/check_in', {
+        fetch('http://localhost:3000/api/v1/access_update/check_in', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -91,14 +103,14 @@ class ProfileActivity extends Component {
                 })
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    console.log(responseJson);
+                    // console.log(responseJson);
                 }).catch((error) => {
                 console.error(error);
             }); 
     }
 
     WorkOrderFunction = (item) =>{
-        this.getLocation();
+
         var obj={
             access_in_datetime: new Date(),
             work_order_id:item.id,
