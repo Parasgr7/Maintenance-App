@@ -540,9 +540,9 @@ class WorkOrder extends Component {
                                         }}
                                     />
                                 </ScrollView>
-                           </ScrollView>
+
                         
-                           <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
+                          
                                 <ScrollView style={ {margin: 17}}>
                                     <Icon
                                         name='camera'
@@ -555,8 +555,9 @@ class WorkOrder extends Component {
                                     />
                                 {this._maybeRenderUploadingOverlay()}
                                  </ScrollView>
-                           </ScrollView>
+                         
 
+                        </ScrollView>
                         </ScrollView>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                            <View style={styles.maybeRenderImageContainer}>
@@ -564,6 +565,7 @@ class WorkOrder extends Component {
                            </View>
                            
                         </ScrollView>
+                           
                     </View>
                     
                 );
@@ -574,6 +576,7 @@ class WorkOrder extends Component {
                
                
                     <View style={{marginBottom:20}}>
+
                             <Dropdown
                                 label='Select Status'
                                 data={status_data}
@@ -734,10 +737,11 @@ class WorkOrder extends Component {
 
     }
 
+
     thumbs_up=(inspection_result)=> {
         inspection_result.result="good";
         const check = 0;
-        
+     
         if (check==0)
         {
             fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
@@ -918,8 +922,10 @@ class WorkOrder extends Component {
     // };
 
 
+
     async _pickImage(inspection_result) {
-            
+
+
             const {
                 status: cameraRollPerm
             } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
