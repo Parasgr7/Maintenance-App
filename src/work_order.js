@@ -120,9 +120,8 @@ const optionsCost = {
 
 class WorkOrder extends Component {
 
-
-        constructor(){
-            super();
+        constructor(props){
+            super(props);
             this.state = {
                 image: false,
                 text: '',
@@ -133,6 +132,8 @@ class WorkOrder extends Component {
                     "inventory":["Dummy"],
                     "cost":["Dummy"]
                 },
+                inspection_items:[],
+                inspections_results:[],
                 area:"",
                 rate:"",
                 visibleModal: null,
@@ -142,8 +143,14 @@ class WorkOrder extends Component {
                 refreshing: false,
                 visible: false,
                 area_data:false,
-                renderUpload: false
+                renderUpload: false,
+                id:"",
+                check:""
             }
+            this.thumbs_up=this.thumbs_up.bind(this);
+            this.thumbs_down=this.thumbs_down.bind(this);
+            this._pickImage=this._pickImage.bind(this);
+            this.uploadImageAsync=this.uploadImageAsync.bind(this);
         }
     
 
@@ -319,14 +326,14 @@ class WorkOrder extends Component {
       fetchData(){
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
-        const userData=this.props.navigation.state.params.param.userData;
 
         if (check==1){
-            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
                             {
+                              console.log("check here", responseJson)
                                 let res = responseJson;
                                 
                                 this.setState({
@@ -345,11 +352,12 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+userData.token+'&date='+userData.date)
+            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
-                            {   
+                            {
+                              console.log("check there", responseJson)
                                 let res= responseJson;
                                 this.setState({
                                     data: res[0],
@@ -372,27 +380,39 @@ class WorkOrder extends Component {
       _getToken = async () => {
         try {
            data = await AsyncStorage.getItem('session_data');
-           this.setState({token: JSON.parse(data)[0].access_token, worker: JSON.parse(data)[0].worker });
+            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,  user_id: JSON.parse(data)[0].user_id});
         
         } catch (error) {
             console.log("Something went wrong");
         }
     }
 
-        componentDidMount(){
+    componentDidMount(){
         this._getToken();
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
-        const userData=this.props.navigation.state.params.param.userData;
-        if (check==1){
-            fetch('http://dev4.holidale.org/api/v1/work_order/service_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
+        this.state.inspection_items=[
+            {"id": 1, "description": "Capture a photo of the apartment front door showing the apartment number:", "photo_needed": true},
+            {"id": 2, "description": "Is a lockbox present(with tag and light) if applicable?:", "photo_needed": false},
+            {"id": 3, "description": "Capture a photo of theaccess items provided forthe guest:", "photo_needed": true}
+        ];
+            
+        this.state.inspections_results=[
+            {"inspection_item_id": 1, "service_schedule_id": 13356, "result": "bad", "picture_path": ""},
+            {"inspection_item_id": 2, "service_schedule_id": 13356, "result": "bad", "picture_path": ""},
+            {"inspection_item_id": 3, "service_schedule_id": 13356, "result": "bad", "picture_path": ""}
+        ];
+        
+        this.state.id=this.props.navigation.state.params.param.id;
+        this.state.check=1;
+        if (this.state.check==1){
+            fetch('http://kk.local:3000/api/v1/service_schedules/'+this.state.id+'/')
                         .then((response) => response.json())
                         .then((responseJson) => {
+                              console.log("now!:", responseJson);
                             if(responseJson)
                             {  
                                 let res = responseJson;
                                 this.setState({
-                                    data: res[0],
+                                    data: res,
                                     visible: !this.state.visible
                                 });
 
@@ -407,16 +427,17 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://dev4.holidale.org/api/v1/work_order/cleaning_schedules/'+id+'/?token='+this.state.token+'&date='+userData.date)
+            fetch('http://kk.local:3000/api/v1/service_schedules/'+this.state.id+'/?token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
+                              console.log("here!:", responseJson);
                             if(responseJson)
                             {   
                             
                                 let res= responseJson;
                                 
                                 this.setState({
-                                    data: res[0],
+                                    data: res,
                                     visible: !this.state.visible
                                 });
 
@@ -430,8 +451,8 @@ class WorkOrder extends Component {
                         console.error(error);
                     });
         }
-           
-        }
+
+    }
 
         
     
@@ -447,7 +468,7 @@ class WorkOrder extends Component {
           );
         }
         
-        let list=[];
+        /*let list=[];
         if(this.state.data.listings!=null)
         {
             for(let i=0;i<this.state.data.listings.length;i++)
@@ -456,8 +477,7 @@ class WorkOrder extends Component {
                     value: this.state.data.listings[i]
                 })
             }  
-        }
-
+        }*/
         status_data=[{
             value:"Completed"
         },{
@@ -473,59 +493,9 @@ class WorkOrder extends Component {
         },{
             value:"Train"
         }]
-        
+        count=0;
         const {goBack} = this.props.navigation;
 
-        const questionair=[
-            {id: 1, text: "This is the first question?"},
-            {id: 2, text: "This is the second question?"},
-            {id: 3, text: "This is the third question?"}
-        ];
-
-        var questions=[];
-        for (var i = 0; i < questionair.length; i++) {
-            questions.push(<View><Text style={styles.WorkOrderTextStyle}>{questionair[i].id}.  {questionair[i].text}</Text>
-                    <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row',
-                        alignItems: 'stretch',
-                        justifyContent: 'space-between'}}>
-                        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch',flexDirection: 'row', flex: 1}}>
-                            <ScrollView style={ {margin: 17}}>
-                                <Icon
-                                    name='thumbs-up'
-                                    type='font-awesome'
-                                    color={this.state.area_data.rate=="true" && this.state.area_data.area==this.state.area?"#033b49":"#378A9E"}
-                                    raised
-                                    // reverse
-                                    onPress={() => this.thumbs_up()} />
-                            </ScrollView>
-                            <ScrollView style={ {margin: 17}}>
-                                <Icon
-                                    name='thumbs-down'
-                                    type='font-awesome'
-                                    color={this.state.area_data.rate=="false" && this.state.area_data.area==this.state.area?"#033b49":"#378A9E"}
-                                    raised
-                                    onPress={() => this.thumbs_down()}
-                                />
-                            </ScrollView>
-                        </ScrollView>
-                        
-                        <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                            <ScrollView style={ {margin: 17}}>
-                                <Icon
-                                    name='camera'
-                                    type='font-awesome'
-                                    color='#378A9E'
-                                    raised
-                                    onPress={this._pickImage} 
-                                />
-                                {this._maybeRenderUploadingOverlay()}
-                                 </ScrollView>
-                        </ScrollView>
-
-                    </ScrollView>
-            
-            </View>);
-        }
         return(
             <ScrollView
             refreshControl={
@@ -536,32 +506,86 @@ class WorkOrder extends Component {
             }>
             
             <ScrollView style={styles.container}>
-                <Text style={styles.WorkOrderTextStyle}>{this.state.data.name}</Text>
-                <Text style={styles.TextComponentStyle}>{this.state.data.address}</Text>
-                <Text style={styles.TextComponentStyle}>{this.state.data.due}</Text>
+                <Text style={styles.WorkOrderTextStyle}>{this.props.navigation.state.params.param.name}</Text>
+                <Text style={styles.TextComponentStyle}>{this.props.navigation.state.params.param.address}</Text>
+                <Text style={styles.TextComponentStyle}>{this.props.navigation.state.params.param.due}</Text>
                
-                {questions}
+                {this.state.data.inspection_results.map((item) => {
+                    count=count+1;
+                    return(
+                        <View>
+                           <Text style={styles.WorkOrderTextStyle}>{count+". "}{item.description}</Text>
+                           <ScrollView contentContainerStyle={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'space-between'}}>
+                           <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch',flexDirection: 'row', flex: 1}}>
+                                <ScrollView style={ {margin: 17}}>
+                                    <Icon
+                                        name='thumbs-up'
+                                        type='font-awesome'
+                                        color={item.result=="good" ?"#033b49":"#378A9E"}
+                                        raised
+                                        // reverse
+                                        onPress={() => {
+                                            this.thumbs_up(item);
+                                        }}
+                                    />
+                                </ScrollView>
+                                <ScrollView style={ {margin: 17}}>
+                                    <Icon
+                                        name='thumbs-down'
+                                        type='font-awesome'
+                                        color={item.result=="bad" ?"#033b49":"#378A9E"}
+                                        raised
+                                        onPress={() => {
+                                            this.thumbs_down(item);
+                                        }}
+                                    />
+                                </ScrollView>
+                           </ScrollView>
+                        
+                           <ScrollView contentContainerStyle={{ justifyContent: 'center', alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
+                                <ScrollView style={ {margin: 17}}>
+                                    <Icon
+                                        name='camera'
+                                        type='font-awesome'
+                                        color='#378A9E'
+                                        raised
+                                        onPress={() => {
+                                            this._pickImage(item);
+                                        }}
+                                    />
+                                {this._maybeRenderUploadingOverlay()}
+                                 </ScrollView>
+                           </ScrollView>
+
+                        </ScrollView>
+                        <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
+                           <View style={styles.maybeRenderImageContainer}>
+                           {item.images[0]&&(<Image source={{ uri: "http://kk.local:3000/"+item.images[0].directory}} style={styles.maybeRenderImage} />)}
+                           </View>
+                           
+                        </ScrollView>
+                    </View>
+                    
+                );
+            })}
+        
         
                
-                    <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                            {this.listing_data()}
-                            {this._maybeRenderUploadingOverlay()}
-                    </ScrollView>
-                    {this.add_inventory()}
-                    {this.add_cost()}
-                    <View style={{marginBottom:80}}>
+               
+               
+                    <View style={{marginBottom:20}}>
                             <Dropdown
                                 label='Select Status'
                                 data={status_data}
-                                value={this.state.data.status}
+                                value={this.props.navigation.state.params.param.status}
                                 onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
                             />
                     </View>
-                    <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>
-                        <View>
+                    <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
+                        <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>                        
                             <Text style={styles.TextStyle4}>Check-Out</Text>
-                        </View>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
+                    </View>
                 </ScrollView>
 
             </ScrollView>
@@ -658,12 +682,12 @@ class WorkOrder extends Component {
 
     statusUpdate=(value)=> {
         this.setState({status:value});
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
+        //const id = this.props.navigation.state.params.param.id;
+        //const check = this.props.navigation.state.params.param.check;
       
         if (check==0)
         {
-            fetch('http://dev4.holidale.org/api/v1/work_status/cleaning_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/cleaning_schedules/'+this.state.id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -686,7 +710,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://dev4.holidale.org/api/v1/work_status/service_schedules/'+id+'/', {
+            fetch('http://dev4.holidale.org/api/v1/work_status/service_schedules/'+this.state.id+'/', {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
@@ -710,131 +734,115 @@ class WorkOrder extends Component {
 
     }
 
-    thumbs_up=()=> {
-       
-        if(this.state.area_data.area!=this.state.area)
-        {
-            Alert.alert("Please upload image");
-            return;
-        }
-
-        else (this.state.area_data.area==this.state.area)
-        {
-        this.setState({rate:"true"});
-        this.state.area_data.rate="true";
-
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
+    thumbs_up=(inspection_result)=> {
+        inspection_result.result="good";
+        const check = 0;
         
         if (check==0)
         {
-            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
-                method: 'PUT',
+            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-
-                    data: this.state.area_data,
-                    index: this.state.index
-
+                    inspector_id: this.state.user_id,
+                    result: inspection_result.result
                 })
                 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                  
-                    Alert.alert("Liked :)");  
-
+                      this.setState(() => {
+                            console.log('Thumb up!');
+                            return { unseen: "Thump up!" }
+                        });
+                      return;
                 }).catch((error) => {
                 console.error(error);
             });
         }
         else
         {   
-            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
-                method: 'PUT',
+            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-
-                    data: this.state.area_data,
-                    index: this.state.index
+                    inspector_id: this.state.user_id,
+                    result: inspection_result.result
 
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                  
-                    Alert.alert("Liked :)");
+                      this.setState(() => {
+                            console.log('Thumb up!');
+                            return { unseen: "Thump up!" }
+                        });
+                      return;
                 }).catch((error) => {
                 console.error(error);
             });
         }
+    
     }
-    }
-    thumbs_down=()=>{
+    
+    thumbs_down=(inspection_result)=>{
+        inspection_result.result="bad";
 
-        if(this.state.area_data.area!=this.state.area)
-        {   
-            Alert.alert("Please upload image");
-            return;
-        }
+        const check = 0;
 
-        else(this.state.area_data.area==this.state.area)
-        {
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
-        this.setState({rate:"false"});
-        this.state.area_data.rate="false";
-       
         if (check==0)
         {
-            fetch('http://dev4.holidale.org/api/v1/up/cleaning_schedules/'+id+'/', {
-                method: 'PUT',
+            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    data: this.state.area_data,
-                    index: this.state.index
+                     inspector_id: this.state.user_id,
+                     result: inspection_result.result
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                
-                    Alert.alert("Unliked :(");
-                    
-
+                      this.setState(() => {
+                            console.log('Thumb down');
+                            return { unseen: "Thump down" }
+                        });
+                      return;
                 }).catch((error) => {
                 console.error(error);
             });
         }
         else
         {   
-            fetch('http://dev4.holidale.org/api/v1/down/service_schedules/'+id+'/', {
-                method: 'PUT',
+            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    data: this.state.area_data,
-                    index: this.state.index
+                     inspector_id: this.state.user_id,
+                     result: inspection_result.result
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    Alert.alert("Unliked :(");
-
+                      this.setState(() => {
+                            console.log('Thumb down');
+                            return { unseen: "Thump down" }
+                        });
+                      return;
                 }).catch((error) => {
                 console.error(error);
             });
         }
-    }
 
     }
 
@@ -849,35 +857,23 @@ class WorkOrder extends Component {
         }
     };
 
-    listing_data=()=>{
-        if (this.state.area_data.area==this.state.area) {
-            return(
-                <View
-                    style={styles.maybeRenderImageText}>
-                     
-                    <View style={styles.maybeRenderImageContainer}>
-                        <Image source={{ uri: this.state.area_data.image }} style={styles.maybeRenderImage} />
-                    </View>
 
-                    <TextField
-                        label='Notes'
-                        value={this.state.area_data.note}
-                        onChangeText={ this.changeText }   
-                    />
-
-                    <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={()=>{ this.uploadNotes(this.state.image,this.state.text,this.state.area)}}>
-                   <Text style={styles.TextStyle}>Upload</Text>
-                    </TouchableOpacity>
-           
-                </View>
-                
-            );
+    /*listing_data = async (inspection_result) =>{
+        directory="";
+        if (!inspection_result){
+            return;
+>>>>>>> V2.0 First BIG push
         }
         else{
-            return;
-            
+            const uploadResponse = await fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/');
+            const json = await response.json();
         }
-    }
+        return(
+               <View style={styles.maybeRenderImageContainer}>
+               <Image source={{ uri: "http://kk.local:3000/"+directory}} style={styles.maybeRenderImage} />
+               </View>
+        );
+    }*/
   
     changeText=(text)=>{
         this.setState({text: text});
@@ -922,7 +918,7 @@ class WorkOrder extends Component {
     // };
 
 
-    _pickImage = async () => {
+    async _pickImage(inspection_result) {
             
             const {
                 status: cameraRollPerm
@@ -932,12 +928,17 @@ class WorkOrder extends Component {
                  pickerResult = await ImagePicker.launchImageLibraryAsync({
                     allowsEditing: true,
                     aspect: [4, 3]
-                });  
-                this._handleImagePicked(pickerResult);
-            }     
+                });
+                this._handleImagePicked(inspection_result, pickerResult);
+                this.setState(() => {
+                    console.log('Image picked');
+                    return { unseen: "Image picked" }
+                });
+            }
+        this.setState({ unseen: "help me" });
     };
 
-    _handleImagePicked = async (pickerResult) => {
+    _handleImagePicked = async (inspection_result, pickerResult) => {
         let uploadResponse, uploadResult;
 
         try {
@@ -946,13 +947,11 @@ class WorkOrder extends Component {
             });
 
             if (!pickerResult.cancelled) {
-                uploadResponse = await this.uploadImageAsync(pickerResult.uri);
+                uploadResponse = await this.uploadImageAsync(inspection_result, pickerResult.uri);
                 uploadResult = await uploadResponse;
                
-              this.setState({
-                    image: uploadResult.location,
+                this.setState({
                     renderUpload: true,
-                    area_data: {area:this.state.area, image:uploadResult.location, rate:"",note:"" },
                     text:''
                 });
             }
@@ -967,14 +966,14 @@ class WorkOrder extends Component {
         }
     };
 
-    uploadNotes= (link,text,area)=> {
+    uploadNotes= (inspection_item, inspection_result)=> {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         // if(link==false)
         // {
         //     Alert.alert("Image not selected!");
         // }
-        if(link==false&&text){
+        if(inspection_result.picture_path&&inspection_result.comment){
             link= this.state.area_data.image;
             if (check==0)
             {
@@ -1093,7 +1092,7 @@ class WorkOrder extends Component {
     
     }
 
-     uploadImageAsync= async(uri)=> {
+     uploadImageAsync= async(inspection_result, uri)=> {
 
         let uriParts = uri.split('.');
         let fileType = uriParts[uriParts.length - 1];
@@ -1101,7 +1100,24 @@ class WorkOrder extends Component {
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
         
-        const file = {
+        const data = new FormData();
+        data.append('images', {
+             uri: uri,
+             type: 'image/jpeg', // or photo.type
+             name: 'testPhotoName'
+        });
+        data.append('inspector_id', this.state.user_id);
+        data.append('result', inspection_result.result);
+        fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+             method: 'POST',
+             headers: {
+              'Content-Type': 'multipart/form-data',
+             },
+             body: data
+        }).then(res => {
+             console.log(res)
+        });
+        /*const file = {
             uri: uri,
             name: `${uriParts[uriParts.length - 2]}.${fileType}`,
             type: `image/${fileType}`
@@ -1114,13 +1130,13 @@ class WorkOrder extends Component {
             secretKey: "RDpMcC30eTk8JFdkdKoYPH9okbiSctgYa4c2mwzf",
             successActionStatus: 201,
          
-          }
+          }*/
           
-        return RNS3.put(file, options).then(response => {
+        /*return RNS3.put(file, options).then(response => {
             if (response.status !== 201)
               throw new Error("Failed to upload image to S3");
             return response.body.postResponse;
-          });
+          });*/
     
     }
     

@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { View, Text,  Image, ImageBackground,TouchableOpacity} from 'react-native';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/logout_css";
+import { StackNavigator } from 'react-navigation';
 
 class Logout extends Component {
+    
     static navigationOptions =
         {
             title: 'Log Out',
-            
+            header: null
         };
     _signOutAsync = async () => {
         await AsyncStorage.removeItem('session_data');
@@ -16,7 +18,7 @@ class Logout extends Component {
 
     render() {
         return (
-
+            
             <View style={{flex:1}}>
                 <ImageBackground source={require('../assets/Images/login.jpg')} style={styles.backgroundImage}>
                     <View style={styles.logoImage}>

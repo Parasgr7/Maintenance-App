@@ -16,7 +16,7 @@ export default StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         // marginTop: 50
-
+        
     },
 
     TextInputStyleClass: {
@@ -84,17 +84,17 @@ export default StyleSheet.create({
         paddingBottom:15,
         marginLeft:30,
         marginRight:30,
-        backgroundColor:'#00BCD4',
+        backgroundColor:'#00BCD5',
         borderRadius:10,
     },
     Check_inButtonStyle: {
-        flex:1,
+        flex:0.5,
         justifyContent: "center",
-        width:100,
+        width:70,
         height:35,
-        marginTop:10,
-        marginLeft:145,
-        backgroundColor:'#018b9e',
+        marginTop:0,
+        marginLeft:0,
+        backgroundColor:'#018bb3',
         borderRadius:10,
     },
 
@@ -114,7 +114,7 @@ export default StyleSheet.create({
         color:'#fff',
         fontWeight:'bold',
         fontSize:16,
-        marginRight:10,
+        marginRight:0,
 
     },
     TextStyle4:{

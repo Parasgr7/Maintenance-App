@@ -53,7 +53,7 @@ export default StyleSheet.create({
         resizeMode: 'contain'
     },
     inputStyle: {
-        flex: 1,
+        flex: 0.7,
         flexDirection: 'column',
         justifyContent: 'center',
         margin: 15

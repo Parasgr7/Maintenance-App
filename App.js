@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Alert, Text,  Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { View, Alert, Text, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {Form, Item, Input} from 'native-base';
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
@@ -42,7 +42,7 @@ class LoginActivity extends Component {
        
     constructor(props) {
 
-        super(props)
+        super(props);
     
         this.state = {
 
@@ -52,7 +52,7 @@ class LoginActivity extends Component {
             isLoading: false
 
         }
-
+        this.UserLoginFunction = this.UserLoginFunction.bind(this);
     }
     componentWillMount(){
         this._getToken();
@@ -67,11 +67,9 @@ class LoginActivity extends Component {
     _storeToken = async responseJson => {
         console.log("App",this.state.latitude);
         try{
-            userdata={"access_token": responseJson.token,
-             "worker": this.state.worker,
-              "user_id": responseJson.id,
-              "lat": this.state.latitude,
-              "long":this.state.longitude  };
+
+            console.log("~~~~ information:", responseJson.auth_token, this.state.worker,responseJson.user_id )
+            userdata={"access_token": responseJson.json.auth_token, "worker": this.state.worker, "user_id": responseJson.json.user_id};
             item=[];
             item.push(userdata);
         await AsyncStorage.setItem('session_data',JSON.stringify(item))
@@ -100,12 +98,12 @@ class LoginActivity extends Component {
     UserLoginFunction = () =>{
         this.setState({isLoading: true});
 
-        const { UserEmail }  = this.state ;
-        const { UserPassword }  = this.state ;
+        UserEmail   = this.state.UserEmail ;
+        UserPassword  = this.state.UserPassword ;
 
         if(this.state.worker=='1')
         {
-        fetch('http://dev4.holidale.org/api/v1/login', {
+        fetch('http://kk.local:3000/api/v1/authentication/auth', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -143,7 +141,7 @@ class LoginActivity extends Component {
             });
         }
         else if (this.state.worker==='0'){
-            fetch('http://dev4.holidale.org/api/v1/cleaner_login', {
+            fetch('http://kk.local:3000/api/v1/authentication/auth', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -201,28 +199,30 @@ class LoginActivity extends Component {
                         </Image>
                     </View>
                     
-                    <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled>
-                        <Form>
-                            <Item >
-                                <Input
+                <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled>
+                    <Form>
+                            <Item style={[{marginLeft: 0}]}>
+                                <TextInput onSubmitEditing={Keyboard.dismiss} style={[{fontSize: 18, flex: 1}]}
                                     autoCorrect={false}
                                     placeholder="Email"
+                                    textContentType="emailAddress"
                                     placeholderTextColor="white"
                                     onChangeText={UserEmail => this.setState({UserEmail})}
                                 />
                             </Item>
-                            <Item >
-                                <Input
+                
+                            <Text>{"\n"}</Text>
+                            <Item style={[{marginLeft: 0}]}>
+                                <TextInput onSubmitEditing={Keyboard.dismiss} style={[{fontSize: 18, flex: 1}]}
                                     autoCorrect={false}
                                     placeholder="Password"
                                     placeholderTextColor="white"
                                     secureTextEntry={true}
                                     onChangeText={UserPassword => this.setState({UserPassword})}
-                                />  
-                                 
-                                
+                                />
                             </Item>
-                        </Form>
+                            <Text>{"\n"}</Text>
+                    </Form>
                          <View style={styles.Select}>
                          <SwitchSelector
                             initial={0}
@@ -279,7 +279,7 @@ const Tabs = createBottomTabNavigator({
         activeTintColor: '#45AAC5',
         inactiveTintColor: 'white',
         style: {
-          backgroundColor: 'black',
+          backgroundColor: '#006075',
         },
       }
     }
@@ -296,15 +296,15 @@ const AppStack = createStackNavigator({
                 } },{
                     navigationOptions: {
                       headerStyle: {
-                        backgroundColor: 'black',
-                      },
+                        backgroundColor: '#007085',
+                    },
                       headerTintColor: '#fff',
                       headerTitleStyle: {
                         fontWeight: 'bold',
                       },
                       headerBackground: (
                         <Image
-                          style={{width: 150,height:adjst,resizeMode: 'contain',alignItems: 'center',marginLeft:28}}
+                          style={{width: 150,height:adjst, flex:1,alignSelf: 'center', marginTop:5, marginLeft:8}}
                           source= {require('./assets/Images/logout.png')}
                         />
                       ),

@@ -188,8 +188,8 @@ export default StyleSheet.create({
         width:100,
         height:35,
         marginTop:10,
-        marginLeft:120,
-        backgroundColor:'#018b9e',
+        marginLeft:0,
+        backgroundColor:'#00BCD4',
         borderRadius:10,
     },
     TextStyle4:{
