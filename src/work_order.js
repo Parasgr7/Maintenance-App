@@ -11,6 +11,7 @@ import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { TextField } from 'react-native-material-textfield';
 import { Input} from 'native-base';
+import GLOBALS from './Globals';
 
 import styles from "../assets/stylesheets/work_order_css";
 
@@ -146,8 +147,6 @@ class WorkOrder extends Component {
                 renderUpload: false,
                 id:"",
                 check:"",
-                base_url:"https://holidale.com/",
-                api_url:"https://holidale.com/api/v1/"
             }
             this.thumbs_up=this.thumbs_up.bind(this);
             this.thumbs_down=this.thumbs_down.bind(this);
@@ -333,7 +332,7 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
 
         if (check==1){
-            fetch(api_url+'service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -356,7 +355,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch(api_url+'service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -406,7 +405,7 @@ class WorkOrder extends Component {
         this.state.id=this.props.navigation.state.params.param.id;
         this.state.check=1;
         if (this.state.check==1){
-            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/')
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/')
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -428,7 +427,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/?token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -456,7 +455,7 @@ class WorkOrder extends Component {
 
         
     updateData(){
-        fetch(this.state.api_url+'service_schedules/'+this.state.id+'/')
+        fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/')
         .then((response) => response.json())
         .then((responseJson) => {
               if(responseJson){
@@ -577,7 +576,7 @@ class WorkOrder extends Component {
                         </ScrollView>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                            <View style={styles.maybeRenderImageContainer}>
-                           {item.images[0]&&(<Image source={{ uri: this.state.base_url+item.images[0].directory}} style={styles.maybeRenderImage} />)}
+                           {item.images[0]&&(<Image source={{ uri: GLOBALS.BASE_URL+item.images[0].directory}} style={styles.maybeRenderImage} />)}
                            </View>
                            
                         </ScrollView>
@@ -688,7 +687,7 @@ class WorkOrder extends Component {
         check=0
         if (check==0)
         {
-            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/', {
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -711,7 +710,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/', {
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -742,7 +741,7 @@ class WorkOrder extends Component {
      
         if (check==0)
         {
-            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -766,7 +765,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -799,7 +798,7 @@ class WorkOrder extends Component {
 
         if (check==0)
         {
-            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -823,7 +822,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -1094,7 +1093,7 @@ class WorkOrder extends Component {
         });
         data.append('inspector_id', this.state.user_id);
         data.append('result', inspection_result.result);
-        fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
+        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
              method: 'POST',
              headers: {
               'Content-Type': 'multipart/form-data',

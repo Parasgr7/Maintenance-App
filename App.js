@@ -9,7 +9,7 @@ import ProfileActivity from './src/LoggedScreen';
 import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
-
+import GLOBALS from './src/Globals';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -50,7 +50,6 @@ class LoginActivity extends Component {
             UserPassword: '',
             worker:'0',
             isLoading: false,
-            auth_url: 'https://holidale.com/api/v1/authentication/auth'
         }
         this.UserLoginFunction = this.UserLoginFunction.bind(this);
         console.disableYellowBox = true;
@@ -103,7 +102,7 @@ class LoginActivity extends Component {
 
         if(this.state.worker=='1')
         {
-        fetch(this.state.auth_url, {
+        fetch(GLOBALS.AUTH_URL, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -141,7 +140,7 @@ class LoginActivity extends Component {
             });
         }
         else if (this.state.worker==='0'){
-            fetch(this.state.auth_url, {
+            fetch(GLOBALS.AUTH_URL, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

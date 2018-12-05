@@ -3,6 +3,7 @@ import { View, Alert, Text, Dimensions,TouchableOpacity} from 'react-native';
 import {Agenda} from 'react-native-calendars';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
+import GLOBALS from './Globals';
 
 const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
 
@@ -24,7 +25,6 @@ class ProfileActivity extends Component {
 
             latitude: "",
             longitude: "",
-            api_url: "https://holidale.com/api/v1/"
         };
         
     }
@@ -166,7 +166,7 @@ class ProfileActivity extends Component {
     loadItems(day) {
             
         if (this.state.worker==='0'){
-            fetch(this.state.api_url+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
@@ -206,7 +206,7 @@ class ProfileActivity extends Component {
                 });
         }else if(this.state.worker==='1')
         {
-            fetch(this.state.api_url+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
