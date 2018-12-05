@@ -145,12 +145,16 @@ class WorkOrder extends Component {
                 area_data:false,
                 renderUpload: false,
                 id:"",
-                check:""
+                check:"",
+                base_url:"https://holidale.com/",
+                api_url:"https://holidale.com/api/v1/"
             }
             this.thumbs_up=this.thumbs_up.bind(this);
             this.thumbs_down=this.thumbs_down.bind(this);
             this._pickImage=this._pickImage.bind(this);
             this.uploadImageAsync=this.uploadImageAsync.bind(this);
+            this._onRefresh=this._onRefresh.bind(this);
+
         }
     
 
@@ -320,7 +324,8 @@ class WorkOrder extends Component {
 
     _onRefresh = () => {
         this.setState({refreshing: true});
-        this.fetchData();
+        this.setState({refreshing: false});
+        //this.fetchData();
       }
 
       fetchData(){
@@ -328,12 +333,11 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
 
         if (check==1){
-            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(api_url+'service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
                             {
-                              console.log("check here", responseJson)
                                 let res = responseJson;
                                 
                                 this.setState({
@@ -352,12 +356,11 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(api_url+'service_schedules?assignee_id=1&token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
                             {
-                              console.log("check there", responseJson)
                                 let res= responseJson;
                                 this.setState({
                                     data: res[0],
@@ -400,14 +403,12 @@ class WorkOrder extends Component {
             {"inspection_item_id": 2, "service_schedule_id": 13356, "result": "bad", "picture_path": ""},
             {"inspection_item_id": 3, "service_schedule_id": 13356, "result": "bad", "picture_path": ""}
         ];
-        
         this.state.id=this.props.navigation.state.params.param.id;
         this.state.check=1;
         if (this.state.check==1){
-            fetch('http://kk.local:3000/api/v1/service_schedules/'+this.state.id+'/')
+            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/')
                         .then((response) => response.json())
                         .then((responseJson) => {
-                              console.log("now!:", responseJson);
                             if(responseJson)
                             {  
                                 let res = responseJson;
@@ -427,10 +428,9 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch('http://kk.local:3000/api/v1/service_schedules/'+this.state.id+'/?token='+this.state.token)
+            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/?token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
-                              console.log("here!:", responseJson);
                             if(responseJson)
                             {   
                             
@@ -455,7 +455,23 @@ class WorkOrder extends Component {
     }
 
         
-    
+    updateData(){
+        fetch(this.state.api_url+'service_schedules/'+this.state.id+'/')
+        .then((response) => response.json())
+        .then((responseJson) => {
+              if(responseJson){
+                  let res = responseJson;
+                  this.setState({
+                                data: res,
+                        });
+              }
+              else{
+                    Alert.alert(responseJson);
+              }
+              }).catch((error) => {
+                       console.error(error);
+            });
+    }
 
     
     render()
@@ -561,7 +577,7 @@ class WorkOrder extends Component {
                         </ScrollView>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                            <View style={styles.maybeRenderImageContainer}>
-                           {item.images[0]&&(<Image source={{ uri: "http://kk.local:3000/"+item.images[0].directory}} style={styles.maybeRenderImage} />)}
+                           {item.images[0]&&(<Image source={{ uri: this.state.base_url+item.images[0].directory}} style={styles.maybeRenderImage} />)}
                            </View>
                            
                         </ScrollView>
@@ -581,7 +597,7 @@ class WorkOrder extends Component {
                                 label='Select Status'
                                 data={status_data}
                                 value={this.props.navigation.state.params.param.status}
-                                onChangeText={(value,index,data)=>{this.statusUpdate(value)}}
+                                onChangeText={(value)=>{this.statusUpdate(value)}}
                             />
                     </View>
                     <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
@@ -597,26 +613,8 @@ class WorkOrder extends Component {
     }
 
     check_out=()=>{
-         var time= new Date();
-         var id=this.props.navigation.state.params.param.id;
-         fetch('http://dev4.holidale.org/api/v1/access_out_update/check_out/'+id+'/', {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                access_out_datetime: time
-            })
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                if(responseJson)
-                {
-                    Alert.alert("Checked Out");
-                }
-            }).catch((error) => {
-            console.error(error);
-        }); 
+        Alert.alert("Check out successfully!");
+        this.props.navigation.goBack();
          
     }
 
@@ -687,11 +685,11 @@ class WorkOrder extends Component {
         this.setState({status:value});
         //const id = this.props.navigation.state.params.param.id;
         //const check = this.props.navigation.state.params.param.check;
-      
+        check=0
         if (check==0)
         {
-            fetch('http://dev4.holidale.org/api/v1/work_status/cleaning_schedules/'+this.state.id+'/', {
-                method: 'PUT',
+            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -713,8 +711,8 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://dev4.holidale.org/api/v1/work_status/service_schedules/'+this.state.id+'/', {
-                method: 'PUT',
+            fetch(this.state.api_url+'service_schedules/'+this.state.id+'/', {
+                method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -744,7 +742,7 @@ class WorkOrder extends Component {
      
         if (check==0)
         {
-            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -768,7 +766,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -801,7 +799,7 @@ class WorkOrder extends Component {
 
         if (check==0)
         {
-            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -825,7 +823,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+            fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -860,24 +858,6 @@ class WorkOrder extends Component {
             );
         }
     };
-
-
-    /*listing_data = async (inspection_result) =>{
-        directory="";
-        if (!inspection_result){
-            return;
->>>>>>> V2.0 First BIG push
-        }
-        else{
-            const uploadResponse = await fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/');
-            const json = await response.json();
-        }
-        return(
-               <View style={styles.maybeRenderImageContainer}>
-               <Image source={{ uri: "http://kk.local:3000/"+directory}} style={styles.maybeRenderImage} />
-               </View>
-        );
-    }*/
   
     changeText=(text)=>{
         this.setState({text: text});
@@ -1114,13 +1094,14 @@ class WorkOrder extends Component {
         });
         data.append('inspector_id', this.state.user_id);
         data.append('result', inspection_result.result);
-        fetch('http://kk.local:3000/api/v1/inspection_results/'+inspection_result.id+'/', {
+        fetch(this.state.api_url+'inspection_results/'+inspection_result.id+'/', {
              method: 'POST',
              headers: {
               'Content-Type': 'multipart/form-data',
              },
              body: data
         }).then(res => {
+            this.updateData();
              console.log(res)
         });
         /*const file = {

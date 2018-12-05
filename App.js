@@ -49,10 +49,11 @@ class LoginActivity extends Component {
             UserEmail: '',
             UserPassword: '',
             worker:'0',
-            isLoading: false
-
+            isLoading: false,
+            auth_url: 'https://holidale.com/api/v1/authentication/auth'
         }
         this.UserLoginFunction = this.UserLoginFunction.bind(this);
+        console.disableYellowBox = true;
     }
     componentWillMount(){
         this._getToken();
@@ -65,10 +66,9 @@ class LoginActivity extends Component {
     
 
     _storeToken = async responseJson => {
-        console.log("App",this.state.latitude);
         try{
 
-            console.log("~~~~ information:", responseJson.auth_token, this.state.worker,responseJson.user_id )
+            console.log("Token information, worker, user_id:", responseJson.auth_token, this.state.worker, responseJson.user_id )
             userdata={"access_token": responseJson.json.auth_token, "worker": this.state.worker, "user_id": responseJson.json.user_id};
             item=[];
             item.push(userdata);
@@ -103,7 +103,7 @@ class LoginActivity extends Component {
 
         if(this.state.worker=='1')
         {
-        fetch('http://kk.local:3000/api/v1/authentication/auth', {
+        fetch(this.state.auth_url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -141,7 +141,7 @@ class LoginActivity extends Component {
             });
         }
         else if (this.state.worker==='0'){
-            fetch('http://kk.local:3000/api/v1/authentication/auth', {
+            fetch(this.state.auth_url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

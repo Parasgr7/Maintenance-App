@@ -23,7 +23,8 @@ class ProfileActivity extends Component {
             visible: false,
 
             latitude: "",
-            longitude: ""
+            longitude: "",
+            api_url: "https://holidale.com/api/v1/"
         };
         
     }
@@ -39,8 +40,7 @@ class ProfileActivity extends Component {
         try {
            data = await AsyncStorage.getItem('session_data');
            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
-            console.log("Token information hahaha: ", JSON.parse(data));
-        
+            console.log("Token information: ", JSON.parse(data));
         } catch (error) {
             console.log("Something went wrong in logged screen");
         }
@@ -166,14 +166,12 @@ class ProfileActivity extends Component {
     loadItems(day) {
             
         if (this.state.worker==='0'){
-            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(this.state.api_url+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
             .then((response) => response.json())
             .then((responseJson) => {
-                  console.log("Cleaner: ", responseJson)
                   if(responseJson){
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
-                        console.log("what the due is : ", item.due);
                         this.state.items[strTime]=[];
                         this.state.items[strTime].push({
                             name: item.house.address,
@@ -208,13 +206,11 @@ class ProfileActivity extends Component {
                 });
         }else if(this.state.worker==='1')
         {
-            fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(this.state.api_url+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
             .then((response) => response.json())
             .then((responseJson) => {
-                  console.log("Cleaner: ", responseJson)
                   if(responseJson){
                     responseJson.map((item) => {
-                        console.log("due is : ", item.due)
                         strTime = this.timeToString(item.due);
                         if (this.state.items[strTime]) {
                         this.state.items[strTime]=[];
@@ -259,120 +255,10 @@ class ProfileActivity extends Component {
         for (let i = -15; i < 85; i++) {
             const time = day.timestamp + i * 24 * 60 * 60 * 1000;
             const strTime = this.timeToString(time);
-            console.log("strTime:::", strTime);
             if (!this.state.items[strTime]) {
                 this.state.items[strTime] = [];
             }
         }
-        
-            /*for (let i = -15; i < 85; i++) {
-                const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-                const strTime = this.timeToString(time);
-                if (!this.state.items[strTime]) {
-                    this.state.items[strTime] = [];
-                    const userData = {date:strTime};
-                    if (this.state.worker==='0')
-                    {
-                    fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token+'&date='+userData.date)
-                        .then((response) => response.json())
-                        .then((responseJson) => {
-                              console.log("Cleaner: ", responseJson)
-                            // If server response message same as Data Matched
-
-                            if(responseJson)
-                            {   
-                                const numItems = responseJson.length;
-                                for (let j = 0; j < numItems; j++) {
-                                    this.state.items[strTime].push({
-                                        name: responseJson[j].house.address,
-                                        id: responseJson[j].id,
-                                        house_id: responseJson[j].house.id,
-                                        address: responseJson[j].house.full_address,
-                                        status: responseJson[j].status,
-                                        booking_id: responseJson[j].booking_id,
-                                        cleaner_id: responseJson[j].cleaner_id,
-                                        completed: responseJson[j].completed,
-                                        created_at: responseJson[j].created_at,
-                                        creator_id: responseJson[j].creator_id,
-                                        due: responseJson[j].due,
-                                        end_time: responseJson[j].end_time,
-                                        note: responseJson[j].note,
-                                        scheduled: responseJson[j].scheduled,
-                                        service_id: responseJson[j].service_id,
-                                        start_time: responseJson[j].start_time,
-                                        height: Math.max(50, Math.floor(Math.random() * 150)),
-                                        //check:responseJson[j].check,
-                                        //app_data:responseJson[j].app_data,
-                                        date:strTime,
-                                        //inventory: responseJson[j].inventory,
-                                        //cost: responseJson[j].cost,
-                                        latitude:responseJson[j].house.latitude,
-                                        longitude:responseJson[j].house.longitude
-                                    });
-                                }
-
-                            }
-                            else{
-
-                                Alert.alert(responseJson);
-                            }
-
-                        }).catch((error) => {
-                        console.error(error);
-                    });
-                }
-                else if(this.state.worker==='1')
-                {
-                    fetch('http://kk.local:3000/api/v1/service_schedules?assignee_id=1&token='+this.state.token+'&date='+userData.date)
-                    .then((response) => response.json())
-                    .then((responseJson) => {
-                          console.log("Maintainer: ", responseJson)
-                        // If server response message same as Data Matched
-                        if(responseJson)
-                        {   
-                            const numItems = responseJson.length;
-                            for (let j = 0; j < numItems; j++) {
-                                this.state.items[strTime].push({
-                                    name: responseJson[j].house.address,
-                                    id: responseJson[j].id,
-                                    house_id: responseJson[j].house.id,
-                                    address: responseJson[j].house.full_address,
-                                    status: responseJson[j].status,
-                                    booking_id: responseJson[j].booking_id,
-                                    cleaner_id: responseJson[j].cleaner_id,
-                                    completed: responseJson[j].completed,
-                                    created_at: responseJson[j].created_at,
-                                    creator_id: responseJson[j].creator_id,
-                                    due: responseJson[j].due,
-                                    end_time: responseJson[j].end_time,
-                                    note: responseJson[j].note,
-                                    scheduled: responseJson[j].scheduled,
-                                    service_id: responseJson[j].service_id,
-                                    start_time: responseJson[j].start_time,
-                                    height: Math.max(50, Math.floor(Math.random() * 150)),
-                                    //check:responseJson[j].check,
-                                    //app_data:responseJson[j].app_data,
-                                    date:strTime,
-                                    //inventory: responseJson[j].inventory,
-                                    //cost: responseJson[j].cost,
-                                    latitude:responseJson[j].house.latitude,
-                                    longitude:responseJson[j].house.longitude
-                                });
-                            }
-
-                        }
-                        else{
-
-                            Alert.alert(responseJson);
-                        }
-
-                    }).catch((error) => {
-                    console.error(error);
-                });  
-                }
-
-                }  
-            }*/
             const newItems = {};
             Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
             this.setState({
