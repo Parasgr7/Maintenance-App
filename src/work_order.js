@@ -153,7 +153,7 @@ class WorkOrder extends Component {
             this._pickImage=this._pickImage.bind(this);
             this.uploadImageAsync=this.uploadImageAsync.bind(this);
             this._onRefresh=this._onRefresh.bind(this);
-
+            this.statusUpdate=this.statusUpdate.bind(this);
         }
     
 
@@ -600,7 +600,7 @@ class WorkOrder extends Component {
                             />
                     </View>
                     <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                        <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>                        
+                        <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>
                             <Text style={styles.TextStyle4}>Check-Out</Text>
                         </TouchableOpacity>
                     </View>
@@ -681,7 +681,7 @@ class WorkOrder extends Component {
     }
 
     statusUpdate=(value)=> {
-        this.setState({status:value});
+        this.state.status=value;
         //const id = this.props.navigation.state.params.param.id;
         //const check = this.props.navigation.state.params.param.check;
         check=0
@@ -695,15 +695,16 @@ class WorkOrder extends Component {
                 },
                 body: JSON.stringify({
 
-                    status: this.state.status,
+                    status: value,
             
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    Alert.alert("Status Updated!");
-                    
-
+                    this.setState(() => {
+                        console.log('Status Updated!');
+                        return { unseen: "Status Updated!" }
+                    });
                 }).catch((error) => {
                 console.error(error);
             });
@@ -726,7 +727,7 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                 
                     Alert.alert("Status Updated!");
-
+                    return;
                 }).catch((error) => {
                 console.error(error);
             });
