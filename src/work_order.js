@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { ScrollView, View, Alert, Text,  Image, Dimensions, TouchableOpacity,ActivityIndicator,RefreshControl} from 'react-native';
+import { ScrollView, View, Alert, Text, TextInput, Image, Dimensions, TouchableOpacity,ActivityIndicator,RefreshControl} from 'react-native';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, Row, Rows } from 'react-native-table-component';
@@ -147,6 +147,7 @@ class WorkOrder extends Component {
                 renderUpload: false,
                 id:"",
                 check:"",
+                comment:""
             }
             this.thumbs_up=this.thumbs_up.bind(this);
             this.thumbs_down=this.thumbs_down.bind(this);
@@ -154,6 +155,7 @@ class WorkOrder extends Component {
             this.uploadImageAsync=this.uploadImageAsync.bind(this);
             this._onRefresh=this._onRefresh.bind(this);
             this.statusUpdate=this.statusUpdate.bind(this);
+            this.uploadNotes=this.uploadNotes.bind(this);
         }
     
 
@@ -519,7 +521,7 @@ class WorkOrder extends Component {
                 onRefresh={this._onRefresh}
               />
             }>
-            
+               
             <ScrollView style={styles.container}>
                 <Text style={styles.WorkOrderTextStyle}>{this.props.navigation.state.params.param.name}</Text>
                 <Text style={styles.TextComponentStyle}>{this.props.navigation.state.params.param.address}</Text>
@@ -574,13 +576,34 @@ class WorkOrder extends Component {
 
                         </ScrollView>
                         </ScrollView>
+                        <View style={{ flex: 1, marginLeft: 15, marginRight: 8, flexDirection: 'row', justifyContent: 'center' }}>
+                           <TextInput multiline={true} style={[{paddingTop:2, flex:1, marginRight: 5, fontSize: 20, borderColor: '#43889c',  borderWidth: 1}]}
+                               autoCorrect={false}
+                               placeholder={item.comment? item.comment:"No comment"}
+                               value={item.comment? item.comment:null}
+                               textContentType="none"
+                               placeholderTextColor="Gray"
+                               color="Black"
+                               onChangeText={(text) => this.setState({comment: text})}
+                            />
+                            <Icon
+                                name='check'
+                                type='font-awesome'
+                                color={"#378A9E"}
+                                raised
+                                // reverse
+                                onPress={() => {
+                                    this.uploadNotes(item);
+                                }}
+                           />
+                        </View>
+                        <Text></Text>
+                        <View>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                           <View style={styles.maybeRenderImageContainer}>
+                          
                            {item.images[0]&&(<Image source={{ uri: GLOBALS.BASE_URL+item.images[0].directory}} style={styles.maybeRenderImage} />)}
-                           </View>
-                           
                         </ScrollView>
-                           
+                        </View>
                     </View>
                     
                 );
@@ -952,130 +975,31 @@ class WorkOrder extends Component {
         }
     };
 
-    uploadNotes= (inspection_item, inspection_result)=> {
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
-        // if(link==false)
-        // {
-        //     Alert.alert("Image not selected!");
-        // }
-        if(inspection_result.picture_path&&inspection_result.comment){
-            link= this.state.area_data.image;
-            if (check==0)
-            {
-                fetch('http://dev4.holidale.org/api/v1/notesupload/cleaning_schedules/'+id+'/', {
-                    method: 'PUT',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-    
-                        image: link,
-                        note: text,
-                        area: area,
-                        rate: this.state.rate
-    
-                    })
-    
-                }).then((response) => response.json())
-                    .then((responseJson) => {
-    
-                        Alert.alert("Successfully Uploaded");
-    
-                    }).catch((error) => {
-                    console.error(error);
-                });
-            }
-            else
-            {   
-                link= this.state.area_data.image;
-    
-                fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
-                    method: 'PUT',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-    
-                        image: link,
-                        note: text,
-                        area: area,
-                        rate: this.state.rate
-    
-                    })
-    
-                }).then((response) => response.json())
-                    .then((responseJson) => {
-                        Alert.alert("Successfully Uploaded");
-    
-                    }).catch((error) => {
-                    console.error(error);
-                });
-            }
-        }
-        else if(link==false&&text=='')
-        {
-            Alert.alert("Image not selected!");
-        }
-        else{
-      
-        if (check==0)
-        {
-            fetch('http://dev4.holidale.org/api/v1/notesupload/cleaning_schedules/'+id+'/', {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-
-                    image: link,
-                    note: text,
-                    area: area,
-                    rate: this.state.rate
-
-                })
-
-            }).then((response) => response.json())
-                .then((responseJson) => {
-
-                    Alert.alert("Successfully Uploaded");
-
-                }).catch((error) => {
-                console.error(error);
-            });
-        }
-        else
-        {   
-            link= this.state.area_data.image;
-
-            fetch('http://dev4.holidale.org/api/v1/notesupload/service_schedules/'+id+'/', {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-
-                    image: link,
-                    note: text,
-                    area: area,
-                    rate: this.state.rate
-
-                })
-
-            }).then((response) => response.json())
-                .then((responseJson) => {
-                    Alert.alert("Successfully Uploaded");
-
-                }).catch((error) => {
-                console.error(error);
-            });
-        }
-    }
-    
+    uploadNotes= (inspection_result)=> {
+        inspection_result.comment=this.state.comment;
+        
+        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+              method: 'POST',
+              headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                   inspector_id: this.state.user_id,
+                   comment: this.state.comment
+              })
+              
+              }).then((response) => response.json())
+        .then((responseJson) => {
+              this.setState(() => {
+                    console.log('Comment updated!');
+                    return { unseen: "Comment updated!" }
+              });
+              Alert.alert("Comment updated!");
+              return;
+              }).catch((error) => {
+                       console.error(error);
+        });
     }
 
      uploadImageAsync= async(inspection_result, uri)=> {
