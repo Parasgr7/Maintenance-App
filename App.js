@@ -6,10 +6,15 @@ import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } 
 import Icon from '@expo/vector-icons/FontAwesome';
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
+import Contact from './src/contact';
 import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
 import GLOBALS from './src/Globals';
+import { Ionicons } from '@expo/vector-icons';
+import { Octicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -118,7 +123,7 @@ class LoginActivity extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     // If server response message same as Data Matched
-                    if(typeof(responseJson)=='object')
+                    if(responseJson.status!=="unauthorized")
                     {   
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -155,7 +160,7 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    if(typeof(responseJson)=='object')
+                    if(responseJson.status!=="unauthorized")
                     {  
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -255,19 +260,35 @@ class LoginActivity extends Component {
 
 
 const Tabs = createBottomTabNavigator({
-    Home:   {
+    Tasklist:   {
         screen: ProfileActivity,
         navigationOptions: () => ({
             tabBarIcon: ({tintColor}) => (
-                <Icon name="home" size={24} color={tintColor}/>
+                <Octicons name="tasklist" size={24} color={tintColor}/>
             )
             
         })},
+    Calendar:   {
+        screen: ProfileActivity,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <AntDesign name="calendar" size={24} color={tintColor}/>
+            )
+            
+        })},
+    Contact:  {
+        screen: Contact,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Ionicons name="ios-call" size={24} color={tintColor}/>
+            )   
+        })
+    },
     User:  {
         screen: Logout,
         navigationOptions: () => ({
             tabBarIcon: ({tintColor}) => (
-                <Icon name="user" size={24} color={tintColor}/>
+                <Entypo name="user" size={24} color={tintColor}/>
             )
             
         })

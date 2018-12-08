@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { View, Text,  Image, ImageBackground,TouchableOpacity} from 'react-native';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/logout_css";
-import { StackNavigator } from 'react-navigation';
 
-class Logout extends Component {
+
+class Contact extends Component {
     
     static navigationOptions =
         {
-            title: 'Log Out',
+            title: 'Contact',
             header: null
         };
     _signOutAsync = async () => {
@@ -26,12 +26,11 @@ class Logout extends Component {
                         </Image>
                     </View>
                     
-                    <Text style={styles.WorkOrderTextStyle2}>Maintenance App</Text>
-                    <Text style={styles.WorkOrderTextStyle2}>V1.0</Text>                            
+                    <Text style={styles.WorkOrderTextStyle}>ADDRESS : </Text>
+                    <Text style={styles.WorkOrderTextStyle1}>9 Corporate Park, Ste 130 Irvine CA 92606</Text>
+                    <Text style={styles.WorkOrderTextStyle}>PHONE : </Text>
+                    <Text style={styles.WorkOrderTextStyle1}>(855) 346-3050</Text>                            
                 
-                    <TouchableOpacity style={styles.SubmitButtonStyle} activeOpacity = { .5 } onPress={ this._signOutAsync }>
-                                <Text style={styles.TextStyle}> Logout </Text>
-                    </TouchableOpacity>
                 </ImageBackground>
             </View>
 
@@ -40,4 +39,4 @@ class Logout extends Component {
 }
 
 
-export default Logout;
+export default Contact;

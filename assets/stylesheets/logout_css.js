@@ -50,11 +50,23 @@ export default StyleSheet.create({
         justifyContent: 'center',
         margin: 15
     },
-    WorkOrderTextStyle: {
+    WorkOrderTextStyle2: {
         fontSize: 20,
         color: "white",
         textAlign: 'center',
-        marginTop: 14
+        marginTop: 14,
+    },
+    WorkOrderTextStyle: {
+        fontSize: 16,
+        color: "Black",
+        textAlign: 'center',
+        marginTop: 14,
+    },
+    WorkOrderTextStyle1: {
+        fontSize: 18,
+        color: "white",
+        textAlign: 'center',
+        margin: 10,
     },
     error: {
         color: 'red',
