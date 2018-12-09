@@ -1,5 +1,19 @@
 import React, {Component} from 'react';
-import { ScrollView, View, Alert, Text, TextInput, Image, Dimensions, TouchableOpacity,ActivityIndicator,RefreshControl} from 'react-native';
+import {
+    ScrollView,
+    View,
+    Alert,
+    Text,
+    TextInput,
+    Image,
+    Dimensions,
+    TouchableOpacity,
+    ActivityIndicator,
+    RefreshControl,
+    CameraRoll,
+    Linking,
+    ActionSheetIOS,
+} from 'react-native';
 import { Dropdown } from 'react-native-material-dropdown';
 import { Icon } from 'react-native-elements';
 import { Table, Row, Rows } from 'react-native-table-component';
@@ -148,10 +162,9 @@ class WorkOrder extends Component {
                 id:"",
                 check:"",
                 comment:""
-            }
+            };
             this.thumbs_up=this.thumbs_up.bind(this);
             this.thumbs_down=this.thumbs_down.bind(this);
-            this._pickImage=this._pickImage.bind(this);
             this.uploadImageAsync=this.uploadImageAsync.bind(this);
             this._onRefresh=this._onRefresh.bind(this);
             this.statusUpdate=this.statusUpdate.bind(this);
@@ -567,7 +580,7 @@ class WorkOrder extends Component {
                                         color='#378A9E'
                                         raised
                                         onPress={() => {
-                                            this._pickImage(item);
+                                            this.showActionSheet(item);
                                         }}
                                     />
                                 {this._maybeRenderUploadingOverlay()}
@@ -924,27 +937,61 @@ class WorkOrder extends Component {
     // }
     // };
 
+    showActionSheet(inspection_result) {
+        ActionSheetIOS.showActionSheetWithOptions({
+                options: ['Take Photo...', 'Choose from Library...', 'Cancel'],
+                cancelButtonIndex: 2,
+            },
+            (buttonIndex) => {
+                if (buttonIndex === 0) {
+                    this._takePhoto(inspection_result);
+                } else if (buttonIndex === 1) {
+                    this._pickImage(inspection_result);
+                }
+            });
+    }
 
+    async _takePhoto(inspection_result) {
+        const cameraPerms = await Promise.all([
+            Permissions.askAsync(Permissions.CAMERA),
+            Permissions.askAsync(Permissions.CAMERA_ROLL)
+        ]);
+        // only if user allows permission to camera roll
+        if (cameraPerms.every(({status}) => status === 'granted')) {
+            const pickerResult = await ImagePicker.launchCameraAsync();
+            CameraRoll.saveToCameraRoll(pickerResult.uri);
+            this._handleImagePicked(inspection_result, pickerResult);
+            this.setState(() => {
+                console.log('Photo took');
+                return {unseen: "Photo took"}
+            });
+        } else {
+            let title = cameraPerms.every(({status}) => status !== 'granted') ?
+                'Camera and Photo Library Permissions' :
+                (cameraPerms[0].status !== 'granted' ? 'Camera' : 'Photo Library') + ' Permission';
+            Alert.alert('No ' + title, 'Make sure to open in settings.',
+                [{text: 'Settings', onPress: () => Linking.openURL('app-settings:')}, {text: 'Cancel'}]
+            );
+            this.setState({unseen: 'No ' + title});
+        }
+    }
 
     async _pickImage(inspection_result) {
-
-
-            const {
-                status: cameraRollPerm
-            } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-            // only if user allows permission to camera roll
-            if (cameraRollPerm === 'granted') {
-                 pickerResult = await ImagePicker.launchImageLibraryAsync({
-                    allowsEditing: true,
-                    aspect: [4, 3]
-                });
-                this._handleImagePicked(inspection_result, pickerResult);
-                this.setState(() => {
-                    console.log('Image picked');
-                    return { unseen: "Image picked" }
-                });
-            }
-        this.setState({ unseen: "help me" });
+        const {status: cameraRollPerm} = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        // only if user allows permission to camera roll
+        if (cameraRollPerm === 'granted') {
+            const pickerResult = await ImagePicker.launchImageLibraryAsync({});
+            this._handleImagePicked(inspection_result, pickerResult);
+            this.setState(() => {
+                console.log('Image picked');
+                return {unseen: "Image picked"}
+            });
+        } else {
+            Alert.alert('No Photo Library Permission', 'Make sure to open in settings.',
+                [{text: 'Settings', onPress: () => Linking.openURL('app-settings:')}, {text: 'Cancel'}]
+            );
+            this.setState({unseen: "No Photo Library Permission"});
+        }
     };
 
     _handleImagePicked = async (inspection_result, pickerResult) => {
