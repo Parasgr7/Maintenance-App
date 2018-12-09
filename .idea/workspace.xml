@@ -205,8 +205,12 @@
     </option>
   </component>
   <component name="RunManager" selected="Node.js.App.js">
-    <configuration name="App.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" nameIsGenerated="true" path-to-js-file="App.js" working-dir="$PROJECT_DIR$" />
-    <configuration name="SignIn.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" nameIsGenerated="true" path-to-js-file="SignIn.js" working-dir="$PROJECT_DIR$/src" />
+    <configuration name="App.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="App.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
+    <configuration name="SignIn.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="SignIn.js" working-dir="$PROJECT_DIR$/src">
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Node.js.App.js" />
       <item itemvalue="Node.js.SignIn.js" />
