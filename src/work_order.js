@@ -959,7 +959,9 @@ class WorkOrder extends Component {
         // only if user allows permission to camera roll
         if (cameraPerms.every(({status}) => status === 'granted')) {
             const pickerResult = await ImagePicker.launchCameraAsync();
-            CameraRoll.saveToCameraRoll(pickerResult.uri);
+            if (pickerResult.uri) {
+                CameraRoll.saveToCameraRoll(pickerResult.uri);
+            }
             this._handleImagePicked(inspection_result, pickerResult);
             this.setState(() => {
                 console.log('Photo took');
@@ -1013,7 +1015,7 @@ class WorkOrder extends Component {
             }
         } catch (e) {
             console.log({ e });
-            alert('Upload failed, sorry :(');
+            Alert.alert('Upload failed, sorry :(');
         } finally {
             
             this.setState({
