@@ -5,7 +5,7 @@ import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
 import GLOBALS from './Globals';
 
-const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
+// const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
 
 class ProfileActivity extends Component {
 
@@ -22,7 +22,6 @@ class ProfileActivity extends Component {
             items: {},
             data:{},
             visible: false,
-
             latitude: "",
             longitude: "",
         };
@@ -31,8 +30,6 @@ class ProfileActivity extends Component {
     componentDidMount(){
         this._getToken();
 
-        
-        
     }
    
 
@@ -49,7 +46,7 @@ class ProfileActivity extends Component {
     getLocation=()=>
     {   
     
-        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+auth_token)
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+GLOBALS.MAP_TOKEN)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                     this.setState({loc: responseJson.features[0].place_name });
@@ -60,7 +57,7 @@ class ProfileActivity extends Component {
 
      degreesToRadians=(degrees)=> {
         return degrees * Math.PI / 180;
-      }
+    }
 
     distanceInKmBetweenCoordinates=(lat1, lon1, lat2, lon2)=> {
         var earthRadiusKm = 6371;
@@ -267,6 +264,7 @@ class ProfileActivity extends Component {
     }
 
     renderItem(item) {
+        
         return ( 
         <View style={styles.SubmitButtonStyle} activeOpacity = { .5 } >
                 <View style={{flexDirection: 'row',flex:1}}>
@@ -279,7 +277,7 @@ class ProfileActivity extends Component {
                 <View style={{flexDirection: 'row', flex:1, justifyContent: 'center'}}>
                 <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
                         <Text style={styles.TextStyle4}>Check-In</Text>
-                    </TouchableOpacity>
+                </TouchableOpacity>
                     </View>
         </View>
         );

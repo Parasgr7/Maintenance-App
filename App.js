@@ -8,6 +8,7 @@ import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
 import Contact from './src/contact';
 import Logout from "./src/logout";
+import TaskList from "./src/tasklist";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
 import GLOBALS from './src/Globals';
@@ -261,7 +262,7 @@ class LoginActivity extends Component {
 
 const Tabs = createBottomTabNavigator({
     Tasklist:   {
-        screen: ProfileActivity,
+        screen: TaskList,
         navigationOptions: () => ({
             tabBarIcon: ({tintColor}) => (
                 <Octicons name="tasklist" size={24} color={tintColor}/>

@@ -87,6 +87,17 @@ export default StyleSheet.create({
         backgroundColor:'#00BCD5',
         borderRadius:10,
     },
+    SubmitButtonStyle1: {
+        // flex:1,
+        // justifyContent: "center",
+        marginTop:30,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD5',
+        borderRadius:10,
+    },
     Check_inButtonStyle: {
         flex:0.5,
         justifyContent: "center",
@@ -115,6 +126,16 @@ export default StyleSheet.create({
         fontWeight:'bold',
         fontSize:16,
         marginRight:0,
+        margin:10
+
+    },
+    TextStyle5:{
+        textAlign: 'right',
+        color:'#fff',
+        fontWeight:'bold',
+        fontSize:16,
+        marginRight:0,
+
 
     },
     TextStyle4:{
