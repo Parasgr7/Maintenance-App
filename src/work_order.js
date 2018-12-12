@@ -614,7 +614,7 @@ class WorkOrder extends Component {
                         <View>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                           
-                           {item.images[0]&&(<Image source={{ uri: GLOBALS.BASE_URL+item.images[0].directory}} style={styles.maybeRenderImage} />)}
+                           {item.images[0]&&(<Image source={{ uri: (item.images[0].directory.indexOf('http') >= 0 ? "" : GLOBALS.BASE_URL ) + item.images[0].directory }} style={styles.maybeRenderImage} />)}
                         </ScrollView>
                         </View>
                     </View>
