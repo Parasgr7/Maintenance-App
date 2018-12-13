@@ -164,15 +164,20 @@ class ProfileActivity extends Component {
 
 
     loadItems(day) {
-            
+        const before_dueTS=day.timestamp+(60)* 24 * 60 * 60 * 1000;
+        const after_dueTS=day.timestamp+(-15)* 24 * 60 * 60 * 1000;
+        const before_due = this.timeToString(before_dueTS);
+        const after_due = this.timeToString(after_dueTS);
         if (this.state.worker==='0'){
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&before_due='+before_due+'&after_due='+after_due)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
+                        if (!this.state.items[strTime]) {
                         this.state.items[strTime]=[];
+                        }
                         this.state.items[strTime].push({
                             name: item.house.address,
                             id: item.id,
@@ -206,14 +211,15 @@ class ProfileActivity extends Component {
                 });
         }else if(this.state.worker==='1')
         {
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&before_due='+before_due+'&after_due='+after_due)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
-                        if (this.state.items[strTime]) {
-                        this.state.items[strTime]=[];
+                        if (!this.state.items[strTime]) {
+                            this.state.items[strTime]=[];
+                        }
                         this.state.items[strTime].push({
                             name: item.house.address,
                             id: item.id,
@@ -240,7 +246,7 @@ class ProfileActivity extends Component {
                             latitude:item.house.latitude,
                             longitude:item.house.longitude
                         });
-                        }
+                        
                     })
                   }
                   else{
@@ -252,7 +258,7 @@ class ProfileActivity extends Component {
                     console.error(error);
                 });
         }
-        for (let i = -15; i < 85; i++) {
+        for (let i = -15; i < 60; i++) {
             const time = day.timestamp + i * 24 * 60 * 60 * 1000;
             const strTime = this.timeToString(time);
             if (!this.state.items[strTime]) {
