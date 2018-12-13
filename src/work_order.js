@@ -551,7 +551,7 @@ class WorkOrder extends Component {
                                     <Icon
                                         name='thumbs-up'
                                         type='font-awesome'
-                                        color={item.result=="good" ?"#c60000":"#378A9E"}
+                                        color={item.result === "good" ? "#4CD964" : "#378A9E"}
                                         raised
                                         // reverse
                                         onPress={() => {
@@ -563,7 +563,7 @@ class WorkOrder extends Component {
                                     <Icon
                                         name='thumbs-down'
                                         type='font-awesome'
-                                        color={item.result=="bad" ?"#c60000":"#378A9E"}
+                                        color={item.result === "bad" ? "#FF3B30" : "#378A9E"}
                                         raised
                                         onPress={() => {
                                             this.thumbs_down(item);
@@ -614,7 +614,7 @@ class WorkOrder extends Component {
                         <View>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
                           
-                           {item.images[0]&&(<Image source={{ uri: (item.images[0].directory.indexOf('http') >= 0 ? "" : GLOBALS.BASE_URL ) + item.images[0].directory }} style={styles.maybeRenderImage} />)}
+                           {item.images[0]&&(<Image source={{ uri: (item.images[item.images.length - 1].directory.indexOf('http') >= 0 ? "" : GLOBALS.BASE_URL ) + item.images[item.images.length - 1].directory }} style={styles.maybeRenderImage} />)}
                         </ScrollView>
                         </View>
                     </View>

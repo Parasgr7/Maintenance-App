@@ -164,12 +164,11 @@ class ProfileActivity extends Component {
 
 
     loadItems(day) {
-        const before_dueTS=day.timestamp+(60)* 24 * 60 * 60 * 1000;
-        const after_dueTS=day.timestamp+(-15)* 24 * 60 * 60 * 1000;
-        const before_due = this.timeToString(before_dueTS);
-        const after_due = this.timeToString(after_dueTS);
+        const one_day = 24 * 60 * 60 * 1000;
+        const due_before = this.timeToString(day.timestamp + 60 * one_day);
+        const due_after = this.timeToString(day.timestamp);
         if (this.state.worker==='0'){
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&before_due='+before_due+'&after_due='+after_due)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
@@ -193,7 +192,7 @@ class ProfileActivity extends Component {
                             end_time: item.end_time,
                             note: item.note,
                             scheduled: item.scheduled,
-                            service_id: item.service_id,
+                            service_name: item.service_name,
                             start_time: item.start_time,
                             height: Math.max(50, Math.floor(Math.random() * 150)),
                             latitude:item.house.latitude,
@@ -211,7 +210,7 @@ class ProfileActivity extends Component {
                 });
         }else if(this.state.worker==='1')
         {
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&before_due='+before_due+'&after_due='+after_due)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
@@ -235,7 +234,7 @@ class ProfileActivity extends Component {
                             end_time: item.end_time,
                             note: item.note,
                             scheduled: item.scheduled,
-                            service_id: item.service_id,
+                            service_name: item.service_name,
                             start_time: item.start_time,
                             height: Math.max(50, Math.floor(Math.random() * 150)),
                             //check:responseJson[j].check,
@@ -258,8 +257,8 @@ class ProfileActivity extends Component {
                     console.error(error);
                 });
         }
-        for (let i = -15; i < 60; i++) {
-            const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        for (let i = 0; i < 60; i++) {
+            const time = day.timestamp + i * one_day;
             const strTime = this.timeToString(time);
             if (!this.state.items[strTime]) {
                 this.state.items[strTime] = [];
@@ -276,15 +275,15 @@ class ProfileActivity extends Component {
         return ( 
         <View style={styles.SubmitButtonStyle} activeOpacity = { .5 } >
                 <View style={{flexDirection: 'row',flex:1}}>
-                    <Text style={styles.TextStyle}>{item.name}</Text>
+                    <Text style={styles.TextStyle}>{item.address}</Text>
                 </View>
-                <Text style={styles.TextStyle2}>{item.address}</Text>
+                {/*<Text style={styles.TextStyle2}>{item.address}</Text>*/}
                 <View style={{flexDirection: 'row', justifyContent: 'flex-end', flex:1, marginTop:3, marginBottom:8, paddingRight:10}}>
                     <Text style={styles.TextStyle3}>{item.status}</Text>
                 </View>
                 <View style={{flexDirection: 'row', flex:1, justifyContent: 'center'}}>
                 <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
-                        <Text style={styles.TextStyle4}>Check-In</Text>
+                        <Text style={styles.TextStyle4}>{item.service_name}</Text>
                     </TouchableOpacity>
                     </View>
         </View>
