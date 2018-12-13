@@ -172,7 +172,9 @@ class ProfileActivity extends Component {
                   if(responseJson){
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
+                        if (!this.state.items[strTime]) {
                         this.state.items[strTime]=[];
+                        }
                         this.state.items[strTime].push({
                             name: item.house.address,
                             id: item.id,
@@ -212,8 +214,9 @@ class ProfileActivity extends Component {
                   if(responseJson){
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
-                        if (this.state.items[strTime]) {
-                        this.state.items[strTime]=[];
+                        if (!this.state.items[strTime]) {
+                            this.state.items[strTime]=[];
+                        }
                         this.state.items[strTime].push({
                             name: item.house.address,
                             id: item.id,
@@ -240,7 +243,7 @@ class ProfileActivity extends Component {
                             latitude:item.house.latitude,
                             longitude:item.house.longitude
                         });
-                        }
+                        
                     })
                   }
                   else{
