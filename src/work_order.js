@@ -551,7 +551,7 @@ class WorkOrder extends Component {
                                     <Icon
                                         name='thumbs-up'
                                         type='font-awesome'
-                                        color={item.result=="good" ?"#033b49":"#378A9E"}
+                                        color={item.result=="good" ?"#c60000":"#378A9E"}
                                         raised
                                         // reverse
                                         onPress={() => {
@@ -563,7 +563,7 @@ class WorkOrder extends Component {
                                     <Icon
                                         name='thumbs-down'
                                         type='font-awesome'
-                                        color={item.result=="bad" ?"#033b49":"#378A9E"}
+                                        color={item.result=="bad" ?"#c60000":"#378A9E"}
                                         raised
                                         onPress={() => {
                                             this.thumbs_down(item);

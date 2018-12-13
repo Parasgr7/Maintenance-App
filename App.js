@@ -118,7 +118,7 @@ class LoginActivity extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     // If server response message same as Data Matched
-                    if(typeof(responseJson)=='object')
+                    if(responseJson.status!='unauthorized')
                     {   
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -155,8 +155,7 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    if(typeof(responseJson)=='object')
-                    {  
+                    if(responseJson.status!='unauthorized'){
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
                         this.props.navigation.navigate('App');
@@ -197,9 +196,10 @@ class LoginActivity extends Component {
                         <Image source={require('./assets/Images/logout.png')} style={styles.logoImagedesign}>
                         </Image>
                     </View>
-                    
-                <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled>
+                
+                <KeyboardAvoidingView style={styles.inputStyle} behavior="padding" enabled keyboardShouldPersistTaps="handled">
                     <Form>
+                
                             <Item style={[{marginLeft: 0}]}>
                                 <TextInput onSubmitEditing={Keyboard.dismiss} style={[{fontSize: 18, flex: 1}]}
                                     autoCorrect={false}
