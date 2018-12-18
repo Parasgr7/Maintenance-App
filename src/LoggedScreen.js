@@ -136,11 +136,12 @@ class ProfileActivity extends Component {
             <View style={{ flex: 1}}>
                 <View style={styles.container}>
                     <Agenda
-                        items={this.state.items}
                         loadItemsForMonth={this.loadItems.bind(this)}
                         renderItem={this.renderItem.bind(this)}
                         renderEmptyDate={this.renderEmptyDate.bind(this)}
                         rowHasChanged={this.rowHasChanged.bind(this)}
+                        items={this.state.items}
+                        //rowHasChanged={this.rowHasChanged.bind(this)}
                         theme={
                             {
                                 'stylesheet.agenda.list': {
@@ -172,7 +173,7 @@ class ProfileActivity extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
-                    for(i=day.timestamp;i<day.timestamp + 45 * one_day;i+=one_day){
+                    for(i=day.timestamp - 15 * one_day; i<day.timestamp + 30 * one_day; i+=one_day){
                         this.state.items[this.timeToString(i)]=[];
                     }
                     responseJson.map((item) => {
@@ -315,7 +316,14 @@ class ProfileActivity extends Component {
         return date.toISOString().split('T')[0];
     }
     
+    rowHasChanged(r1, r2) {
+        return JSON.stringify(r1) !== JSON.stringify(r2)
+    }
+    
     refresh() {
+        today=new Date();
+        today.timestamp=today.getTime();
+        this.loadItems(today);
         this.setState(() => {
           console.log('Refreshed!');
           return { unseen: "Refreshed!" }

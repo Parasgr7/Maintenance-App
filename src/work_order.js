@@ -645,7 +645,7 @@ class WorkOrder extends Component {
                     });
                     this.check_out();
                 } }>
-                            <Text style={styles.TextStyle4}>Check-Out</Text>
+                            <Text style={styles.TextStyle4}>SUBMIT</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
