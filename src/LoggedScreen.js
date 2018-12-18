@@ -116,7 +116,7 @@ class ProfileActivity extends Component {
         if(DistInMet>25)
         {   
             this.state.data={id:item.id,userData:{token:this.state.token}};
-            this.props.navigation.navigate('ThirdPage',{param:item});
+            this.props.navigation.navigate('ThirdPage',{param:item, onGoBack: () => this.refresh()});
             //this.house_access(obj);
         }
         else{
@@ -129,8 +129,8 @@ class ProfileActivity extends Component {
     
 
     render()
-    {  
-
+    {
+        
         return(
 
             <View style={{ flex: 1}}>
@@ -165,39 +165,45 @@ class ProfileActivity extends Component {
 
     loadItems(day) {
         const one_day = 24 * 60 * 60 * 1000;
-        const due_before = this.timeToString(day.timestamp + 60 * one_day);
-        const due_after = this.timeToString(day.timestamp);
+        const due_before = this.timeToString(day.timestamp + 30 * one_day);
+        const due_after = this.timeToString(day.timestamp - 15 * one_day);
         if (this.state.worker==='0'){
             fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
+                    for(i=day.timestamp;i<day.timestamp + 45 * one_day;i+=one_day){
+                        this.state.items[this.timeToString(i)]=[];
+                    }
                     responseJson.map((item) => {
                         strTime = this.timeToString(item.due);
                         if (!this.state.items[strTime]) {
-                        this.state.items[strTime]=[];
+                            this.state.items[strTime]=[];
                         }
-                        this.state.items[strTime].push({
-                            name: item.house.address,
-                            id: item.id,
-                            house_id: item.house.id,
-                            address: item.house.full_address,
-                            status: item.status,
-                            booking_id: item.booking_id,
-                            cleaner_id: item.cleaner_id,
-                            completed: item.completed,
-                            created_at: item.created_at,
-                            creator_id: item.creator_id,
-                            due: item.due,
-                            end_time: item.end_time,
-                            note: item.note,
-                            scheduled: item.scheduled,
-                            service_name: item.service_name,
-                            start_time: item.start_time,
-                            height: Math.max(50, Math.floor(Math.random() * 150)),
-                            latitude:item.house.latitude,
-                            longitude:item.house.longitude
-                        });
+                        if(!this.state.items[strTime].some(function(el) {
+                            return el.id === item.id;})){
+                            this.state.items[strTime].push({
+                                name: item.house.address,
+                                id: item.id,
+                                house_id: item.house.id,
+                                address: item.house.full_address,
+                                status: item.status,
+                                booking_id: item.booking_id,
+                                cleaner_id: item.cleaner_id,
+                                completed: item.completed,
+                                created_at: item.created_at,
+                                creator_id: item.creator_id,
+                                due: item.due,
+                                end_time: item.end_time,
+                                note: item.note,
+                                scheduled: item.scheduled,
+                                service_name: item.service_name,
+                                start_time: item.start_time,
+                                height: Math.max(50, Math.floor(Math.random() * 150)),
+                                latitude:item.house.latitude,
+                                longitude:item.house.longitude
+                            });
+                        }
                     })
                   }
                   else{
@@ -219,32 +225,35 @@ class ProfileActivity extends Component {
                         if (!this.state.items[strTime]) {
                             this.state.items[strTime]=[];
                         }
-                        this.state.items[strTime].push({
-                            name: item.house.address,
-                            id: item.id,
-                            house_id: item.house.id,
-                            address: item.house.full_address,
-                            status: item.status,
-                            booking_id: item.booking_id,
-                            cleaner_id: item.cleaner_id,
-                            completed: item.completed,
-                            created_at: item.created_at,
-                            creator_id: item.creator_id,
-                            due: item.due,
-                            end_time: item.end_time,
-                            note: item.note,
-                            scheduled: item.scheduled,
-                            service_name: item.service_name,
-                            start_time: item.start_time,
-                            height: Math.max(50, Math.floor(Math.random() * 150)),
-                            //check:responseJson[j].check,
-                            //app_data:responseJson[j].app_data,
-                            //date:strTime,
-                            //inventory: responseJson[j].inventory,
-                            //cost: responseJson[j].cost,
-                            latitude:item.house.latitude,
-                            longitude:item.house.longitude
-                        });
+                        if(!this.state.items[strTime].some(function(el) {
+                            return el.id === item.id;})){
+                            this.state.items[strTime].push({
+                                name: item.house.address,
+                                id: item.id,
+                                house_id: item.house.id,
+                                address: item.house.full_address,
+                                status: item.status,
+                                booking_id: item.booking_id,
+                                cleaner_id: item.cleaner_id,
+                                completed: item.completed,
+                                created_at: item.created_at,
+                                creator_id: item.creator_id,
+                                due: item.due,
+                                end_time: item.end_time,
+                                note: item.note,
+                                scheduled: item.scheduled,
+                                service_name: item.service_name,
+                                start_time: item.start_time,
+                                height: Math.max(50, Math.floor(Math.random() * 150)),
+                                //check:responseJson[j].check,
+                                //app_data:responseJson[j].app_data,
+                                //date:strTime,
+                                //inventory: responseJson[j].inventory,
+                                //cost: responseJson[j].cost,
+                                latitude:item.house.latitude,
+                                longitude:item.house.longitude
+                            });
+                        }
                         
                     })
                   }
@@ -257,7 +266,7 @@ class ProfileActivity extends Component {
                     console.error(error);
                 });
         }
-        for (let i = 0; i < 60; i++) {
+        for (let i = -15; i < 30; i++) {
             const time = day.timestamp + i * one_day;
             const strTime = this.timeToString(time);
             if (!this.state.items[strTime]) {
@@ -304,6 +313,13 @@ class ProfileActivity extends Component {
     timeToString(time) {
         const date = new Date(time);
         return date.toISOString().split('T')[0];
+    }
+    
+    refresh() {
+        this.setState(() => {
+          console.log('Refreshed!');
+          return { unseen: "Refreshed!" }
+        });
     }
 }
 

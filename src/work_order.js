@@ -169,6 +169,7 @@ class WorkOrder extends Component {
             this._onRefresh=this._onRefresh.bind(this);
             this.statusUpdate=this.statusUpdate.bind(this);
             this.uploadNotes=this.uploadNotes.bind(this);
+            this.check_out=this.check_out.bind(this);
         }
     
 
@@ -636,7 +637,14 @@ class WorkOrder extends Component {
                             />
                     </View>
                     <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                        <TouchableOpacity style={styles.Check_outButtonStyle} onPress={()=>{ this.check_out() } }>
+               <TouchableOpacity style={styles.Check_outButtonStyle}
+                onPress={()=>{
+                    this.setState(() => {
+                      console.log('Checked out!');
+                      return { unseen: "Checked out!" }
+                    });
+                    this.check_out();
+                } }>
                             <Text style={styles.TextStyle4}>Check-Out</Text>
                         </TouchableOpacity>
                     </View>
@@ -649,8 +657,8 @@ class WorkOrder extends Component {
 
     check_out=()=>{
         Alert.alert("Check out successfully!");
+        this.props.navigation.state.params.onGoBack();
         this.props.navigation.goBack();
-         
     }
 
     add_inventory=()=>{
@@ -717,7 +725,7 @@ class WorkOrder extends Component {
     }
 
     statusUpdate=(value)=> {
-        this.state.status=value;
+        this.props.navigation.state.params.param.status=value;
         //const id = this.props.navigation.state.params.param.id;
         //const check = this.props.navigation.state.params.param.check;
         check=0
