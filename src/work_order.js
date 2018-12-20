@@ -161,7 +161,8 @@ class WorkOrder extends Component {
                 renderUpload: false,
                 id:"",
                 check:"",
-                comment:""
+                comment:"",
+                token: ""
             };
             this.thumbs_up=this.thumbs_up.bind(this);
             this.thumbs_down=this.thumbs_down.bind(this);
@@ -348,7 +349,7 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
 
         if (check==1){
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&auth_token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -371,7 +372,7 @@ class WorkOrder extends Component {
                     });
         }
         else{
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&token='+this.state.token)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&auth_token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
@@ -397,16 +398,16 @@ class WorkOrder extends Component {
 
       _getToken = async () => {
         try {
-           data = await AsyncStorage.getItem('session_data');
-            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,  user_id: JSON.parse(data)[0].user_id});
-        
+            data = await AsyncStorage.getItem('session_data');
+            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
+            console.log("Token information: ", JSON.parse(data));
+            this.state.token=JSON.parse(data)[0].auth_token;
         } catch (error) {
-            console.log("Something went wrong");
+            console.log("_getToken in work_order.js failed");
         }
     }
 
     componentDidMount(){
-        this._getToken();
         this.state.inspection_items=[
             {"id": 1, "description": "Capture a photo of the apartment front door showing the apartment number:", "photo_needed": true},
             {"id": 2, "description": "Is a lockbox present(with tag and light) if applicable?:", "photo_needed": false},
@@ -420,12 +421,13 @@ class WorkOrder extends Component {
         ];
         this.state.id=this.props.navigation.state.params.param.id;
         this.state.check=1;
-        if (this.state.check==1){
-            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/')
+        this._getToken().then((value) => {
+            if (this.state.check==1){
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
                         .then((response) => response.json())
                         .then((responseJson) => {
                             if(responseJson)
-                            {  
+                            {
                                 let res = responseJson;
                                 this.setState({
                                     data: res,
@@ -441,37 +443,39 @@ class WorkOrder extends Component {
                         }).catch((error) => {
                         console.error(error);
                     });
-        }
-        else{
-            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?token='+this.state.token)
-                        .then((response) => response.json())
-                        .then((responseJson) => {
-                            if(responseJson)
-                            {   
-                            
-                                let res= responseJson;
+            }
+            else{
+                fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
+                            .then((response) => response.json())
+                            .then((responseJson) => {
+                                if(responseJson)
+                                {
                                 
-                                this.setState({
-                                    data: res,
-                                    visible: !this.state.visible
-                                });
+                                    let res= responseJson;
+                                  
+                                    this.setState({
+                                        data: res,
+                                        visible: !this.state.visible
+                                    });
 
-                            }
-                            else{
+                                }
+                                else{
 
-                                Alert.alert(responseJson);
-                            }
+                                    Alert.alert(responseJson);
+                                }
 
-                        }).catch((error) => {
-                        console.error(error);
-                    });
-        }
+                            }).catch((error) => {
+                            console.error(error);
+                        });
+            }
 
+        });
+        
     }
 
         
     updateData(){
-        fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/')
+        fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
         .then((response) => response.json())
         .then((responseJson) => {
               if(responseJson){
@@ -656,7 +660,7 @@ class WorkOrder extends Component {
     }
 
     check_out=()=>{
-        Alert.alert("Check out successfully!");
+        Alert.alert("Submit successfully!");
         this.props.navigation.state.params.onGoBack();
         this.props.navigation.goBack();
     }
@@ -731,7 +735,7 @@ class WorkOrder extends Component {
         check=0
         if (check==0)
         {
-            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/', {
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -755,7 +759,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/', {
+            fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -786,7 +790,7 @@ class WorkOrder extends Component {
      
         if (check==0)
         {
-            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -810,7 +814,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -843,7 +847,7 @@ class WorkOrder extends Component {
 
         if (check==0)
         {
-            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -867,7 +871,7 @@ class WorkOrder extends Component {
         }
         else
         {   
-            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+            fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -1035,7 +1039,7 @@ class WorkOrder extends Component {
     uploadNotes= (inspection_result)=> {
         inspection_result.comment=this.state.comment;
         
-        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
               method: 'POST',
               headers: {
               'Accept': 'application/json',
@@ -1068,14 +1072,14 @@ class WorkOrder extends Component {
         const check = this.props.navigation.state.params.param.check;
         
         const data = new FormData();
-        data.append('images', {
+        data.append('image', {
              uri: uri,
              type: 'image/jpeg', // or photo.type
              name: 'testPhotoName'
         });
         data.append('inspector_id', this.state.user_id);
         data.append('result', inspection_result.result);
-        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/', {
+        fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
              method: 'POST',
              headers: {
               'Content-Type': 'multipart/form-data',

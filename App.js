@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Alert, Text, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { View, Alert, Text, Button, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {Form, Item, Input} from 'native-base';
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
@@ -10,6 +10,11 @@ import Logout from "./src/logout";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
 import GLOBALS from './src/Globals';
+import Expo from "expo";
+//import { GoogleSignin, GoogleSigninButton } from 'react-native-google-signin';
+//import { LoginButton } from 'react-native-fbsdk';
+
+//var { FBLogin, FBLoginManager } = require('react-native-facebook-login');
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -50,12 +55,15 @@ class LoginActivity extends Component {
             UserPassword: '',
             worker:'0',
             isLoading: false,
+            signedIn: false,
+            name: "",
+            photoUrl: "",
+            token: ""
         }
         this.UserLoginFunction = this.UserLoginFunction.bind(this);
         console.disableYellowBox = true;
     }
     componentWillMount(){
-        this._getToken();
         navigator.geolocation.getCurrentPosition((position)=>{
             this.setState({latitude:parseFloat(position.coords.latitude)});
             this.setState({longitude: parseFloat(position.coords.longitude)});
@@ -68,7 +76,7 @@ class LoginActivity extends Component {
         try{
 
             console.log("Token information, worker, user_id:", responseJson.auth_token, this.state.worker, responseJson.user_id )
-            userdata={"access_token": responseJson.json.auth_token, "worker": this.state.worker, "user_id": responseJson.json.user_id};
+            userdata={"auth_token": responseJson.json.auth_token, "worker": this.state.worker, "user_id": responseJson.json.user_id};
             item=[];
             item.push(userdata);
         await AsyncStorage.setItem('session_data',JSON.stringify(item))
@@ -83,11 +91,9 @@ class LoginActivity extends Component {
 
     _getToken = async () => {
         try {
-        const token = await AsyncStorage.getItem('session_data');
-        this.setState({token: token});
-        if (token !== null) {
-            this.props.navigation.navigate(token? 'App':'Auth');
-        }
+        const auth_token = await AsyncStorage.getItem('session_data');
+        this.setState({token: JSON.parse(auth_token)[0].access_token});
+        this.props.navigation.navigate(auth_token? 'App':'Auth');
         } catch (error) {
             // console.log(error);
             console.log("Something went wrong while getting token");
@@ -109,7 +115,7 @@ class LoginActivity extends Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-
+                
                 email: UserEmail,
                 password: UserPassword
 
@@ -118,7 +124,7 @@ class LoginActivity extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     // If server response message same as Data Matched
-                    if(responseJson.status!='unauthorized')
+                    if(typeof(responseJson.error)!="string")
                     {   
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
@@ -155,7 +161,7 @@ class LoginActivity extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    if(responseJson.status!='unauthorized'){
+                    if(typeof(responseJson.error)!="string"){
                         this._storeToken(responseJson);
                         this.setState({isLoading: false});
                         this.props.navigation.navigate('App');

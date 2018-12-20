@@ -5,8 +5,6 @@ import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
 import GLOBALS from './Globals';
 
-const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
-
 class ProfileActivity extends Component {
 
     
@@ -22,7 +20,7 @@ class ProfileActivity extends Component {
             items: {},
             data:{},
             visible: false,
-
+            token: "",
             latitude: "",
             longitude: "",
         };
@@ -42,7 +40,7 @@ class ProfileActivity extends Component {
            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
             console.log("Token information: ", JSON.parse(data));
         } catch (error) {
-            console.log("Something went wrong in logged screen");
+            console.log("_getToken in LoggedScreen.js failed");
         }
     }
 
@@ -169,7 +167,7 @@ class ProfileActivity extends Component {
         const due_before = this.timeToString(day.timestamp + 30 * one_day);
         const due_after = this.timeToString(day.timestamp - 15 * one_day);
         if (this.state.worker==='0'){
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&auth_token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
@@ -217,7 +215,7 @@ class ProfileActivity extends Component {
                 });
         }else if(this.state.worker==='1')
         {
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
+            fetch(GLOBALS.API_URL+'service_schedules?assignee_id='+this.state.user_id+'&auth_token='+this.state.token+'&due_before='+due_before+'&due_after='+due_after)
             .then((response) => response.json())
             .then((responseJson) => {
                   if(responseJson){
