@@ -154,6 +154,7 @@ class WorkOrder extends Component {
                 visibleModal: null,
                 visibleModalCost:null,
                 res:[],
+                status_data:[],
                 status:"",
                 refreshing: false,
                 visible: false,
@@ -171,6 +172,7 @@ class WorkOrder extends Component {
             this.statusUpdate=this.statusUpdate.bind(this);
             this.uploadNotes=this.uploadNotes.bind(this);
             this.check_out=this.check_out.bind(this);
+            this._getStatusData=this._getStatusData.bind(this);
         }
     
 
@@ -396,53 +398,61 @@ class WorkOrder extends Component {
 
       }
 
-      _getToken = async () => {
+    _getToken = async () => {
         try {
             data = await AsyncStorage.getItem('session_data');
             this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
             console.log("Token information: ", JSON.parse(data));
-            this.state.token=JSON.parse(data)[0].auth_token;
+            //this.state.token=JSON.parse(data)[0].auth_token;
         } catch (error) {
             console.log("_getToken in work_order.js failed");
         }
     }
+    
+    _getStatusData = async () => {
+        
+    }
 
-    componentDidMount(){
-        this.state.inspection_items=[
-            {"id": 1, "description": "Capture a photo of the apartment front door showing the apartment number:", "photo_needed": true},
-            {"id": 2, "description": "Is a lockbox present(with tag and light) if applicable?:", "photo_needed": false},
-            {"id": 3, "description": "Capture a photo of theaccess items provided forthe guest:", "photo_needed": true}
-        ];
-            
-        this.state.inspections_results=[
-            {"inspection_item_id": 1, "service_schedule_id": 13356, "result": "bad", "picture_path": ""},
-            {"inspection_item_id": 2, "service_schedule_id": 13356, "result": "bad", "picture_path": ""},
-            {"inspection_item_id": 3, "service_schedule_id": 13356, "result": "bad", "picture_path": ""}
-        ];
+    componentWillMount(){
         this.state.id=this.props.navigation.state.params.param.id;
         this.state.check=1;
         this._getToken().then((value) => {
             if (this.state.check==1){
             fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
-                        .then((response) => response.json())
-                        .then((responseJson) => {
-                            if(responseJson)
-                            {
-                                let res = responseJson;
-                                this.setState({
-                                    data: res,
-                                    visible: !this.state.visible
-                                });
+                .then((response) => response.json())
+                .then((responseJson) => {
+                    if(responseJson)
+                    {
+                        let res = responseJson;
+                        this.setState({
+                            data: res,
+                            visible: !this.state.visible
+                        });
 
-                            }
-                            else{
+                    }
+                    else{
 
-                                Alert.alert(responseJson);
-                            }
+                        Alert.alert(responseJson);
+                    }
 
-                        }).catch((error) => {
-                        console.error(error);
+                }).catch((error) => {
+                console.error(error);
+            });
+            fetch(GLOBALS.API_URL+'service_schedules/statuses/?auth_token='+this.state.token)
+                .then((response) => response.json())
+                .then((responseJson) => {
+                  if(responseJson){
+                    let res = responseJson;
+                    this.setState({
+                        status_data: res.statuses
                     });
+                  }
+                  else{
+                    Alert.alert(responseJson);
+                  }
+                }).catch((error) => {
+                    console.error(error);
+            });
             }
             else{
                 fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
@@ -470,7 +480,9 @@ class WorkOrder extends Component {
             }
 
         });
-        
+        this._getStatusData().then(() => {});
+    }
+    componentDidMount(){
     }
 
         
@@ -513,13 +525,7 @@ class WorkOrder extends Component {
                 })
             }  
         }*/
-        status_data=[{
-            value:"Completed"
-        },{
-            value:"Pending"
-        },{
-            value:"Scheduled"
-        }]
+
 
         source=[{
             value:"Car"
@@ -635,9 +641,10 @@ class WorkOrder extends Component {
 
                             <Dropdown
                                 label='Select Status'
-                                data={status_data}
+                                data={this.state.status_data}
                                 value={this.props.navigation.state.params.param.status}
-                                onChangeText={(value)=>{this.statusUpdate(value)}}
+                                onChangeText={(value)=>{
+                                    this.statusUpdate(this.state.status_data.findIndex(s =>s.value==value))}}
                             />
                     </View>
                     <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
