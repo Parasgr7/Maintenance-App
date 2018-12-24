@@ -74,7 +74,7 @@ const Cost = t.struct({
 
 
 function customTemplate(locals) {
- 
+
     return (
         <View style={{flexDirection: 'row',width:width-100, marginTop:35}}>
           <View style={{flex:1}}>
@@ -102,14 +102,14 @@ function customTemplate(locals) {
 
 
 const options = {
- 
+
 
     fields: {
             product:{
                     disableOrder:true,
 
-                    item:{   
-                            template: customTemplate 
+                    item:{
+                            template: customTemplate
                     }
                 }
             }
@@ -117,14 +117,14 @@ const options = {
 };
 
 const optionsCost = {
- 
+
 
     fields: {
             add_cost:{
                     disableOrder:true,
 
-                    item:{   
-                            template: costTemplate 
+                    item:{
+                            template: costTemplate
                     }
                 }
             }
@@ -174,7 +174,7 @@ class WorkOrder extends Component {
             this.check_out=this.check_out.bind(this);
             this._getStatusData=this._getStatusData.bind(this);
         }
-    
+
 
     handleSubmit = () => {
         const value = this.formRef.getValue();
@@ -186,9 +186,9 @@ class WorkOrder extends Component {
             return;
         }
         else(value.product.length)
-        {   
+        {
             for(let i=0;i<value.product.length;i++)
-            {   
+            {
                 result.push({count:value.product[i].count,product:value.product[i].name,source:value.source});
             }
             const id = this.props.navigation.state.params.param.id;
@@ -209,13 +209,13 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
-                    
+
                 }).catch((error) => {
                 console.error(error);
             });
         }
         else
-        {   
+        {
             fetch('http://dev4.holidale.org/api/v1/add_inventory/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
@@ -231,7 +231,7 @@ class WorkOrder extends Component {
 
                     Alert.alert("Inventory Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModal: null }) }]);
 
-                    
+
                 }).catch((error) => {
                 console.error(error);
             });
@@ -249,9 +249,9 @@ class WorkOrder extends Component {
             return;
         }
         else if(value.add_cost.length)
-        {   
+        {
             for(let i=0;i<value.add_cost.length;i++)
-            {   
+            {
                 result.push({item:value.add_cost[i].item,cost:"$ "+value.add_cost[i].cost});
             }
             const id = this.props.navigation.state.params.param.id;
@@ -272,13 +272,13 @@ class WorkOrder extends Component {
             }).then((response) => response.json())
                 .then((responseJson) => {
                     Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () =>  this.setState({ visibleModalCost: null }) }]);
-                    
+
                 }).catch((error) => {
                 console.error(error);
             });
         }
         else
-        {   
+        {
             fetch('http://dev4.holidale.org/api/v1/add_cost/service_schedules/'+id+'/', {
                 method: 'PUT',
                 headers: {
@@ -291,10 +291,10 @@ class WorkOrder extends Component {
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                
+
                     Alert.alert("Cost Updated","Done",[{text: 'OK', onPress: () => this.setState({ visibleModalCost: null }) }]);
- 
-                    // 
+
+                    //
                 }).catch((error) => {
                 console.error(error);
             });
@@ -357,7 +357,7 @@ class WorkOrder extends Component {
                             if(responseJson)
                             {
                                 let res = responseJson;
-                                
+
                                 this.setState({
                                     data: res[0],
                                     refreshing: false
@@ -408,9 +408,9 @@ class WorkOrder extends Component {
             console.log("_getToken in work_order.js failed");
         }
     }
-    
+
     _getStatusData = async () => {
-        
+
     }
 
     componentWillMount(){
@@ -423,9 +423,8 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     if(responseJson)
                     {
-                        let res = responseJson;
                         this.setState({
-                            data: res,
+                            data: responseJson,
                             visible: !this.state.visible
                         });
 
@@ -442,9 +441,8 @@ class WorkOrder extends Component {
                 .then((response) => response.json())
                 .then((responseJson) => {
                   if(responseJson){
-                    let res = responseJson;
                     this.setState({
-                        status_data: res.statuses
+                        status_data: responseJson.statuses
                     });
                   }
                   else{
@@ -460,11 +458,8 @@ class WorkOrder extends Component {
                             .then((responseJson) => {
                                 if(responseJson)
                                 {
-                                
-                                    let res= responseJson;
-                                  
                                     this.setState({
-                                        data: res,
+                                        data: responseJson,
                                         visible: !this.state.visible
                                     });
 
@@ -485,16 +480,15 @@ class WorkOrder extends Component {
     componentDidMount(){
     }
 
-        
+
     updateData(){
         fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token)
         .then((response) => response.json())
         .then((responseJson) => {
               if(responseJson){
-                  let res = responseJson;
                   this.setState({
-                                data: res,
-                        });
+                      data: responseJson,
+                  });
               }
               else{
                     Alert.alert(responseJson);
@@ -504,17 +498,17 @@ class WorkOrder extends Component {
             });
     }
 
-    
+
     render()
     {
-        if(!this.state.visible) { 
+        if(!this.state.visible) {
         return (
             <View style={{ flex: 1 }}>
              <Spinner visible={!this.state.visible} textContent={"Loading..."} textStyle={{color: '#FFF', width: '100%', textAlign: 'center'}} />
             </View>
           );
         }
-        
+
         /*let list=[];
         if(this.state.data.listings!=null)
         {
@@ -545,12 +539,12 @@ class WorkOrder extends Component {
                 onRefresh={this._onRefresh}
               />
             }>
-               
+
             <ScrollView style={styles.container}>
                 <Text style={styles.WorkOrderTextStyle}>{this.props.navigation.state.params.param.name}</Text>
                 <Text style={styles.TextComponentStyle}>{this.props.navigation.state.params.param.address}</Text>
                 <Text style={styles.TextComponentStyle}>{this.props.navigation.state.params.param.due}</Text>
-               
+
                 {this.state.data.inspection_results.map((item) => {
                     count=count+1;
                     return(
@@ -582,8 +576,8 @@ class WorkOrder extends Component {
                                     />
                                 </ScrollView>
 
-                        
-                          
+
+
                                 <ScrollView style={ {margin: 17}}>
                                     <Icon
                                         name='camera'
@@ -596,7 +590,7 @@ class WorkOrder extends Component {
                                     />
                                 {this._maybeRenderUploadingOverlay()}
                                  </ScrollView>
-                         
+
 
                         </ScrollView>
                         </ScrollView>
@@ -606,8 +600,8 @@ class WorkOrder extends Component {
                                placeholder={item.comment? item.comment:"No comment"}
                                value={item.comment? item.comment:null}
                                textContentType="none"
-                               placeholderTextColor="Gray"
-                               color="Black"
+                               placeholderTextColor="gray"
+                               color="black"
                                onChangeText={(text) => this.setState({comment: text})}
                             />
                             <Icon
@@ -624,27 +618,26 @@ class WorkOrder extends Component {
                         <Text></Text>
                         <View>
                         <ScrollView contentContainerStyle={{ justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
-                          
+
                            {item.images[0]&&(<Image source={{ uri: (item.images[item.images.length - 1].directory.indexOf('http') >= 0 ? "" : GLOBALS.BASE_URL ) + item.images[item.images.length - 1].directory }} style={styles.maybeRenderImage} />)}
                         </ScrollView>
                         </View>
                     </View>
-                    
+
                 );
             })}
-        
-        
-               
-               
-               
+
+
+
+
+
                     <View style={{marginBottom:20}}>
 
                             <Dropdown
                                 label='Select Status'
                                 data={this.state.status_data}
                                 value={this.props.navigation.state.params.param.status}
-                                onChangeText={(value)=>{
-                                    this.statusUpdate(this.state.status_data.findIndex(s =>s.value==value))}}
+                                onChangeText={(value)=>{this.statusUpdate(value)}}
                             />
                     </View>
                     <View style={{justifyContent: 'center',alignItems: 'stretch', flexDirection: 'row', flex: 1}}>
@@ -662,7 +655,7 @@ class WorkOrder extends Component {
                 </ScrollView>
 
             </ScrollView>
-  
+
         );
     }
 
@@ -694,11 +687,11 @@ class WorkOrder extends Component {
                             <Modal isVisible={this.state.visibleModal === 1} style={styles.bottomModal}>
                                 {this._renderInventoryModalContent()}
                             </Modal>
-                        </View>   
+                        </View>
         </ScrollView>
             );
         }
-        else 
+        else
             return;
 
     }
@@ -712,7 +705,7 @@ class WorkOrder extends Component {
         {
             costData.push([this.state.data.cost[i].item,this.state.data.cost[i].cost])
         }
-    
+
         if(this.state.worker==='1')
         {
             return(
@@ -726,7 +719,7 @@ class WorkOrder extends Component {
                             <Modal isVisible={this.state.visibleModalCost === 1} style={styles.bottomModal}>
                                 {this._renderCostModalContent()}
                             </Modal>
-                        </View>    
+                        </View>
         </ScrollView>
             );
         }
@@ -736,7 +729,9 @@ class WorkOrder extends Component {
     }
 
     statusUpdate=(value)=> {
-        this.props.navigation.state.params.param.status=value;
+        if (this.props.navigation.state.params.param.status === value) return;
+        this.props.navigation.state.params.param.status = value;
+        const staus = this.state.status_data.findIndex(s => s.value === value);
         //const id = this.props.navigation.state.params.param.id;
         //const check = this.props.navigation.state.params.param.check;
         check=0
@@ -750,8 +745,8 @@ class WorkOrder extends Component {
                 },
                 body: JSON.stringify({
 
-                    status: value,
-            
+                    status: staus,
+
                 })
 
             }).then((response) => response.json())
@@ -765,7 +760,7 @@ class WorkOrder extends Component {
             });
         }
         else
-        {   
+        {
             fetch(GLOBALS.API_URL+'service_schedules/'+this.state.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
@@ -774,13 +769,13 @@ class WorkOrder extends Component {
                 },
                 body: JSON.stringify({
 
-                    status: this.state.status
+                    status: staus,
 
                 })
 
             }).then((response) => response.json())
                 .then((responseJson) => {
-                
+
                     Alert.alert("Status Updated!");
                     return;
                 }).catch((error) => {
@@ -792,9 +787,10 @@ class WorkOrder extends Component {
 
 
     thumbs_up=(inspection_result)=> {
+        if (inspection_result.result === 'good') return;
         inspection_result.result="good";
         const check = 0;
-     
+
         if (check==0)
         {
             fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
@@ -807,7 +803,7 @@ class WorkOrder extends Component {
                     inspector_id: this.state.user_id,
                     result: inspection_result.result
                 })
-                
+
             }).then((response) => response.json())
                 .then((responseJson) => {
                       this.setState(() => {
@@ -820,7 +816,7 @@ class WorkOrder extends Component {
             });
         }
         else
-        {   
+        {
             fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
@@ -844,10 +840,11 @@ class WorkOrder extends Component {
                 console.error(error);
             });
         }
-    
+
     }
-    
+
     thumbs_down=(inspection_result)=>{
+        if (inspection_result.result === 'bad') return;
         inspection_result.result="bad";
 
         const check = 0;
@@ -877,7 +874,7 @@ class WorkOrder extends Component {
             });
         }
         else
-        {   
+        {
             fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
                 method: 'POST',
                 headers: {
@@ -913,7 +910,7 @@ class WorkOrder extends Component {
             );
         }
     };
-  
+
     changeText=(text)=>{
         this.setState({text: text});
         console.log(this.state.text);
@@ -921,12 +918,12 @@ class WorkOrder extends Component {
     }
 
     // _maybeRenderImage = () => {
-        
+
     //     let {
     //         image
     //     } = this.state;
     //     let x= this.state.image;
-        
+
     //     if(image){
     //     return (
     //         <View style={styles.maybeRenderImageText}> 
@@ -946,9 +943,9 @@ class WorkOrder extends Component {
     //                <Text style={styles.TextStyle}>Upload</Text>
     //             </TouchableOpacity>
     //             </View>
-       
+
     //         </View>
-            
+
     //     );
     // }
     // else{
@@ -1026,7 +1023,7 @@ class WorkOrder extends Component {
             if (!pickerResult.cancelled) {
                 uploadResponse = await this.uploadImageAsync(inspection_result, pickerResult.uri);
                 uploadResult = await uploadResponse;
-               
+
                 this.setState({
                     renderUpload: true,
                     text:''
@@ -1036,7 +1033,7 @@ class WorkOrder extends Component {
             console.log({ e });
             Alert.alert('Upload failed, sorry :(');
         } finally {
-            
+
             this.setState({
                 uploading: false
             });
@@ -1044,8 +1041,9 @@ class WorkOrder extends Component {
     };
 
     uploadNotes= (inspection_result)=> {
+        if (inspection_result.comment === this.state.comment) return;
         inspection_result.comment=this.state.comment;
-        
+
         fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
               method: 'POST',
               headers: {
@@ -1056,7 +1054,7 @@ class WorkOrder extends Component {
                    inspector_id: this.state.user_id,
                    comment: this.state.comment
               })
-              
+
               }).then((response) => response.json())
         .then((responseJson) => {
               this.setState(() => {
@@ -1077,7 +1075,7 @@ class WorkOrder extends Component {
 
         const id = this.props.navigation.state.params.param.id;
         const check = this.props.navigation.state.params.param.check;
-        
+
         const data = new FormData();
         data.append('image', {
              uri: uri,
@@ -1110,16 +1108,16 @@ class WorkOrder extends Component {
             successActionStatus: 201,
          
           }*/
-          
+
         /*return RNS3.put(file, options).then(response => {
             if (response.status !== 201)
               throw new Error("Failed to upload image to S3");
             return response.body.postResponse;
           });*/
-    
+
     }
-    
-    
+
+
 }
 
 
