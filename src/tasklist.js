@@ -201,7 +201,7 @@ class TaskList extends Component {
     {   
  
         const length =this.state.list.length;
-
+        var dup_list= this.state.list;
         if (length>=1 && length<4){
             return(
                 <View>
@@ -375,7 +375,11 @@ class TaskList extends Component {
               
           ]}
         />
-
+            {/* <View style={{position:'absolute',bottom:0,alignSelf:'flex-end'}}>
+                <TouchableOpacity style={styles.Fix_ButtonStyle}  >
+                    <MaterialCommunityIcons name="sort" size={33} color="#676262"/>
+                </TouchableOpacity>
+            </View> */}
             </View>
             
             

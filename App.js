@@ -264,7 +264,7 @@ const Tabs = createBottomTabNavigator({
     Tasklist:   {
         screen: TaskList,
         navigationOptions: () => ({
-        
+
             tabBarIcon: ({tintColor}) => (
                 <Octicons name="tasklist" size={24} color={tintColor}/>
             )
