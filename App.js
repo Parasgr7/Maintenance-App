@@ -264,6 +264,7 @@ const Tabs = createBottomTabNavigator({
     Tasklist:   {
         screen: TaskList,
         navigationOptions: () => ({
+        
             tabBarIcon: ({tintColor}) => (
                 <Octicons name="tasklist" size={24} color={tintColor}/>
             )
@@ -272,6 +273,7 @@ const Tabs = createBottomTabNavigator({
     Calendar:   {
         screen: ProfileActivity,
         navigationOptions: () => ({
+           
             tabBarIcon: ({tintColor}) => (
                 <AntDesign name="calendar" size={24} color={tintColor}/>
             )

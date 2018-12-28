@@ -1,22 +1,25 @@
 import React, { Component } from 'react';
-import { ScrollView,View, Text,  Alert, Image, ImageBackground,TouchableOpacity} from 'react-native';
+import { ScrollView,View, Text,  Alert, Button, Image, Icon, ImageBackground,TouchableOpacity} from 'react-native';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
 import { StackNavigator } from 'react-navigation';
 import GLOBALS from './Globals';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import ReactNativeTooltipMenu from 'react-native-tooltip-menu';
 
 class TaskList extends Component {
     
     static navigationOptions =
         {
             title: 'TaskList',
-            header: null
+            header: null,
+ 
         };
         constructor(props){
             super(props);
             this.state={
                 id:"",
-                list:[{service_name: "new", house:{full_address:"xyz"},status:"abc",due:"1998-05-18"}],
+                list:[{service_name: "HolidaleTest", house:{full_address:"Holidale"},status:"Done",due:"2013-05-18"}],
                 item:{}
                 
             };
@@ -198,8 +201,8 @@ class TaskList extends Component {
     {   
  
         const length =this.state.list.length;
-        var dup_list= this.state.list;
-        if (length>1 && length<4){
+
+        if (length>=1 && length<4){
             return(
                 <View>
                 {this.display_list(this.state.list)}
@@ -222,16 +225,18 @@ class TaskList extends Component {
                     current_day.push(item);
                 }
             });
+    
             if(loc[0]<=3)
             {   
                 const index=0;
-                last_days=dup_list.slice(index,loc[0]);
-                future_days=dup_list.slice(loc[-1]+1);
+                last_days=this.state.list.slice(index,loc[0]);
+                
+                future_days=this.state.list.slice(loc[loc.length-1]+1);
             }
             else{
                 const index=i-4;
-                last_days=dup_list.slice(index,loc[0]);
-                future_days=dup_list.slice(loc[-1]+1);
+                last_days=this.state.list.slice(index,loc[0]);
+                future_days=this.state.list.slice(loc[loc.length-1]+1);
             }
 
             return(
@@ -248,19 +253,132 @@ class TaskList extends Component {
         else{
             return(
                         <View >
-                            <Text style={styles.TextStyle}>No item to display</Text>
+                            <Text style={styles.NoStyle2Bold}>No Available Items</Text>
                         </View>
             )
         }
     }
       
-      
+
+    sort_list(val){
+        if (val==0)
+        {
+        fetch(GLOBALS.API_URL+"service_schedules/desc_date?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+        })
+        }
+        else if (val==4)
+        {
+        fetch(GLOBALS.API_URL+"service_schedules/asc_date?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+        })
+        }
+        else if (val==1)
+        {   
+           
+            fetch(GLOBALS.API_URL+"service_schedules/completed?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+            })
+        }
+        else if (val==2)
+        {   
+            
+            fetch(GLOBALS.API_URL+"service_schedules/scheduled?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+            })
+        }
+        else if (val==3)
+        {  
+            fetch(GLOBALS.API_URL+"service_schedules/pending?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+            })
+        }
+
+    }
+
     
     render() {
         return (
-            <ScrollView>
+            <View style={{flex:1}}>
+            <ScrollView >
             {this.tasklist()}
             </ScrollView>
+            <ReactNativeTooltipMenu
+          buttonComponent={
+            <View
+              style={{
+                backgroundColor: 'black',
+                padding: 6,
+                borderRadius: 80
+
+              }}
+            >
+             <MaterialCommunityIcons name="sort" size={25} color="#676262"/>
+            </View>
+          }
+          items={[
+            {
+                label: 'Due Date (Desc)',
+                onPress: () => {
+                    this.sort_list(val=0);
+                    
+                }
+              },
+            {
+              label: 'Completed',
+              onPress: () => {
+                    this.sort_list(val=1);
+                
+                }
+            },
+            {
+                label: 'Scheduled',
+                onPress: () => {
+                    this.sort_list(val=2);
+                   
+                }
+              },
+              {
+                label: 'Pending',
+                onPress: () => {
+                    this.sort_list(val=3);
+                   
+                }
+              },
+            {
+                label: 'Due Date (Asc)',
+                onPress: () => {
+                    this.sort_list(val=4);
+                   
+                }
+              },
+              
+          ]}
+        />
+
+            </View>
+            
+            
         );
     }
 }

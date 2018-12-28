@@ -109,6 +109,18 @@ export default StyleSheet.create({
         backgroundColor:'#018bb3',
         borderRadius:10,
     },
+    Fix_ButtonStyle: {
+       borderWidth:1,
+       borderColor:'rgba(0,0,0,0.2)',
+       alignItems:'center',
+       justifyContent:'center',
+       width:50,
+       height:50,
+       backgroundColor:'#fff',
+       borderRadius:100,
+       margin:10
+    },
+  
 
     TextStyleHead:{
         color:'white',
@@ -130,6 +142,14 @@ export default StyleSheet.create({
         fontSize:15,
         marginLeft:10,
         marginBottom:5,
+        fontWeight:'bold',
+    },
+    NoStyle2Bold:{
+        color:'black',
+        fontSize:22,
+        marginLeft:10,
+        marginBottom:5,
+        margin:20,
         fontWeight:'bold',
     },
     TextStyle2:{
