@@ -16,7 +16,7 @@ class TaskList extends Component {
             super(props);
             this.state={
                 id:"",
-                list:[{service_name: "new", house:{full_address:"xyz"},status:"abc",due:"22-1-1998"}],
+                list:[{service_name: "new", house:{full_address:"xyz"},status:"abc",due:"1998-05-18"}],
                 item:{}
                 
             };
@@ -24,8 +24,8 @@ class TaskList extends Component {
         }
 
         componentDidMount(){
-            // this.state.id=this.props.navigation.state.params.param.id;
-            this.state.id= 396;
+            this.state.id=this.props.navigation.state.params.param.id;
+            // this.state.id= 396;
             this.getTaskList();
             this._getToken();
            
@@ -45,7 +45,7 @@ class TaskList extends Component {
 
     getTaskList=()=>
     {   
-        fetch("http://localhost:3000/api/v1/service_schedules?assignee_id="+this.state.id)
+        fetch(GLOBALS.API_URL+"service_schedules?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -89,7 +89,7 @@ class TaskList extends Component {
                 })
             }).then((response) => response.json())
                 .then((responseJson) => {
-                    // console.log(responseJson);
+                
                 }).catch((error) => {
                 console.error(error);
             }); 
@@ -141,27 +141,118 @@ class TaskList extends Component {
         
     }
 
-    tasklist() {
-        const that= this;
-        return this.state.list.map(function(item, i){
-          return(
-                <View style={styles.SubmitButtonStyle1} key={i} >
-                    <View >
-                        <Text style={styles.TextStyle}>{item.service_name}</Text>
-                    </View>
-                    <Text style={styles.TextStyle2}>{item.house.full_address}</Text>
-                    <View style={{paddingRight:10}}>
-                        <Text style={styles.TextStyle3}>{item.status}</Text>
-                    </View>
-                    <View style={{flexDirection: 'row', flex:1, justifyContent: 'flex-end'}}>
-                    <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>that.WorkOrderFunction(item)  } >
-                        <Text style={styles.TextStyle4}>Check-In</Text>
-                    </TouchableOpacity>
-                    </View>
-                </View>  
-          );
-        });
-      }
+    note_display(item){
+        if(item.note!=null)
+        {
+        return(
+            <Text style={{marginLeft:10, marginBottom:5}} >
+                <Text style={styles.TextStyle2Bold}>Note : </Text>
+                <Text style={styles.TextStyle2}>{item.note}</Text>
+            </Text>
+        
+        )
+        }
+
+    }
+    display_list(list)
+    {   const that=this;
+        return list.map(function(item, i){
+            return(
+                  <View style={styles.SubmitButtonStyle1} key={i} >
+                      <View >
+                          <Text style={styles.TextStyleHead}>{item.service_name}</Text>
+                      </View>
+                      <Text style={{marginLeft:10,marginBottom:5}} >
+                          <Text style={styles.TextStyle2Bold}>Address : </Text>
+                          <Text style={styles.TextStyle2}>{item.house.full_address}</Text>
+                      </Text>
+                      
+                      <Text style={{marginLeft:10,marginBottom:5}} >
+                          <Text style={styles.TextStyle2Bold}>Due Date : </Text>
+                          <Text style={styles.TextStyle2}>{item.due}</Text>
+                      </Text>
+                        {that.note_display(item)}
+                      <View style={{paddingRight:10}}>
+                          <Text style={styles.TextStyle3}>{item.status}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', flex:1, justifyContent: 'flex-end'}}>
+                      <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>that.WorkOrderFunction(item)  } >
+                          <Text style={styles.TextStyle4}>Check-In</Text>
+                      </TouchableOpacity>
+                      </View>
+                  </View>  
+            );
+          });
+    }
+
+
+    line_break(){
+        return(
+            <View>
+            <View style={{borderBottomColor: 'black',borderBottomWidth: 5, marginTop:15, marginBottom:5, margin:15}}/>
+            </View>
+        )
+    }
+
+    tasklist() 
+    {   
+ 
+        const length =this.state.list.length;
+        var dup_list= this.state.list;
+        if (length>1 && length<4){
+            return(
+                <View>
+                {this.display_list(this.state.list)}
+                </View>
+            
+            )
+        }
+        else if(length>=4){
+            const that=this;
+            const date= new Date().toISOString().split('T')[0];
+            // const date= "2016-04-19";
+            loc=[];
+            last_days=[];
+            current_day=[];
+            future_days=[];
+            this.state.list.forEach(function(item,i){
+                if (date==item.due)
+                {   
+                    loc.push(i);
+                    current_day.push(item);
+                }
+            });
+            if(loc[0]<=3)
+            {   
+                const index=0;
+                last_days=dup_list.slice(index,loc[0]);
+                future_days=dup_list.slice(loc[-1]+1);
+            }
+            else{
+                const index=i-4;
+                last_days=dup_list.slice(index,loc[0]);
+                future_days=dup_list.slice(loc[-1]+1);
+            }
+
+            return(
+                <View>
+                    {that.display_list(last_days)}
+                    {that.line_break()}
+                    {that.display_list(current_day)}
+                    {that.line_break()}
+                    {that.display_list(future_days)}
+                </View>
+            )
+          
+        }
+        else{
+            return(
+                        <View >
+                            <Text style={styles.TextStyle}>No item to display</Text>
+                        </View>
+            )
+        }
+    }
       
       
     
