@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { ScrollView,View, Text,  Alert, Button, Image, Icon, ImageBackground,TouchableOpacity} from 'react-native';
 import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
-import { StackNavigator } from 'react-navigation';
 import GLOBALS from './Globals';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import ReactNativeTooltipMenu from 'react-native-tooltip-menu';
+import _ from 'lodash';
 
 class TaskList extends Component {
     
@@ -20,17 +20,21 @@ class TaskList extends Component {
             this.state={
                 id:"",
                 list:[{service_name: "HolidaleTest", house:{full_address:"Holidale"},status:"Done",due:"2013-05-18"}],
-                item:{}
-                
+                item:{},
+                check:0,
+                list1:[{service_name: "HolidaleTest", house:{full_address:"Holidale"},status:"Done",due:"2013-05-18"}],
             };
             this.WorkOrderFunction= this.WorkOrderFunction.bind(this);
         }
 
         componentDidMount(){
-            this.state.id=this.props.navigation.state.params.param.id;
-            // this.state.id= 396;
-            this.getTaskList();
+            
+            this.state.id= 396;
             this._getToken();
+            this.getTaskList();
+            // console.log(this.props.navigation.getParam.name);
+           
+           
            
              
     }
@@ -48,7 +52,8 @@ class TaskList extends Component {
 
     getTaskList=()=>
     {   
-        fetch(GLOBALS.API_URL+"service_schedules?assignee_id="+this.state.id)
+        
+        fetch("http://localhost:3000/api/v1/service_schedules?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -169,11 +174,15 @@ class TaskList extends Component {
                           <Text style={styles.TextStyle2Bold}>Address : </Text>
                           <Text style={styles.TextStyle2}>{item.house.full_address}</Text>
                       </Text>
-                      
+                      <Text style={{marginLeft:10,marginBottom:5}} >
+                          <Text style={styles.TextStyle2Bold}>City : </Text>
+                          <Text style={styles.TextStyle2}>{item.house.full_address.split(',')[1]}</Text>
+                      </Text>
                       <Text style={{marginLeft:10,marginBottom:5}} >
                           <Text style={styles.TextStyle2Bold}>Due Date : </Text>
                           <Text style={styles.TextStyle2}>{item.due}</Text>
                       </Text>
+
                         {that.note_display(item)}
                       <View style={{paddingRight:10}}>
                           <Text style={styles.TextStyle3}>{item.status}</Text>
@@ -201,7 +210,7 @@ class TaskList extends Component {
     {   
  
         const length =this.state.list.length;
-        var dup_list= this.state.list;
+        
         if (length>=1 && length<4){
             return(
                 <View>
@@ -209,6 +218,17 @@ class TaskList extends Component {
                 </View>
             
             )
+        }
+        else if(this.state.check==1)
+        {   
+            return(
+            <View>
+            {this.display_list(this.state.list1)}
+            </View>
+        
+        )
+    
+
         }
         else if(length>=4){
             const that=this;
@@ -225,6 +245,7 @@ class TaskList extends Component {
                     current_day.push(item);
                 }
             });
+            
     
             if(loc[0]<=3)
             {   
@@ -262,8 +283,8 @@ class TaskList extends Component {
 
     sort_list(val){
         if (val==0)
-        {
-        fetch(GLOBALS.API_URL+"service_schedules/desc_date?assignee_id="+this.state.id)
+        {   this.setState({check:0});
+        fetch("http://localhost:3000/api/v1/service_schedules/desc_date?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -272,8 +293,8 @@ class TaskList extends Component {
         })
         }
         else if (val==4)
-        {
-        fetch(GLOBALS.API_URL+"service_schedules/asc_date?assignee_id="+this.state.id)
+        {   this.setState({check:0});
+        fetch("http://localhost:3000/api/v1/service_schedules/asc_date?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -283,8 +304,8 @@ class TaskList extends Component {
         }
         else if (val==1)
         {   
-           
-            fetch(GLOBALS.API_URL+"service_schedules/completed?assignee_id="+this.state.id)
+            this.setState({check:0});
+            fetch("http://localhost:3000/api/v1/service_schedules/completed?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -294,8 +315,8 @@ class TaskList extends Component {
         }
         else if (val==2)
         {   
-            
-            fetch(GLOBALS.API_URL+"service_schedules/scheduled?assignee_id="+this.state.id)
+            this.setState({check:0});
+            fetch("http://localhost:3000/api/v1/service_schedules/scheduled?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -304,11 +325,23 @@ class TaskList extends Component {
             })
         }
         else if (val==3)
-        {  
-            fetch(GLOBALS.API_URL+"service_schedules/pending?assignee_id="+this.state.id)
+        {   this.setState({check:0});
+            fetch("http://localhost:3000/api/v1/service_schedules/pending?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
+                }).catch((error) => {
+                    console.error(error);
+            })
+        }
+        else if (val==5)
+        {   this.setState({check:1});
+            fetch("http://localhost:3000/api/v1/service_schedules/?assignee_id="+this.state.id)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                  responseJson=_.sortBy(responseJson,'city');
+                  this.setState({list1: responseJson});
+                
                 }).catch((error) => {
                     console.error(error);
             })
@@ -323,7 +356,7 @@ class TaskList extends Component {
             <ScrollView >
             {this.tasklist()}
             </ScrollView>
-            <ReactNativeTooltipMenu
+            <ReactNativeTooltipMenu 
           buttonComponent={
             <View
               style={{
@@ -343,6 +376,13 @@ class TaskList extends Component {
                     this.sort_list(val=0);
                     
                 }
+              },
+              {
+                label: 'City',
+                onPress: () => {
+                      this.sort_list(val=5);
+                  
+                  }
               },
             {
               label: 'Completed',
@@ -375,11 +415,6 @@ class TaskList extends Component {
               
           ]}
         />
-            {/* <View style={{position:'absolute',bottom:0,alignSelf:'flex-end'}}>
-                <TouchableOpacity style={styles.Fix_ButtonStyle}  >
-                    <MaterialCommunityIcons name="sort" size={33} color="#676262"/>
-                </TouchableOpacity>
-            </View> */}
             </View>
             
             
