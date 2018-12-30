@@ -18,7 +18,6 @@ class TaskList extends Component {
         constructor(props){
             super(props);
             this.state={
-                id:"",
                 list:[{service_name: "HolidaleTest", house:{full_address:"Holidale"},status:"Done",due:"2013-05-18"}],
                 item:{},
                 check:0,
@@ -27,17 +26,10 @@ class TaskList extends Component {
             this.WorkOrderFunction= this.WorkOrderFunction.bind(this);
         }
 
-        componentDidMount(){
-            
-            this.state.id= 396;
+        componentDidMount()
+        {
             this._getToken();
-            this.getTaskList();
-            // console.log(this.props.navigation.getParam.name);
-           
-           
-           
-             
-    }
+        }
 
 
     _getToken = async () => {
@@ -45,23 +37,16 @@ class TaskList extends Component {
            data = await AsyncStorage.getItem('session_data');
            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
             console.log("Token information: ", JSON.parse(data));
-        } catch (error) {
-            console.log("Something went wrong in logged screen");
-        }
-    }
-
-    getTaskList=()=>
-    {   
-        
-        fetch("http://localhost:3000/api/v1/service_schedules?assignee_id="+this.state.id)
+            fetch("http://localhost:3000/api/v1/service_schedules?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
                 }).catch((error) => {
                     console.error(error);
         });
-
-        
+        } catch (error) {
+            console.log("Something went wrong in logged screen");
+        }
     }
 
     getLocation=()=>
@@ -150,6 +135,7 @@ class TaskList extends Component {
     }
 
     note_display(item){
+       
         if(item.note!=null)
         {
         return(
@@ -284,7 +270,7 @@ class TaskList extends Component {
     sort_list(val){
         if (val==0)
         {   this.setState({check:0});
-        fetch("http://localhost:3000/api/v1/service_schedules/desc_date?assignee_id="+this.state.id)
+        fetch("http://localhost:3000/api/v1/service_schedules/desc_date?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -294,7 +280,7 @@ class TaskList extends Component {
         }
         else if (val==4)
         {   this.setState({check:0});
-        fetch("http://localhost:3000/api/v1/service_schedules/asc_date?assignee_id="+this.state.id)
+        fetch("http://localhost:3000/api/v1/service_schedules/asc_date?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -305,7 +291,7 @@ class TaskList extends Component {
         else if (val==1)
         {   
             this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/completed?assignee_id="+this.state.id)
+            fetch("http://localhost:3000/api/v1/service_schedules/completed?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -316,7 +302,7 @@ class TaskList extends Component {
         else if (val==2)
         {   
             this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/scheduled?assignee_id="+this.state.id)
+            fetch("http://localhost:3000/api/v1/service_schedules/scheduled?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -326,7 +312,7 @@ class TaskList extends Component {
         }
         else if (val==3)
         {   this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/pending?assignee_id="+this.state.id)
+            fetch("http://localhost:3000/api/v1/service_schedules/pending?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -336,7 +322,8 @@ class TaskList extends Component {
         }
         else if (val==5)
         {   this.setState({check:1});
-            fetch("http://localhost:3000/api/v1/service_schedules/?assignee_id="+this.state.id)
+            
+            fetch("http://localhost:3000/api/v1/service_schedules/?assignee_id="+this.state.user_id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   responseJson=_.sortBy(responseJson,'city');
