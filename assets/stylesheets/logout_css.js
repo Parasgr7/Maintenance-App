@@ -11,7 +11,9 @@ export default StyleSheet.create({
         flex:1,
         margin: 10,
     },
-
+    map:{
+        ...StyleSheet.absoluteFillObject
+    },
     TextInputStyleClass: {
 
         textAlign: 'center',

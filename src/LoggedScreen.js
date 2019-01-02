@@ -5,8 +5,6 @@ import { AsyncStorage } from "react-native";
 import styles from "../assets/stylesheets/calendar_page_css";
 import GLOBALS from './Globals';
 
-// const auth_token= 'pk.eyJ1IjoiZWRnYXJqaSIsImEiOiJjajVuMm42ZHEzYm53MndvMjl5YXprZGZyIn0.aySqkra3YpvqN7FQvOtdIA';
-
 class ProfileActivity extends Component {
 
     
@@ -262,6 +260,8 @@ class ProfileActivity extends Component {
                 items: newItems
             });
     }
+
+  
 
     renderItem(item) {
         

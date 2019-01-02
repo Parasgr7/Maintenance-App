@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { View, Alert, Text, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { View, Alert, Text, TextInput,Keyboard,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {Form, Item, Input} from 'native-base';
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
-import Icon from '@expo/vector-icons/FontAwesome';
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
 import Contact from './src/contact';
 import Logout from "./src/logout";
+import OnMap from "./src/onmap";
 import TaskList from "./src/tasklist";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
@@ -15,6 +15,7 @@ import GLOBALS from './src/Globals';
 import { Ionicons } from '@expo/vector-icons';
 import { Octicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Entypo } from '@expo/vector-icons';
 
 let height= Dimensions.get('window').height;
@@ -276,6 +277,14 @@ const Tabs = createBottomTabNavigator({
            
             tabBarIcon: ({tintColor}) => (
                 <AntDesign name="calendar" size={24} color={tintColor}/>
+            )
+            
+        })},
+    Map:  {
+        screen: OnMap,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <MaterialCommunityIcons name="map-marker-radius" size={24} color={tintColor}/>
             )
             
         })},

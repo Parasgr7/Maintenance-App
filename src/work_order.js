@@ -6,11 +6,8 @@ import { Table, Row, Rows } from 'react-native-table-component';
 import { AsyncStorage } from "react-native";
 import Modal from 'react-native-modal';
 import t from 'tcomb-form-native';
-import { RNS3 } from 'react-native-aws3';
 import {Permissions, ImagePicker } from 'expo';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { TextField } from 'react-native-material-textfield';
-import { Input} from 'native-base';
 import GLOBALS from './Globals';
 
 import styles from "../assets/stylesheets/work_order_css";
