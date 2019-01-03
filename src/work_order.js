@@ -560,7 +560,7 @@ class WorkOrder extends Component {
                                         raised
                                         // reverse
                                         onPress={() => {
-                                            this.thumbs_up(item);
+                                            this.thumbs_up(this.state.data.inspection_results, item);
                                         }}
                                     />
                                 </ScrollView>
@@ -571,7 +571,7 @@ class WorkOrder extends Component {
                                         color={item.result === "bad" ? "#FF3B30" : "#378A9E"}
                                         raised
                                         onPress={() => {
-                                            this.thumbs_down(item);
+                                            this.thumbs_down(this.state.data.inspection_results, item);
                                         }}
                                     />
                                 </ScrollView>
@@ -786,11 +786,14 @@ class WorkOrder extends Component {
     }
 
 
-    thumbs_up=(inspection_result)=> {
+    thumbs_up=(ins_results, inspection_result)=> {
         if (inspection_result.result === 'good') return;
         inspection_result.result="good";
         const check = 0;
-
+        this.setState(() => {
+            console.log('Preset thumb up!');
+            return { inspection_results: ins_results }
+        });
         if (check==0)
         {
             fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
@@ -843,10 +846,13 @@ class WorkOrder extends Component {
 
     }
 
-    thumbs_down=(inspection_result)=>{
+    thumbs_down=(ins_results, inspection_result)=>{
         if (inspection_result.result === 'bad') return;
         inspection_result.result="bad";
-
+        this.setState(() => {
+            console.log('Preset thumb down!');
+            return { inspection_results: ins_results }
+        });
         const check = 0;
 
         if (check==0)
