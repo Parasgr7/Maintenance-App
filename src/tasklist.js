@@ -38,7 +38,7 @@ class TaskList extends Component {
            data = await AsyncStorage.getItem('session_data');
            this.setState({token: JSON.parse(data)[0].auth_token, worker: JSON.parse(data)[0].worker,user_id: JSON.parse(data)[0].user_id});
             console.log("Token information: ", JSON.parse(data));
-            fetch("http://localhost:3000/api/v1/service_schedules?assignee_id="+this.state.id)
+            fetch("http://18.216.18.191/api/v1/service_schedules?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -150,22 +150,6 @@ class TaskList extends Component {
 
     }
 
-    move(){
-     
-        <Modal
-          animationType="slide"
-          transparent={false}
-        >
-          <View style={{marginTop: 22}}>
-            <View>
-              <Text>Hello World!</Text>
-                <Text>Hide Modal</Text>
-          
-            </View>
-          </View>
-        </Modal>
-        
-    }
 
     display_list(list)
     {   const that=this;
@@ -237,8 +221,8 @@ class TaskList extends Component {
         }
         else if(length>=4){
             const that=this;
-            const date= new Date().toISOString().split('T')[0];
-            // const date= "2016-04-19";
+            // const date= new Date().toISOString().split('T')[0];
+            const date= "2016-04-25";
             loc=[];
             last_days=[];
             current_day=[];
@@ -250,17 +234,24 @@ class TaskList extends Component {
                     current_day.push(item);
                 }
             });
-            
-    
-            if(loc[0]<=3)
+           
+            if(loc.length==0)
+            {
+                return(
+                    <View>
+                    {this.display_list(this.state.list)}
+                    </View>
+                )
+            }
+            else if(loc[0]<=3)
             {   
                 const index=0;
                 last_days=this.state.list.slice(index,loc[0]);
                 
                 future_days=this.state.list.slice(loc[loc.length-1]+1);
             }
-            else{
-                const index=i-4;
+            else {
+                const index=loc[0]-4;
                 last_days=this.state.list.slice(index,loc[0]);
                 future_days=this.state.list.slice(loc[loc.length-1]+1);
             }
@@ -289,7 +280,7 @@ class TaskList extends Component {
     sort_list(val){
         if (val==0)
         {   this.setState({check:0});
-        fetch("http://localhost:3000/api/v1/service_schedules/desc_date?assignee_id="+this.state.id)
+        fetch("http://18.216.18.191/api/v1/service_schedules/desc_date?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -299,7 +290,7 @@ class TaskList extends Component {
         }
         else if (val==4)
         {   this.setState({check:0});
-        fetch("http://localhost:3000/api/v1/service_schedules/asc_date?assignee_id="+this.state.id)
+        fetch("http://18.216.18.191/api/v1/service_schedules/asc_date?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -310,7 +301,7 @@ class TaskList extends Component {
         else if (val==1)
         {   
             this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/completed?assignee_id="+this.state.id)
+            fetch("http://18.216.18.191/api/v1/service_schedules/completed?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -321,7 +312,7 @@ class TaskList extends Component {
         else if (val==2)
         {   
             this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/scheduled?assignee_id="+this.state.id)
+            fetch("http://18.216.18.191/api/v1/service_schedules/scheduled?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -331,7 +322,7 @@ class TaskList extends Component {
         }
         else if (val==3)
         {   this.setState({check:0});
-            fetch("http://localhost:3000/api/v1/service_schedules/pending?assignee_id="+this.state.id)
+            fetch("http://18.216.18.191/api/v1/service_schedules/pending?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   this.setState({list: responseJson});
@@ -342,7 +333,7 @@ class TaskList extends Component {
         else if (val==5)
         {   this.setState({check:1});
             
-            fetch("http://localhost:3000/api/v1/service_schedules/?assignee_id="+this.state.id)
+            fetch("http://18.216.18.191/api/v1/service_schedules/?assignee_id="+this.state.id)
                 .then((response) => {return response.json()})
                 .then((responseJson) => {
                   responseJson=_.sortBy(responseJson,'city');

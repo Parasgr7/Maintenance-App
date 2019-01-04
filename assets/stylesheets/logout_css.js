@@ -14,6 +14,102 @@ export default StyleSheet.create({
     map:{
         ...StyleSheet.absoluteFillObject
     },
+    SubmitButtonStyle1: {
+        flex:0,
+        flexDirection: 'column',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        backgroundColor:'#00BCD5',
+        borderRadius: 15,
+        // marginTop:10,
+        // padding:25,
+        paddingTop:15,
+        paddingBottom:20,
+        paddingRight:10,
+        // marginRight:30,
+    },
+    
+    Fix_ButtonStyle: {
+       borderWidth:1,
+       borderColor:'rgba(0,0,0,0.2)',
+       alignItems:'center',
+       justifyContent:'center',
+       width:50,
+       height:50,
+       backgroundColor:'#fff',
+       borderRadius:100,
+       margin:10
+    },
+    Check_inButtonStyle: {
+        flex:0.5,
+        justifyContent: "center",
+        height:35,
+        // marginTop:0,
+        // marginLeft:0,
+        // marginRight:5,
+        // marginBottom:15,
+        backgroundColor:'#018bb3',
+        borderRadius:10,
+    },
+    TextStyleHead:{
+        color:'white',
+        fontSize:18,
+        marginLeft:10,
+        marginBottom:5,
+        fontWeight:'bold'
+    },
+
+    TextStyle:{
+        color:'#fff',
+        fontSize:16,
+        marginLeft:10,
+        fontWeight:'bold',
+        
+    },
+    TextStyle2Bold:{
+        color:'#fff',
+        fontSize:15,
+        marginLeft:10,
+        marginBottom:5,
+        fontWeight:'bold',
+    },
+    NoStyle2Bold:{
+        color:'black',
+        fontSize:22,
+        marginLeft:10,
+        marginBottom:5,
+        margin:20,
+        fontWeight:'bold',
+    },
+    TextStyle2:{
+        color:'#fff',
+        fontSize:15,
+        marginLeft:10,
+        marginBottom:5,
+    },
+    TextStyle3:{
+        textAlign: 'right',
+        color:'#fff',
+        fontWeight:'bold',
+        fontSize:16,
+        marginRight:0,
+        margin:10
+
+    },
+    TextStyle5:{
+        textAlign: 'right',
+        color:'#fff',
+        fontWeight:'bold',
+        fontSize:16,
+        marginRight:0,
+
+
+    },
+    TextStyle4:{
+        color:'#fff',
+        textAlign:'center',
+        fontSize:15,
+    },
     TextInputStyleClass: {
 
         textAlign: 'center',
