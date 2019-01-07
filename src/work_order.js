@@ -343,60 +343,8 @@ class WorkOrder extends Component {
     _onRefresh = () => {
         this.setState({refreshing: true});
         this.setState({refreshing: false});
-        //this.fetchData();
       }
 
-      fetchData(){
-        const id = this.props.navigation.state.params.param.id;
-        const check = this.props.navigation.state.params.param.check;
-
-        if (check==1){
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&auth_token='+this.state.token)
-                        .then((response) => response.json())
-                        .then((responseJson) => {
-                            if(responseJson)
-                            {
-                                let res = responseJson;
-
-                                this.setState({
-                                    data: res[0],
-                                    refreshing: false
-                                });
-
-                            }
-                            else{
-
-                                Alert.alert(responseJson);
-                            }
-
-                        }).catch((error) => {
-                        console.error(error);
-                    });
-        }
-        else{
-            fetch(GLOBALS.API_URL+'service_schedules?assignee_id=1&auth_token='+this.state.token)
-                        .then((response) => response.json())
-                        .then((responseJson) => {
-                            if(responseJson)
-                            {
-                                let res= responseJson;
-                                this.setState({
-                                    data: res[0],
-                                    refreshing: false
-                                });
-
-                            }
-                            else{
-
-                                Alert.alert(responseJson);
-                            }
-
-                        }).catch((error) => {
-                        console.error(error);
-                    });
-        }
-
-      }
 
     _getToken = async () => {
         try {
@@ -423,6 +371,7 @@ class WorkOrder extends Component {
                 .then((responseJson) => {
                     if(responseJson)
                     {
+                        responseJson.inspection_results.map((item) => {item.old_comment=item.comment});
                         this.setState({
                             data: responseJson,
                             visible: !this.state.visible
@@ -602,7 +551,10 @@ class WorkOrder extends Component {
                                textContentType="none"
                                placeholderTextColor="gray"
                                color="black"
-                               onChangeText={(text) => this.setState({comment: text})}
+                               onChangeText={(text) => {
+                                    item.comment=text;
+                                    this.setState({comment: text});}
+                                }
                             />
                             <Icon
                                 name='check'
@@ -1047,7 +999,7 @@ class WorkOrder extends Component {
     };
 
     uploadNotes= (inspection_result)=> {
-        if (inspection_result.comment === this.state.comment) return;
+        if (inspection_result.comment === inspection_result.old_comment) return;
         inspection_result.comment=this.state.comment;
 
         fetch(GLOBALS.API_URL+'inspection_results/'+inspection_result.id+'/?auth_token='+this.state.token, {
@@ -1063,6 +1015,7 @@ class WorkOrder extends Component {
 
               }).then((response) => response.json())
         .then((responseJson) => {
+              inspection_result.old_comment=inspection_result.comment;
               this.setState(() => {
                     console.log('Comment updated!');
                     return { unseen: "Comment updated!" }
