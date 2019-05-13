@@ -48,22 +48,21 @@ class ProfileActivity extends Component {
         }
     };
 
-    getLocation = () => {
-
-        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + this.state.longitude + ',' + this.state.latitude + '.json?access_token=' + auth_token)
-            .then((response) => {
-                return response.json()
-            })
-            .then((responseJson) => {
-                this.setState({loc: responseJson.features[0].place_name});
-            }).catch((error) => {
-            console.error(error);
+    getLocation=()=>
+    {   
+    
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/'+this.state.longitude+','+this.state.latitude+'.json?access_token='+GLOBALS.MAP_TOKEN)
+                .then((response) => {return response.json()})
+                .then((responseJson) => {
+                    this.setState({loc: responseJson.features[0].place_name });
+                }).catch((error) => {
+                    console.error(error);
         });
     };
 
     degreesToRadians = (degrees) => {
         return degrees * Math.PI / 180;
-    };
+    }
 
     distanceInKmBetweenCoordinates = (lat1, lon1, lat2, lon2) => {
         var earthRadiusKm = 6371;
@@ -285,11 +284,14 @@ class ProfileActivity extends Component {
         });
     }
 
+  
+
     renderItem(item) {
-        return (
-            <View style={styles.SubmitButtonStyle} activeOpacity={.5}>
-                <View style={{flexDirection: 'row', flex: 1}}>
-                    <Text style={styles.TextStyle}>{item.address}</Text>
+        
+        return ( 
+        <View style={styles.SubmitButtonStyle} activeOpacity = { .5 } >
+                <View style={{flexDirection: 'row',flex:1}}>
+                    <Text style={styles.TextStyle}>{item.name}</Text>
                 </View>
                 {/*<Text style={styles.TextStyle2}>{item.address}</Text>*/}
                 <View style={{
@@ -302,14 +304,12 @@ class ProfileActivity extends Component {
                 }}>
                     <Text style={styles.TextStyle3}>{item.status}</Text>
                 </View>
-                <View style={{flexDirection: 'row', flex: 1, justifyContent: 'center'}}>
-                    <TouchableOpacity style={styles.Check_inButtonStyle} onPress={() => {
-                        this.WorkOrderFunction(item)
-                    }}>
-                        <Text style={styles.TextStyle4}>{item.service_name}</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+                <View style={{flexDirection: 'row', flex:1, justifyContent: 'center'}}>
+                <TouchableOpacity style={styles.Check_inButtonStyle} onPress={()=>{ this.WorkOrderFunction(item) } }>
+                        <Text style={styles.TextStyle4}>Check-In</Text>
+                </TouchableOpacity>
+                    </View>
+        </View>
         );
     }
 

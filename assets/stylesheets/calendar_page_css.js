@@ -87,27 +87,76 @@ export default StyleSheet.create({
         backgroundColor:'#00BCD5',
         borderRadius:10,
     },
+    SubmitButtonStyle1: {
+        // flex:1,
+        // justifyContent: "center",
+        marginTop:10,
+        paddingTop:15,
+        paddingBottom:15,
+        marginLeft:30,
+        marginRight:30,
+        backgroundColor:'#00BCD5',
+        borderRadius:10,
+    },
     Check_inButtonStyle: {
         flex:0.5,
         justifyContent: "center",
-        width:70,
+        // width:70,
         height:35,
         marginTop:0,
         marginLeft:0,
+        marginRight:5,
         backgroundColor:'#018bb3',
         borderRadius:10,
+    },
+    Fix_ButtonStyle: {
+       borderWidth:1,
+       borderColor:'rgba(0,0,0,0.2)',
+       alignItems:'center',
+       justifyContent:'center',
+       width:50,
+       height:50,
+       backgroundColor:'#fff',
+       borderRadius:100,
+       margin:10
+    },
+  
+
+    TextStyleHead:{
+        color:'white',
+        fontSize:18,
+        marginLeft:10,
+        marginBottom:5,
+        fontWeight:'bold'
     },
 
     TextStyle:{
         color:'#fff',
         fontSize:16,
         marginLeft:10,
-        fontWeight:'bold'
+        fontWeight:'bold',
+        
+    },
+    TextStyle2Bold:{
+        color:'#fff',
+        fontSize:15,
+        marginLeft:10,
+        marginBottom:5,
+        fontWeight:'bold',
+    },
+    NoStyle2Bold:{
+        color:'black',
+        fontSize:22,
+        marginLeft:10,
+        marginBottom:5,
+        margin:20,
+        fontWeight:'bold',
     },
     TextStyle2:{
         color:'#fff',
         fontSize:15,
-        marginLeft:10
+        marginLeft:10,
+        marginBottom:5,
     },
     TextStyle3:{
         textAlign: 'right',
@@ -115,6 +164,16 @@ export default StyleSheet.create({
         fontWeight:'bold',
         fontSize:16,
         marginRight:0,
+        margin:10
+
+    },
+    TextStyle5:{
+        textAlign: 'right',
+        color:'#fff',
+        fontWeight:'bold',
+        fontSize:16,
+        marginRight:0,
+
 
     },
     TextStyle4:{

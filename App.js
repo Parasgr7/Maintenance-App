@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import { View, Alert, Text, Button, TextInput, ScrollView, Keyboard, TouchableWithoutFeedback,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { View, Alert, Text, TextInput,Keyboard,Image, ImageBackground, Dimensions,ActivityIndicator,KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {Form, Item, Input} from 'native-base';
 import { AsyncStorage } from "react-native";
 import { createBottomTabNavigator,createSwitchNavigator, createStackNavigator } from 'react-navigation';
-import Icon from '@expo/vector-icons/FontAwesome';
 import WorkOrder from "./src/work_order";
 import ProfileActivity from './src/LoggedScreen';
+import Contact from './src/contact';
 import Logout from "./src/logout";
+import OnMap from "./src/onmap";
+import TaskList from "./src/tasklist";
 import SwitchSelector from 'react-native-switch-selector';
 import styles from "./assets/stylesheets/login_css";
 import GLOBALS from './src/Globals';
@@ -15,6 +18,11 @@ import Expo from "expo";
 //import { LoginButton } from 'react-native-fbsdk';
 
 //var { FBLogin, FBLoginManager } = require('react-native-facebook-login');
+import { Ionicons } from '@expo/vector-icons';
+import { Octicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Entypo } from '@expo/vector-icons';
 
 let height= Dimensions.get('window').height;
 let width= Dimensions.get('window').width;
@@ -261,19 +269,45 @@ class LoginActivity extends Component {
 
 
 const Tabs = createBottomTabNavigator({
-    Home:   {
-        screen: ProfileActivity,
+    Tasklist:   {
+        screen: TaskList,
         navigationOptions: () => ({
+
             tabBarIcon: ({tintColor}) => (
-                <Icon name="home" size={24} color={tintColor}/>
+                <Octicons name="tasklist" size={24} color={tintColor}/>
             )
             
         })},
+    Calendar:   {
+        screen: ProfileActivity,
+        navigationOptions: () => ({
+           
+            tabBarIcon: ({tintColor}) => (
+                <AntDesign name="calendar" size={24} color={tintColor}/>
+            )
+            
+        })},
+    Map:  {
+        screen: OnMap,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <MaterialCommunityIcons name="map-marker-radius" size={24} color={tintColor}/>
+            )
+            
+        })},
+    Contact:  {
+        screen: Contact,
+        navigationOptions: () => ({
+            tabBarIcon: ({tintColor}) => (
+                <Ionicons name="ios-call" size={24} color={tintColor}/>
+            )   
+        })
+    },
     User:  {
         screen: Logout,
         navigationOptions: () => ({
             tabBarIcon: ({tintColor}) => (
-                <Icon name="user" size={24} color={tintColor}/>
+                <Entypo name="user" size={24} color={tintColor}/>
             )
             
         })

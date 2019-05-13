@@ -5,8 +5,11 @@
     "slug": "Maintenance",
     "privacy": "public",
     "sdkVersion": "31.0.0",
-    "platforms": ["ios", "android"],
-    "version": "1.0.8",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/app-logo.png",
     "splash": {
